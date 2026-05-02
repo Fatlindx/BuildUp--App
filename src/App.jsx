@@ -10,6 +10,7 @@ import Auth from './components/Auth';
 import Onboarding from './components/Onboarding';
 import AICoach from './components/AICoach';
 import WorkoutTracker from './components/WorkoutTracker';
+import ProfilePage from './components/ProfilePage';
 
 const TODAY = new Date().toDateString();
 
@@ -81,6 +82,17 @@ export default function App() {
     setProfile(prev => ({ ...prev, goal, onboarding_done: true }));
   };
 
+  const handleUpdateProfile = async (formData) => {
+    if (!user) return;
+    const { error } = await supabase.from('profiles').upsert({
+      id: user.id,
+      ...formData,
+    });
+    if (!error) {
+      setProfile(prev => ({ ...prev, ...formData }));
+    }
+  };
+
   const dailyLog = logHistory[TODAY] || [];
   const totalCalories = dailyLog.reduce((s, i) => s + i.calories, 0);
 
@@ -130,10 +142,12 @@ export default function App() {
       {activeSection === 'progress' && (
         <Progress calorieGoal={calorieGoal} dailyLog={dailyLog} logHistory={logHistory} />
       )}
-
       {activeSection === 'workout' && (
-  <WorkoutTracker user={user} profile={profile} />
-)}
+        <WorkoutTracker user={user} profile={profile} />
+      )}
+      {activeSection === 'profile' && (
+        <ProfilePage user={user} profile={profile} onUpdateProfile={handleUpdateProfile} />
+      )}
 
       {showCoach && (
         <AICoach

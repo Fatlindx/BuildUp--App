@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, Zap, LogOut, Bot, Dumbbell as WorkoutIcon } from 'lucide-react';
+import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, Zap, LogOut, Bot, ClipboardList } from 'lucide-react';
 
 const navItems = [
   { id: 'home',       label: 'Home',        icon: Home },
   { id: 'nutrition',  label: 'Ernährung',   icon: UtensilsCrossed },
-  { id: 'calculator', label: 'Kalorien',    icon: Flame },
+  { id: 'calculator', label: 'Rechner',     icon: Flame },
   { id: 'exercises',  label: 'Übungen',     icon: Dumbbell },
-  { id: 'workout',    label: 'Training',    icon: Dumbbell },
+  { id: 'workout',    label: 'Training',    icon: ClipboardList },
   { id: 'progress',   label: 'Fortschritt', icon: BarChart2 },
 ];
 
@@ -46,51 +46,75 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+
+          {/* Klickbarer Username → Profil */}
           {user && (
-            <span style={{ fontSize: 12.5, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }} />
+            <button
+              onClick={() => handleNav('profile')}
+              style={{
+                fontSize: 12.5,
+                color: activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)',
+                display: 'flex', alignItems: 'center', gap: 6,
+                background: activeSection === 'profile' ? 'var(--surface-2)' : 'none',
+                border: '1px solid',
+                borderColor: activeSection === 'profile' ? 'var(--border-active)' : 'transparent',
+                cursor: 'pointer',
+                padding: '5px 10px', borderRadius: 8,
+                transition: 'all 0.2s ease',
+                fontWeight: activeSection === 'profile' ? 600 : 400,
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'var(--surface-2)';
+                e.currentTarget.style.color = 'var(--text)';
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = activeSection === 'profile' ? 'var(--surface-2)' : 'none';
+                e.currentTarget.style.color = activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)';
+                e.currentTarget.style.borderColor = activeSection === 'profile' ? 'var(--border-active)' : 'transparent';
+              }}
+              title="Profil öffnen"
+            >
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', flexShrink: 0 }} />
               {profile?.username || user.email?.split('@')[0]}
-            </span>
+            </button>
           )}
 
+          {/* KI Coach Button */}
           {user && (
             <button
               onClick={onOpenCoach}
               style={{
                 display: 'flex', alignItems: 'center', gap: 7,
-                padding: '8px 16px', borderRadius: 10,
-                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                border: 'none', cursor: 'pointer', color: '#000',
-                fontWeight: 700, fontSize: 13,
-                boxShadow: '0 0 18px rgba(34,197,94,0.4)',
+                padding: '7px 13px', borderRadius: 10,
+                background: 'var(--green-glow)',
+                border: '1px solid var(--border-active)',
+                cursor: 'pointer', color: 'var(--green)',
+                fontWeight: 600, fontSize: 12.5,
+                boxShadow: 'none',
                 transition: 'all 0.2s ease',
-                position: 'relative', overflow: 'hidden',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 0 28px rgba(34,197,94,0.6)';
+                e.currentTarget.style.background = 'rgba(34,197,94,0.2)';
+                e.currentTarget.style.borderColor = 'rgba(34,197,94,0.6)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 0 18px rgba(34,197,94,0.4)';
+                e.currentTarget.style.background = 'var(--green-glow)';
+                e.currentTarget.style.borderColor = 'var(--border-active)';
               }}
               title="KI Coach öffnen"
             >
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.15), transparent)',
-                pointerEvents: 'none'
-              }} />
-              <Bot size={15} strokeWidth={2.5} />
+              <Bot size={15} strokeWidth={2} />
               <span>KI Coach</span>
               <span style={{
                 width: 6, height: 6, borderRadius: '50%',
-                background: '#000', opacity: 0.5,
+                background: 'var(--green)', opacity: 0.8,
                 animation: 'pulse 2s infinite'
               }} />
             </button>
           )}
 
+          {/* Logout */}
           {user && (
             <button
               className="btn btn-ghost btn-sm"

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Plus, Trash2, Play, ChevronRight, ChevronLeft,
   Check, Clock, Dumbbell, BarChart2, Edit2, X,
-  Search, Trophy, Zap, ArrowLeft, Timer
+  Search, Trophy, Zap, ArrowLeft, Timer, ClipboardList
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { exercises } from '../data/exercises';
@@ -147,7 +147,7 @@ export default function WorkoutTracker({ user, profile }) {
             {view !== 'create' && (
               <div style={{ display: 'flex', gap: 4, marginTop: 24, background: 'var(--bg-card-2)', padding: 4, borderRadius: 12, width: 'fit-content' }}>
                 {[
-                  { id: 'plans', label: 'Meine Pläne', icon: <Dumbbell size={14}/> },
+                  { id: 'plans', label: 'Meine Pläne', icon: <ClipboardList size={14}/> },
                   { id: 'history', label: 'History', icon: <BarChart2 size={14}/> },
                 ].map(tab => (
                   <button key={tab.id}
@@ -194,7 +194,9 @@ function PlansView({ plans, loading, onEdit, onDelete, onStart, onNew }) {
       background: 'var(--bg-card)', border: '1px solid var(--border)',
       borderRadius: 'var(--radius-xl)',
     }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>💪</div>
+      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'var(--green-glow)', border: '1px solid var(--border-active)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+  <ClipboardList size={28} color="var(--green)" />
+</div>
       <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Noch kein Trainingsplan</h3>
       <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14 }}>
         Erstelle deinen ersten Plan und starte durch!

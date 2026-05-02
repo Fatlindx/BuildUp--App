@@ -5,7 +5,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: `Hallo${profile?.username ? ` ${profile.username}` : ''}! 👋 Ich bin dein persönlicher FitCore Coach. Ich kenne deine heutigen Daten und helfe dir bei allen Fragen zu Ernährung, Training und Sport. Was möchtest du wissen?`
+      content: `Hallo${profile?.username ? ` ${profile.username}` : ''}! 👋 Ich bin dein persönlicher BuildUp Coach. Ich kenne deine heutigen Daten und helfe dir bei allen Fragen zu Ernährung, Training und Sport. Was möchtest du wissen?`
     }
   ]);
   const [input, setInput]     = useState('');
@@ -22,7 +22,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const totalFat  = dailyLog.reduce((s, i) => s + (i.fat || 0), 0);
   const remaining = calorieGoal - totalCal;
 
-  const systemPrompt = `Du bist ein erfahrener, freundlicher und motivierender Personal Trainer und Ernährungscoach in der FitCore App. Du hast umfassendes Wissen über:
+  const systemPrompt = `Du bist ein erfahrener, freundlicher und motivierender Personal Trainer und Ernährungscoach in der BuildUp App. Du hast umfassendes Wissen über:
 
 ERNÄHRUNG:
 - Makronährstoffe (Protein, Kohlenhydrate, Fette) und ihre Funktionen
@@ -56,7 +56,7 @@ Nutzerdaten heute:
 - Fette: ${totalFat}g
 - Mahlzeiten heute: ${dailyLog.length > 0 ? dailyLog.map(i => i.name).join(', ') : 'Noch nichts gegessen'}
 
-Antworte immer auf Deutsch, präzise und motivierend. Nutze die Nutzerdaten wenn relevant. Bei komplett themenfremden Fragen erkläre freundlich dass du ein Fitness und Ernährungscoach bist. Halte Antworten unter 200 Wörtern. Erwähne nie dass du eine KI bist – du bist der FitCore Coach.`;
+Antworte immer auf Deutsch, präzise und motivierend. Nutze die Nutzerdaten wenn relevant. Bei komplett themenfremden Fragen erkläre freundlich dass du ein Fitness und Ernährungscoach bist. Halte Antworten unter 200 Wörtern. Erwähne nie dass du eine KI bist – du bist der BuildUp Coach.`;
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -124,7 +124,7 @@ Antworte immer auf Deutsch, präzise und motivierend. Nutze die Nutzerdaten wenn
               <Bot size={20} color="#000" strokeWidth={2.5} />
             </div>
             <div>
-              <h2 className="modal-title">FitCore Coach</h2>
+              <h2 className="modal-title">BuildUp Coach</h2>
               <p style={{ fontSize: 12, color: 'var(--green)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }} />
                 Online – Ernährung, Training & Sport
