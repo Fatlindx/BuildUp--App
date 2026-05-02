@@ -68,7 +68,7 @@ Antworte immer auf Deutsch, präzise und motivierend. Nutze die Nutzerdaten wenn
     setLoading(true);
 
     try {
-      const response = await fetch('/.netlify/functions/ai-coach', {
+      const response = await fetch('/api/ai-coach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
