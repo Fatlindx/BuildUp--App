@@ -1422,3 +1422,84 @@ img { max-width: 100%; }
   .form-grid { grid-template-columns: 1fr; }
   .radio-group { flex-direction: column; }
 }
+
+/* ─── Critical Mobile Grid Fixes (highest specificity) ─── */
+@media screen and (max-width: 767px) {
+
+  /* Fix: Progress stats — 4 cols → 2 cols */
+  .progress-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Fix: Achievements — 3 cols → 2 cols */
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Fix: Quick actions — 4 cols → 2 cols */
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Fix: Home stats row — 2 cols → 1 col */
+  .home-stats-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Fix: Home mini stats — 4 cols → 2 cols */
+  .home-mini-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Fix: Tracker layout — 2 cols → 1 col */
+  .tracker-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Fix: Library layout — sidebar + content → 1 col */
+  .library-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Fix: Form grid → 1 col */
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Fix: Macro grid → 3 cols (keep as is, just ensure no overflow) */
+  .macro-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Fix: All containers max-width */
+  .home-container,
+  .tracker-container,
+  .calc-container,
+  .progress-container,
+  .library-header,
+  .library-layout {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Fix: Stat card padding on mobile */
+  .stat-card-main {
+    padding: 18px 14px !important;
+  }
+
+  /* Fix: Quick action cards smaller padding */
+  .quick-action-card {
+    padding: 16px 10px !important;
+  }
+  .qa-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
