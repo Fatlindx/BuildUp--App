@@ -15,13 +15,14 @@ import ProfilePage from './components/ProfilePage';
 const TODAY = new Date().toDateString();
 
 export default function App() {
-  const [user, setUser]                   = useState(null);
-  const [profile, setProfile]             = useState(null);
-  const [authLoading, setAuthLoading]     = useState(true);
-  const [activeSection, setActiveSection] = useState('home');
-  const [calorieGoal, setCalorieGoal]     = useState(2000);
-  const [logHistory, setLogHistory]       = useState({});
-  const [showCoach, setShowCoach]         = useState(false);
+  const [user, setUser]                     = useState(null);
+  const [profile, setProfile]               = useState(null);
+  const [authLoading, setAuthLoading]       = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [activeSection, setActiveSection]   = useState('home');
+  const [calorieGoal, setCalorieGoal]       = useState(2000);
+  const [logHistory, setLogHistory]         = useState({});
+  const [showCoach, setShowCoach]           = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -36,18 +37,34 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return;
+
     const load = async () => {
-      const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      setProfile(prof);
+      setProfileLoading(true);
+
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // prof can be null for brand new users — that's valid
+      setProfile(prof ?? null);
       if (prof?.calorie_goal) setCalorieGoal(prof.calorie_goal);
 
-      const { data: logs } = await supabase.from('daily_logs').select('date, log').eq('user_id', user.id);
+      const { data: logs } = await supabase
+        .from('daily_logs')
+        .select('date, log')
+        .eq('user_id', user.id);
+
       if (logs) {
         const history = {};
         logs.forEach(l => { history[l.date] = l.log; });
         setLogHistory(history);
       }
+
+      setProfileLoading(false);
     };
+
     load();
   }, [user]);
 
@@ -73,41 +90,50 @@ export default function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null); setProfile(null);
-    setLogHistory({}); setCalorieGoal(2000);
+    setUser(null);
+    setProfile(null);
+    setLogHistory({});
+    setCalorieGoal(2000);
     setShowCoach(false);
   };
 
   const handleOnboardingComplete = (goal) => {
-    setProfile(prev => ({ ...prev, goal, onboarding_done: true }));
+    setProfile(prev => ({ ...(prev || {}), goal, onboarding_done: true }));
   };
 
   const handleUpdateProfile = async (formData) => {
     if (!user) return;
-    const { error } = await supabase.from('profiles').upsert({
-      id: user.id,
-      ...formData,
-    });
-    if (!error) {
-      setProfile(prev => ({ ...prev, ...formData }));
-    }
+    const { error } = await supabase.from('profiles').upsert({ id: user.id, ...formData });
+    if (!error) setProfile(prev => ({ ...prev, ...formData }));
   };
 
-  const dailyLog = logHistory[TODAY] || [];
+  const dailyLog      = logHistory[TODAY] || [];
   const totalCalories = dailyLog.reduce((s, i) => s + i.calories, 0);
 
+  // ── 1. Auth noch am Laden ──
   if (authLoading) return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: 'var(--green)', fontSize: 16, fontWeight: 600 }}>Laden...</div>
     </div>
   );
 
+  // ── 2. Nicht eingeloggt ──
   if (!user) return <Auth onLogin={setUser} />;
 
-  if (profile && !profile.onboarding_done) {
+  // ── 3. Profil wird noch geladen ──
+  if (profileLoading) return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: 'var(--green)', fontSize: 16, fontWeight: 600 }}>Laden...</div>
+    </div>
+  );
+
+  // ── 4. Onboarding — nur wenn onboarding_done nicht explizit true ist ──
+  // Deckt ab: neuer User (profile = null) UND bestehender User ohne onboarding_done
+  if (!profile || profile.onboarding_done !== true) {
     return <Onboarding user={user} onComplete={handleOnboardingComplete} />;
   }
 
+  // ── 5. App ──
   return (
     <>
       <Navigation
@@ -140,7 +166,7 @@ export default function App() {
       )}
       {activeSection === 'exercises' && <ExerciseLibrary />}
       {activeSection === 'progress' && (
-        <Progress calorieGoal={calorieGoal} dailyLog={dailyLog} logHistory={logHistory} />
+        <Progress calorieGoal={calorieGoal} dailyLog={dailyLog} logHistory={logHistory} user={user} profile={profile} />
       )}
       {activeSection === 'workout' && (
         <WorkoutTracker user={user} profile={profile} />
@@ -148,7 +174,6 @@ export default function App() {
       {activeSection === 'profile' && (
         <ProfilePage user={user} profile={profile} onUpdateProfile={handleUpdateProfile} />
       )}
-
       {showCoach && (
         <AICoach
           onClose={() => setShowCoach(false)}
