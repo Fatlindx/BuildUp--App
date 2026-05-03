@@ -164,7 +164,7 @@ export default function App() {
       {activeSection === 'calculator' && (
         <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); setActiveSection('nutrition'); }} />
       )}
-      {activeSection === 'exercises' && <ExerciseLibrary />}
+      {activeSection === 'exercises' && <ExerciseLibrary user={user} profile={profile} />}
       {activeSection === 'progress' && (
         <Progress calorieGoal={calorieGoal} dailyLog={dailyLog} logHistory={logHistory} user={user} profile={profile} />
       )}

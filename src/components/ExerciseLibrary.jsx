@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
-import { Search, X, Dumbbell, Target, Zap, Package, Flame, ZoomIn } from 'lucide-react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Search, X, Dumbbell, Target, Zap, Package, Flame, ZoomIn, Heart, Plus, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import { supabase } from '../supabase';
 import { exercises, muscleGroups, difficulties, equipmentTypes } from '../data/exercises';
 
 const muscleColors = {
@@ -7,56 +8,57 @@ const muscleColors = {
   Beine: '#f97316', Bizeps: '#22c55e', Trizeps: '#06b6d4', Core: '#eab308',
 };
 
+// Sets/Reps Empfehlungen nach Ziel
+const setsRepsMap = {
+  Muskelaufbau:        { sets: '3–4', reps: '8–12',  rest: '60–90s',  note: 'Hypertrophie-Bereich' },
+  'Gewicht verlieren': { sets: '3',   reps: '15–20', rest: '30–45s',  note: 'Hohes Volumen, kurze Pause' },
+  Kraft:               { sets: '4–5', reps: '3–6',   rest: '3–5 min', note: 'Maximalkraft' },
+  Ausdauer:            { sets: '2–3', reps: '20–25', rest: '20–30s',  note: 'Ausdauer & Kondition' },
+  Standard:            { sets: '3',   reps: '10–15', rest: '60s',     note: 'Allgemeine Fitness' },
+};
+
 function DifficultyBadge({ level }) {
   const cls = { Leicht: 'badge-leicht', Mittel: 'badge-mittel', Schwer: 'badge-schwer' };
   return <span className={`badge ${cls[level] || 'badge-gray'}`}>{level}</span>;
 }
 
-// ─── Lightbox Vollbild ────────────────────────────────────────────────────────
+// ─── Lightbox ─────────────────────────────────────────────────────────────────
 function Lightbox({ src, alt, onClose }) {
   if (!src) return null;
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0,0,0,0.97)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '20px',
-        animation: 'fadeIn 0.15s ease',
-        cursor: 'zoom-out',
-      }}
-    >
+    <div onClick={onClose} style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(0,0,0,0.97)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '20px', animation: 'fadeIn 0.15s ease', cursor: 'zoom-out',
+    }}>
       <button onClick={onClose} style={{
         position: 'absolute', top: 16, right: 16,
         width: 44, height: 44, borderRadius: '50%',
-        background: 'rgba(255,255,255,0.1)',
-        border: '1px solid rgba(255,255,255,0.2)',
-        color: '#fff', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', cursor: 'pointer', zIndex: 10000,
+        background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+        color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10000,
       }}>
         <X size={20} />
       </button>
-      <img
-        src={src} alt={alt}
-        onClick={e => e.stopPropagation()}
-        style={{
-          maxWidth: '95vw', maxHeight: '92vh',
-          objectFit: 'contain',
-          borderRadius: '10px',
-          boxShadow: '0 40px 100px rgba(0,0,0,0.9)',
-          cursor: 'default',
-        }}
-      />
+      <img src={src} alt={alt} onClick={e => e.stopPropagation()} style={{
+        maxWidth: '95vw', maxHeight: '92vh', objectFit: 'contain',
+        borderRadius: '10px', boxShadow: '0 40px 100px rgba(0,0,0,0.9)', cursor: 'default',
+      }} />
     </div>
   );
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-function ExerciseModal({ exercise, onClose }) {
+// ─── Exercise Modal ────────────────────────────────────────────────────────────
+function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGoal }) {
   const [lightboxSrc, setLightboxSrc] = useState(null);
   if (!exercise) return null;
   const color = muscleColors[exercise.muscleGroup] || '#22c55e';
+
+  // Sets/Reps basierend auf User-Ziel
+  const goalKey = userGoal === 'Gewicht verlieren' ? 'Gewicht verlieren'
+    : userGoal === 'Muskelaufbau' ? 'Muskelaufbau'
+    : 'Standard';
+  const rec = setsRepsMap[goalKey] || setsRepsMap.Standard;
 
   return (
     <>
@@ -79,94 +81,109 @@ function ExerciseModal({ exercise, onClose }) {
                 <h2 className="modal-title">{exercise.name}</h2>
               </div>
             </div>
-            <button className="modal-close" onClick={onClose}><X size={18} /></button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Favoriten Button */}
+              <button
+                onClick={() => onToggleFavorite(exercise.id)}
+                title={isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+                style={{
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: isFavorite ? 'rgba(239,68,68,0.15)' : 'var(--bg-card-2)',
+                  border: `1px solid ${isFavorite ? 'rgba(239,68,68,0.4)' : 'var(--border)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0,
+                }}
+              >
+                <Heart size={16} color={isFavorite ? '#ef4444' : 'var(--text-muted)'} fill={isFavorite ? '#ef4444' : 'none'} />
+              </button>
+              <button className="modal-close" onClick={onClose}><X size={18} /></button>
+            </div>
           </div>
 
           {/* Body */}
           <div className="modal-body">
 
-            {/* Vorschau-Bild – 4:3 – klickbar für Zoom */}
+            {/* Hauptbild */}
             {exercise.image && (
-              <div
-                onClick={() => setLightboxSrc(exercise.image)}
-                style={{
-                  position: 'relative', marginBottom: 12,
-                  cursor: 'zoom-in', borderRadius: 12, overflow: 'hidden',
-                  border: '1px solid var(--border)',
-                  aspectRatio: '4 / 3',
-                  background: '#0a0a0a',
-                }}
-              >
-                <img
-                  src={exercise.image} alt={exercise.name}
-                  style={{
-                    width: '100%', height: '100%',
-                    objectFit: 'contain',
-                    objectPosition: 'center',
-                    display: 'block',
-                  }}
-                />
+              <div onClick={() => setLightboxSrc(exercise.image)} style={{
+                position: 'relative', marginBottom: 12, cursor: 'zoom-in',
+                borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border)',
+                aspectRatio: '4 / 3', background: '#0a0a0a',
+              }}>
+                <img src={exercise.image} alt={exercise.name} style={{
+                  width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block',
+                }} />
                 <div style={{
                   position: 'absolute', bottom: 8, right: 8,
                   background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 7, padding: '4px 9px',
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  fontSize: 11, color: 'rgba(255,255,255,0.7)',
-                  pointerEvents: 'none',
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: 7,
+                  padding: '4px 9px', display: 'flex', alignItems: 'center', gap: 5,
+                  fontSize: 11, color: 'rgba(255,255,255,0.7)', pointerEvents: 'none',
                 }}>
                   <ZoomIn size={11} /> Vollbild
                 </div>
               </div>
             )}
 
-            {/* Detail-Bild – 16:9 – Ausführung */}
+            {/* Ausführungsbild */}
             {exercise.imageDetail && exercise.imageDetail !== exercise.image && (
               <div style={{ marginBottom: 22 }}>
                 <div style={{
                   fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                  letterSpacing: '1.1px', color: 'var(--text-muted)',
-                  marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6,
+                  letterSpacing: '1.1px', color: 'var(--text-muted)', marginBottom: 8,
+                  display: 'flex', alignItems: 'center', gap: 6,
                 }}>
-                  <span style={{
-                    width: 4, height: 4, borderRadius: '50%',
-                    background: 'var(--green)', display: 'inline-block'
-                  }} />
+                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }} />
                   Ausführung
                 </div>
-                <div
-                  onClick={() => setLightboxSrc(exercise.imageDetail)}
-                  style={{
-                    position: 'relative', cursor: 'zoom-in',
-                    borderRadius: 12, overflow: 'hidden',
-                    border: '1px solid var(--border)',
-                    aspectRatio: '16 / 9',
-                    background: '#0a0a0a',
-                  }}
-                >
-                  <img
-                    src={exercise.imageDetail} alt={`${exercise.name} Ausführung`}
-                    style={{
-                      width: '100%', height: '100%',
-                      objectFit: 'contain',
-                      objectPosition: 'center',
-                      display: 'block',
-                    }}
-                  />
+                <div onClick={() => setLightboxSrc(exercise.imageDetail)} style={{
+                  position: 'relative', cursor: 'zoom-in', borderRadius: 12, overflow: 'hidden',
+                  border: '1px solid var(--border)', aspectRatio: '16 / 9', background: '#0a0a0a',
+                }}>
+                  <img src={exercise.imageDetail} alt={`${exercise.name} Ausführung`} style={{
+                    width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block',
+                  }} />
                   <div style={{
                     position: 'absolute', bottom: 8, right: 8,
                     background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 7, padding: '4px 9px',
-                    display: 'flex', alignItems: 'center', gap: 5,
-                    fontSize: 11, color: 'rgba(255,255,255,0.7)',
-                    pointerEvents: 'none',
+                    border: '1px solid rgba(255,255,255,0.1)', borderRadius: 7,
+                    padding: '4px 9px', display: 'flex', alignItems: 'center', gap: 5,
+                    fontSize: 11, color: 'rgba(255,255,255,0.7)', pointerEvents: 'none',
                   }}>
                     <ZoomIn size={11} /> Vollbild
                   </div>
                 </div>
               </div>
             )}
+
+            {/* Sets/Reps Empfehlung */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.03))',
+              border: '1px solid var(--border-active)', borderRadius: 12,
+              padding: '16px 18px', marginBottom: 20,
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--green)', marginBottom: 12 }}>
+                Empfehlung für dein Ziel — {goalKey}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {[
+                  { label: 'Sätze', value: rec.sets },
+                  { label: 'Wiederholungen', value: rec.reps },
+                  { label: 'Pause', value: rec.rest },
+                ].map(r => (
+                  <div key={r.label} style={{
+                    background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: '10px',
+                    textAlign: 'center', border: '1px solid rgba(34,197,94,0.15)',
+                  }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--green)' }}>{r.value}</div>
+                    <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 2 }}>{r.label}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
+                💡 {rec.note}
+              </div>
+            </div>
 
             {/* Über diese Übung */}
             <div className="modal-section">
@@ -226,9 +243,7 @@ function ExerciseModal({ exercise, onClose }) {
 
             {/* Kalorien */}
             <div className="calorie-info-box">
-              <div className="calorie-info-icon">
-                <Flame size={20} color="var(--green)" />
-              </div>
+              <div className="calorie-info-icon"><Flame size={20} color="var(--green)" /></div>
               <div>
                 <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 2 }}>Kalorienverbrauch</div>
                 <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -236,6 +251,24 @@ function ExerciseModal({ exercise, onClose }) {
                 </div>
               </div>
             </div>
+
+            {/* Favoriten Button unten */}
+            <button
+              onClick={() => onToggleFavorite(exercise.id)}
+              style={{
+                width: '100%', marginTop: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '12px', borderRadius: 12,
+                background: isFavorite ? 'rgba(239,68,68,0.1)' : 'var(--bg-card-2)',
+                border: `1px solid ${isFavorite ? 'rgba(239,68,68,0.3)' : 'var(--border)'}`,
+                color: isFavorite ? '#ef4444' : 'var(--text-muted)',
+                cursor: 'pointer', fontSize: 14, fontWeight: 600,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Heart size={16} fill={isFavorite ? '#ef4444' : 'none'} />
+              {isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+            </button>
           </div>
         </div>
       </div>
@@ -245,34 +278,40 @@ function ExerciseModal({ exercise, onClose }) {
   );
 }
 
-// ─── Exercise Card ────────────────────────────────────────────────────────────
-function ExerciseCard({ exercise, onClick, index }) {
+// ─── Exercise Card ─────────────────────────────────────────────────────────────
+function ExerciseCard({ exercise, onClick, index, isFavorite, onToggleFavorite }) {
   const color = muscleColors[exercise.muscleGroup] || '#22c55e';
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div
-      className="exercise-card"
-      onClick={() => onClick(exercise)}
-      style={{ animationDelay: `${index * 35}ms` }}
-    >
-      {/* Karten-Bild – 4:3 Format, ganzes Bild sichtbar */}
-      <div style={{
-        aspectRatio: '4 / 3',
-        position: 'relative',
-        overflow: 'hidden',
-        background: '#0a0a0a',
-      }}>
+    <div className="exercise-card" onClick={() => onClick(exercise)} style={{ animationDelay: `${index * 35}ms`, position: 'relative' }}>
+
+      {/* Favoriten Button auf der Karte */}
+      <button
+        onClick={e => { e.stopPropagation(); onToggleFavorite(exercise.id); }}
+        title={isFavorite ? 'Aus Favoriten entfernen' : 'Favorit'}
+        style={{
+          position: 'absolute', top: 10, right: 10, zIndex: 10,
+          width: 30, height: 30, borderRadius: '50%',
+          background: isFavorite ? 'rgba(239,68,68,0.9)' : 'rgba(0,0,0,0.55)',
+          backdropFilter: 'blur(6px)',
+          border: `1px solid ${isFavorite ? 'rgba(239,68,68,0.6)' : 'rgba(255,255,255,0.15)'}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', transition: 'all 0.2s ease',
+        }}
+      >
+        <Heart size={13} color={isFavorite ? '#fff' : 'rgba(255,255,255,0.8)'} fill={isFavorite ? '#fff' : 'none'} />
+      </button>
+
+      {/* Bild */}
+      <div style={{ aspectRatio: '4 / 3', position: 'relative', overflow: 'hidden', background: '#0a0a0a' }}>
         {exercise.image && !imgError ? (
           <img
-            src={exercise.image}
-            alt={exercise.name}
+            src={exercise.image} alt={exercise.name}
             onError={() => setImgError(true)}
             style={{
-              position: 'absolute', inset: 0,
-              width: '100%', height: '100%',
-              objectFit: 'contain',
-              objectPosition: 'center',
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'contain', objectPosition: 'center',
               transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
             }}
           />
@@ -285,14 +324,10 @@ function ExerciseCard({ exercise, onClick, index }) {
             <Dumbbell size={40} strokeWidth={1.5} color={color} />
           </div>
         )}
-
-        {/* Overlay mit Name und Kategorie */}
         <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', flexDirection: 'column',
-          justifyContent: 'space-between', padding: '10px 12px',
+          position: 'absolute', inset: 0, zIndex: 1,
+          display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px 12px',
           background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 30%, rgba(0,0,0,0.75) 100%)',
-          zIndex: 1,
         }}>
           <span className="exercise-card-category">{exercise.category}</span>
           <h3 className="exercise-card-name">{exercise.name}</h3>
@@ -327,52 +362,41 @@ function ExerciseCard({ exercise, onClick, index }) {
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
-export default function ExerciseLibrary() {
-  const [search,       setSearch]       = useState('');
-  const [filterMuscle, setFilterMuscle] = useState('Alle');
-  const [filterDiff,   setFilterDiff]   = useState('Alle');
-  const [filterEquip,  setFilterEquip]  = useState('Alle');
-  const [selected,     setSelected]     = useState(null);
-
-  const filtered = useMemo(() => exercises.filter(ex => {
-    const q = search.toLowerCase();
-    const matchSearch = !q ||
-      ex.name.toLowerCase().includes(q) ||
-      ex.muscleGroup.toLowerCase().includes(q) ||
-      ex.targetMuscles.some(m => m.toLowerCase().includes(q));
-    const matchMuscle = filterMuscle === 'Alle' || ex.muscleGroup === filterMuscle;
-    const matchDiff   = filterDiff   === 'Alle' || ex.difficulty  === filterDiff;
-    const matchEquip  = filterEquip  === 'Alle' || ex.equipmentType === filterEquip;
-    return matchSearch && matchMuscle && matchDiff && matchEquip;
-  }), [search, filterMuscle, filterDiff, filterEquip]);
-
-  const resetFilters = () => {
-    setFilterMuscle('Alle'); setFilterDiff('Alle');
-    setFilterEquip('Alle'); setSearch('');
-  };
-  const hasFilters = filterMuscle !== 'Alle' || filterDiff !== 'Alle' || filterEquip !== 'Alle' || search;
-
-  const counts = {};
-  exercises.forEach(e => { counts[e.muscleGroup] = (counts[e.muscleGroup] || 0) + 1; });
+// ─── Filter Panel (Mobile collapsible) ────────────────────────────────────────
+function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff, filterEquip, setFilterEquip, hasFilters, resetFilters, filteredCount, counts, isMobile }) {
+  const [open, setOpen] = useState(!isMobile);
 
   return (
-    <div className="page">
-      <div className="library-header">
-        <h1>Übungsbibliothek</h1>
-        <p>{exercises.length} professionell dokumentierte Übungen — von Einsteiger bis Elite.</p>
+    <aside className="filter-panel">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: open ? 18 : 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="filter-panel-title" style={{ marginBottom: 0 }}>Filter</div>
+          {hasFilters && (
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 100,
+              background: 'var(--green-glow)', color: 'var(--green)', border: '1px solid var(--border-active)',
+            }}>Aktiv</span>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {hasFilters && (
+            <button className="btn btn-ghost btn-sm" onClick={resetFilters} style={{ fontSize: 12 }}>
+              Zurücksetzen
+            </button>
+          )}
+          {isMobile && (
+            <button onClick={() => setOpen(o => !o)} style={{
+              background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)',
+              display: 'flex', alignItems: 'center', padding: 4,
+            }}>
+              {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="library-layout">
-        <aside className="filter-panel">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-            <div className="filter-panel-title" style={{ marginBottom: 0 }}>Filter</div>
-            {hasFilters && (
-              <button className="btn btn-ghost btn-sm" onClick={resetFilters} style={{ fontSize: 12 }}>
-                Zurücksetzen
-              </button>
-            )}
-          </div>
+      {open && (
+        <>
           <div className="filter-group">
             <label><Dumbbell size={12} /> Muskelgruppe</label>
             <div className="filter-chips">
@@ -404,11 +428,141 @@ export default function ExerciseLibrary() {
             </div>
           </div>
           <div className="filter-count">
-            <strong>{filtered.length}</strong> Übung{filtered.length !== 1 ? 'en' : ''} gefunden
+            <strong>{filteredCount}</strong> Übung{filteredCount !== 1 ? 'en' : ''} gefunden
           </div>
-        </aside>
+        </>
+      )}
+    </aside>
+  );
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+export default function ExerciseLibrary({ user, profile }) {
+  const [search,        setSearch]        = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [filterMuscle,  setFilterMuscle]  = useState('Alle');
+  const [filterDiff,    setFilterDiff]    = useState('Alle');
+  const [filterEquip,   setFilterEquip]   = useState('Alle');
+  const [selected,      setSelected]      = useState(null);
+  const [favorites,     setFavorites]     = useState(new Set());
+  const [activeTab,     setActiveTab]     = useState('all'); // 'all' | 'favorites'
+  const [isMobile,      setIsMobile]      = useState(window.innerWidth < 768);
+
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 250);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // Resize listener
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
+  // Favoriten laden
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from('favorite_exercises')
+        .select('exercise_id')
+        .eq('user_id', user.id);
+      if (data) setFavorites(new Set(data.map(f => f.exercise_id)));
+    };
+    load();
+  }, [user]);
+
+  // Favoriten togglen
+  const toggleFavorite = useCallback(async (exerciseId) => {
+    if (!user) return;
+    const isFav = favorites.has(exerciseId);
+    // Optimistic UI
+    setFavorites(prev => {
+      const next = new Set(prev);
+      isFav ? next.delete(exerciseId) : next.add(exerciseId);
+      return next;
+    });
+    if (isFav) {
+      await supabase.from('favorite_exercises').delete()
+        .eq('user_id', user.id).eq('exercise_id', exerciseId);
+    } else {
+      await supabase.from('favorite_exercises').upsert({
+        user_id: user.id, exercise_id: exerciseId,
+      });
+    }
+  }, [user, favorites]);
+
+  const filtered = useMemo(() => {
+    const q = debouncedSearch.toLowerCase();
+    return exercises.filter(ex => {
+      const matchSearch = !q ||
+        ex.name.toLowerCase().includes(q) ||
+        ex.muscleGroup.toLowerCase().includes(q) ||
+        ex.targetMuscles.some(m => m.toLowerCase().includes(q));
+      const matchMuscle = filterMuscle === 'Alle' || ex.muscleGroup === filterMuscle;
+      const matchDiff   = filterDiff   === 'Alle' || ex.difficulty  === filterDiff;
+      const matchEquip  = filterEquip  === 'Alle' || ex.equipmentType === filterEquip;
+      return matchSearch && matchMuscle && matchDiff && matchEquip;
+    });
+  }, [debouncedSearch, filterMuscle, filterDiff, filterEquip]);
+
+  const displayedExercises = activeTab === 'favorites'
+    ? filtered.filter(ex => favorites.has(ex.id))
+    : filtered;
+
+  const resetFilters = () => {
+    setFilterMuscle('Alle'); setFilterDiff('Alle');
+    setFilterEquip('Alle'); setSearch('');
+  };
+  const hasFilters = filterMuscle !== 'Alle' || filterDiff !== 'Alle' || filterEquip !== 'Alle' || search;
+
+  const counts = {};
+  exercises.forEach(e => { counts[e.muscleGroup] = (counts[e.muscleGroup] || 0) + 1; });
+
+  const userGoal = profile?.goal || 'Standard';
+
+  return (
+    <div className="page">
+      <div className="library-header">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h1>Übungsbibliothek</h1>
+            <p>{exercises.length} professionell dokumentierte Übungen — von Einsteiger bis Elite.</p>
+          </div>
+          {/* Tabs: Alle / Favoriten */}
+          <div style={{ display: 'flex', gap: 4, background: 'var(--bg-card-2)', borderRadius: 10, padding: 4 }}>
+            {[
+              { id: 'all',       label: 'Alle Übungen' },
+              { id: 'favorites', label: `❤️ Favoriten${favorites.size > 0 ? ` (${favorites.size})` : ''}` },
+            ].map(t => (
+              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+                padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                background: activeTab === t.id ? 'var(--green-glow)' : 'transparent',
+                border: activeTab === t.id ? '1px solid var(--border-active)' : '1px solid transparent',
+                color: activeTab === t.id ? 'var(--green)' : 'var(--text-muted)',
+                cursor: 'pointer', transition: 'all 0.2s ease', whiteSpace: 'nowrap',
+              }}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="library-layout">
+        <FilterPanel
+          filterMuscle={filterMuscle} setFilterMuscle={setFilterMuscle}
+          filterDiff={filterDiff} setFilterDiff={setFilterDiff}
+          filterEquip={filterEquip} setFilterEquip={setFilterEquip}
+          hasFilters={hasFilters} resetFilters={resetFilters}
+          filteredCount={displayedExercises.length}
+          counts={counts} isMobile={isMobile}
+        />
 
         <div>
+          {/* Suchfeld */}
           <div className="search-bar">
             <Search size={16} className="search-icon" />
             <input
@@ -416,6 +570,7 @@ export default function ExerciseLibrary() {
               placeholder="Übung oder Muskelgruppe suchen…"
               value={search}
               onChange={e => setSearch(e.target.value)}
+              autoComplete="off"
             />
             {search && (
               <button className="search-clear" onClick={() => setSearch('')}>
@@ -424,13 +579,32 @@ export default function ExerciseLibrary() {
             )}
           </div>
 
-          {filtered.length > 0 ? (
+          {/* Favoriten leer */}
+          {activeTab === 'favorites' && favorites.size === 0 && (
+            <div className="no-results">
+              <div className="no-results-icon"><Heart size={38} strokeWidth={1.2} /></div>
+              <p style={{ marginBottom: 8 }}>Noch keine Favoriten gespeichert.</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+                Klicke auf das ❤️ auf einer Übungskarte um sie zu speichern.
+              </p>
+              <button className="btn btn-secondary btn-sm" onClick={() => setActiveTab('all')}>
+                Alle Übungen anzeigen
+              </button>
+            </div>
+          )}
+
+          {/* Grid */}
+          {displayedExercises.length > 0 ? (
             <div className="exercise-grid">
-              {filtered.map((ex, i) => (
-                <ExerciseCard key={ex.id} exercise={ex} onClick={setSelected} index={i} />
+              {displayedExercises.map((ex, i) => (
+                <ExerciseCard
+                  key={ex.id} exercise={ex} onClick={setSelected} index={i}
+                  isFavorite={favorites.has(ex.id)}
+                  onToggleFavorite={toggleFavorite}
+                />
               ))}
             </div>
-          ) : (
+          ) : activeTab !== 'favorites' && (
             <div className="no-results">
               <div className="no-results-icon"><Search size={38} strokeWidth={1.2} /></div>
               <p style={{ marginBottom: 16 }}>Keine Übungen gefunden.</p>
@@ -440,7 +614,15 @@ export default function ExerciseLibrary() {
         </div>
       </div>
 
-      {selected && <ExerciseModal exercise={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <ExerciseModal
+          exercise={selected}
+          onClose={() => setSelected(null)}
+          isFavorite={favorites.has(selected.id)}
+          onToggleFavorite={toggleFavorite}
+          userGoal={userGoal}
+        />
+      )}
     </div>
   );
 }
