@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 
 export default function SplashScreen({ onDone }) {
-  const [phase, setPhase] = useState('in'); // in | hold | out
+  const [phase, setPhase] = useState('in');
 
   useEffect(() => {
-    // Zeige Splash für 1.8s, dann fade out
     const holdTimer = setTimeout(() => setPhase('out'), 1800);
     const doneTimer = setTimeout(() => onDone(), 2300);
     return () => { clearTimeout(holdTimer); clearTimeout(doneTimer); };
@@ -21,33 +20,19 @@ export default function SplashScreen({ onDone }) {
       transition: 'opacity 0.5s ease',
       pointerEvents: 'none',
     }}>
-      {/* Logo Icon */}
+      {/* Echtes Logo */}
       <div style={{
-        width: 80, height: 80,
-        background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-        borderRadius: 22,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 0 60px rgba(34,197,94,0.35), 0 0 120px rgba(34,197,94,0.1)',
+        width: 96, height: 96,
+        borderRadius: 26,
+        overflow: 'hidden',
         animation: 'splashIconIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both',
+        boxShadow: '0 0 60px rgba(34,197,94,0.3), 0 0 120px rgba(34,197,94,0.1)',
       }}>
-        {/* Arrow up icon als SVG */}
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-          <path
-            d="M20 32 L20 10 M20 10 L10 20 M20 10 L30 20"
-            stroke="#000"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M8 28 Q14 22 20 26 Q26 30 32 24"
-            stroke="#000"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.4"
-          />
-        </svg>
+        <img
+          src="/logo-512.png"
+          alt="BuildUp"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
       </div>
 
       {/* Wordmark */}
@@ -66,8 +51,8 @@ export default function SplashScreen({ onDone }) {
           }}>Up</span>
         </div>
         <div style={{
-          fontSize: 13, color: 'rgba(255,255,255,0.35)', letterSpacing: '2.5px',
-          textTransform: 'uppercase', fontWeight: 500,
+          fontSize: 12, color: 'rgba(255,255,255,0.35)',
+          letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 500,
         }}>
           Fortschritt, der bleibt.
         </div>
@@ -77,7 +62,7 @@ export default function SplashScreen({ onDone }) {
       <div style={{
         display: 'flex', gap: 6,
         animation: 'splashTextIn 0.6s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both',
-        marginTop: 8,
+        marginTop: 4,
       }}>
         {[0, 1, 2].map(i => (
           <div key={i} style={{
@@ -90,7 +75,7 @@ export default function SplashScreen({ onDone }) {
 
       <style>{`
         @keyframes splashIconIn {
-          from { opacity: 0; transform: scale(0.7) translateY(20px); }
+          from { opacity: 0; transform: scale(0.6) translateY(20px); }
           to   { opacity: 1; transform: scale(1) translateY(0); }
         }
         @keyframes splashTextIn {

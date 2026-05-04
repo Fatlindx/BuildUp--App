@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
-import { Mail, Lock, User, Eye, EyeOff, Zap } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 // ── Fehlermeldungen auf Deutsch ──
 function translateError(message) {
@@ -110,11 +110,11 @@ export default function Auth({ onLogin }) {
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
             width: 56, height: 56,
-            background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
+            
             borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px', boxShadow: 'var(--shadow-green)',
           }}>
-            <Zap size={26} color="#000" strokeWidth={2.5} />
+            <img src="/logo-512.png" alt="BuildUp" style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 16, display: "block" }} />
           </div>
           <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-1px', marginBottom: 6 }}>
             BuildUp

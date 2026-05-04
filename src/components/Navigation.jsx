@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, Zap, LogOut, Bot, ClipboardList, User } from 'lucide-react';
+import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User } from 'lucide-react';
 
 const navItems = [
   { id: 'home',       label: 'Home',        icon: Home },
@@ -45,8 +45,8 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
           <div className="nav-container">
             <button className="nav-logo" onClick={() => handleNav('home')}
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-              <div className="logo-icon">
-                <Zap size={18} color="#000" strokeWidth={2.5} />
+              <div className="logo-icon" style={{ overflow: 'hidden', padding: 0 }}>
+                <img src="/logo-512.png" alt="BuildUp" style={{ width: 34, height: 34, objectFit: 'cover', borderRadius: 9, display: 'block' }} />
               </div>
               <span className="logo-text">BuildUp</span>
             </button>
@@ -175,7 +175,7 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
                 alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <Zap size={17} color="#000" strokeWidth={2.5} />
+                <img src="/logo-512.png" alt="BuildUp" style={{ width: 26, height: 26, objectFit: "cover", borderRadius: 7, display: "block" }} />
               </div>
               <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.3px' }}>BuildUp</span>
             </button>

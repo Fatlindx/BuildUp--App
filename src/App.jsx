@@ -113,15 +113,12 @@ export default function App() {
       alignItems: 'center', justifyContent: 'center', gap: 16,
     }}>
       <div style={{
-        width: 44, height: 44,
-        background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
-        borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 72, height: 72,
+        borderRadius: 20, overflow: 'hidden',
         animation: 'loadingPulse 1.5s ease infinite',
         boxShadow: '0 0 30px rgba(34,197,94,0.25)',
       }}>
-        <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
-          <path d="M20 32 L20 10 M20 10 L10 20 M20 10 L30 20" stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <img src="/logo-512.png" alt="BuildUp" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       </div>
       <div style={{ display: 'flex', gap: 5 }}>
         {[0, 1, 2].map(i => (
