@@ -11,10 +11,15 @@ import Onboarding from './components/Onboarding';
 import AICoach from './components/AICoach';
 import WorkoutTracker from './components/WorkoutTracker';
 import ProfilePage from './components/ProfilePage';
+import SplashScreen from './components/SplashScreen';
 
 const TODAY = new Date().toDateString();
 
+// Splash nur beim ersten Besuch pro Session
+const SPLASH_KEY = 'buildup_splash_shown';
+
 export default function App() {
+  const [showSplash, setShowSplash]         = useState(() => !sessionStorage.getItem(SPLASH_KEY));
   const [user, setUser]                     = useState(null);
   const [profile, setProfile]               = useState(null);
   const [authLoading, setAuthLoading]       = useState(true);
@@ -23,6 +28,11 @@ export default function App() {
   const [calorieGoal, setCalorieGoal]       = useState(2000);
   const [logHistory, setLogHistory]         = useState({});
   const [showCoach, setShowCoach]           = useState(false);
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem(SPLASH_KEY, '1');
+    setShowSplash(false);
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -37,34 +47,19 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return;
-
     const load = async () => {
       setProfileLoading(true);
-
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      // prof can be null for brand new users — that's valid
+      const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(prof ?? null);
       if (prof?.calorie_goal) setCalorieGoal(prof.calorie_goal);
-
-      const { data: logs } = await supabase
-        .from('daily_logs')
-        .select('date, log')
-        .eq('user_id', user.id);
-
+      const { data: logs } = await supabase.from('daily_logs').select('date, log').eq('user_id', user.id);
       if (logs) {
         const history = {};
         logs.forEach(l => { history[l.date] = l.log; });
         setLogHistory(history);
       }
-
       setProfileLoading(false);
     };
-
     load();
   }, [user]);
 
@@ -90,11 +85,8 @@ export default function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setLogHistory({});
-    setCalorieGoal(2000);
-    setShowCoach(false);
+    setUser(null); setProfile(null);
+    setLogHistory({}); setCalorieGoal(2000); setShowCoach(false);
   };
 
   const handleOnboardingComplete = (goal) => {
@@ -110,30 +102,47 @@ export default function App() {
   const dailyLog      = logHistory[TODAY] || [];
   const totalCalories = dailyLog.reduce((s, i) => s + i.calories, 0);
 
-  // ── 1. Auth noch am Laden ──
-  if (authLoading) return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: 'var(--green)', fontSize: 16, fontWeight: 600 }}>Laden...</div>
+  // ── Splash Screen ──
+  if (showSplash) return <SplashScreen onDone={handleSplashDone} />;
+
+  // ── Auth loading ──
+  if (authLoading || profileLoading) return (
+    <div style={{
+      minHeight: '100vh', background: 'var(--bg)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 16,
+    }}>
+      <div style={{
+        width: 44, height: 44,
+        background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
+        borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        animation: 'loadingPulse 1.5s ease infinite',
+        boxShadow: '0 0 30px rgba(34,197,94,0.25)',
+      }}>
+        <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+          <path d="M20 32 L20 10 M20 10 L10 20 M20 10 L30 20" stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+      <div style={{ display: 'flex', gap: 5 }}>
+        {[0, 1, 2].map(i => (
+          <div key={i} style={{
+            width: 4, height: 4, borderRadius: '50%', background: 'var(--green)',
+            animation: `splashDot 1.2s ease ${i * 0.18}s infinite`,
+          }} />
+        ))}
+      </div>
     </div>
   );
 
-  // ── 2. Nicht eingeloggt ──
+  // ── Nicht eingeloggt ──
   if (!user) return <Auth onLogin={setUser} />;
 
-  // ── 3. Profil wird noch geladen ──
-  if (profileLoading) return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: 'var(--green)', fontSize: 16, fontWeight: 600 }}>Laden...</div>
-    </div>
-  );
-
-  // ── 4. Onboarding — nur wenn onboarding_done nicht explizit true ist ──
-  // Deckt ab: neuer User (profile = null) UND bestehender User ohne onboarding_done
+  // ── Onboarding ──
   if (!profile || profile.onboarding_done !== true) {
     return <Onboarding user={user} onComplete={handleOnboardingComplete} />;
   }
 
-  // ── 5. App ──
+  // ── App ──
   return (
     <>
       <Navigation
@@ -144,36 +153,41 @@ export default function App() {
         onLogout={handleLogout}
         onOpenCoach={() => setShowCoach(true)}
       />
-      {activeSection === 'home' && (
-        <Home
-          setActiveSection={setActiveSection}
-          calorieGoal={calorieGoal}
-          totalCalories={totalCalories}
-          dailyLog={dailyLog}
-          username={profile?.username}
-        />
-      )}
-      {activeSection === 'nutrition' && (
-        <NutritionTracker
-          calorieGoal={calorieGoal}
-          setCalorieGoal={handleSetCalorieGoal}
-          dailyLog={dailyLog}
-          setDailyLog={setDailyLog}
-        />
-      )}
-      {activeSection === 'calculator' && (
-        <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); setActiveSection('nutrition'); }} />
-      )}
-      {activeSection === 'exercises' && <ExerciseLibrary user={user} profile={profile} />}
-      {activeSection === 'progress' && (
-        <Progress calorieGoal={calorieGoal} dailyLog={dailyLog} logHistory={logHistory} user={user} profile={profile} />
-      )}
-      {activeSection === 'workout' && (
-        <WorkoutTracker user={user} profile={profile} />
-      )}
-      {activeSection === 'profile' && (
-        <ProfilePage user={user} profile={profile} onUpdateProfile={handleUpdateProfile} />
-      )}
+
+      {/* Page Transition Wrapper */}
+      <div key={activeSection} style={{ animation: 'pageIn 0.25s ease both' }}>
+        {activeSection === 'home' && (
+          <Home
+            setActiveSection={setActiveSection}
+            calorieGoal={calorieGoal}
+            totalCalories={totalCalories}
+            dailyLog={dailyLog}
+            username={profile?.username}
+          />
+        )}
+        {activeSection === 'nutrition' && (
+          <NutritionTracker
+            calorieGoal={calorieGoal}
+            setCalorieGoal={handleSetCalorieGoal}
+            dailyLog={dailyLog}
+            setDailyLog={setDailyLog}
+          />
+        )}
+        {activeSection === 'calculator' && (
+          <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); setActiveSection('nutrition'); }} />
+        )}
+        {activeSection === 'exercises' && <ExerciseLibrary user={user} profile={profile} />}
+        {activeSection === 'progress' && (
+          <Progress calorieGoal={calorieGoal} dailyLog={dailyLog} logHistory={logHistory} user={user} profile={profile} />
+        )}
+        {activeSection === 'workout' && (
+          <WorkoutTracker user={user} profile={profile} />
+        )}
+        {activeSection === 'profile' && (
+          <ProfilePage user={user} profile={profile} onUpdateProfile={handleUpdateProfile} />
+        )}
+      </div>
+
       {showCoach && (
         <AICoach
           onClose={() => setShowCoach(false)}

@@ -1,9 +1,8 @@
-﻿import { useState, useMemo } from "react";
+﻿import { useState, useMemo, useEffect } from "react";
 import { Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine } from "lucide-react";
 import { foodDatabase, foodCategories } from "../data/foods";
 import BarcodeScanner from "./BarcodeScanner";
-
-const WATER_GOAL = 8;
+import WaterTracker from "./WaterTracker";
 
 function ProgressBar({ value, max, color, height = 7 }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
@@ -37,10 +36,19 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
   const [filterCat, setFilterCat]         = useState("Alle");
   const [selectedFood, setSelectedFood]   = useState(null);
   const [qty, setQty]                     = useState("1");
-  const [waterGlasses, setWaterGlasses]   = useState(0);
   const [manualGoal, setManualGoal]       = useState("");
   const [showGoalInput, setShowGoalInput] = useState(false);
   const [showScanner, setShowScanner]     = useState(false);
+
+  // Wassertracker — persistiert in sessionStorage
+  const [waterGlasses, setWaterGlasses] = useState(() => {
+    const saved = sessionStorage.getItem('water_glasses');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('water_glasses', String(waterGlasses));
+  }, [waterGlasses]);
 
   const searchResults = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -332,39 +340,10 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               </div>
             </div>
 
-            {/* Wassertracker */}
+            {/* Wassertracker — neu */}
             <div className="tracker-card">
               <h3><Droplets size={16} color="#60a5fa" /> Wassertracker</h3>
-              <div className="water-tracker">
-                <div className="water-header">
-                  <div>
-                    <div className="water-value">{waterGlasses}</div>
-                    <div className="water-subtitle">von {WATER_GOAL} Gläsern</div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#60a5fa" }}>{waterGlasses * 250} ml</div>
-                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>getrunken</div>
-                  </div>
-                </div>
-                <ProgressBar value={waterGlasses} max={WATER_GOAL} color="#60a5fa" height={7} />
-                <div className="water-glasses">
-                  {Array.from({ length: WATER_GOAL }, (_, i) => (
-                    <button key={i} className={`water-glass ${i < waterGlasses ? "filled" : ""}`}
-                      onClick={() => setWaterGlasses(i < waterGlasses ? i : i + 1)}>
-                      <Droplets size={16} color={i < waterGlasses ? "#60a5fa" : "var(--text-muted)"} />
-                    </button>
-                  ))}
-                </div>
-                <div className="water-info">
-                  <span>{waterGlasses * 250} ml</span>
-                  <span style={{ color: "#60a5fa" }}>{(WATER_GOAL - waterGlasses) * 250} ml fehlen</span>
-                </div>
-                <button className="btn btn-secondary btn-sm"
-                  style={{ width: "100%", justifyContent: "center", display: "flex", alignItems: "center", gap: 6 }}
-                  onClick={() => setWaterGlasses(g => Math.min(g + 1, WATER_GOAL))}>
-                  <Plus size={14} /> Glas hinzufügen
-                </button>
-              </div>
+              <WaterTracker waterGlasses={waterGlasses} setWaterGlasses={setWaterGlasses} />
             </div>
 
             {/* Tip Box */}
