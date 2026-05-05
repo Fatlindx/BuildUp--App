@@ -35,7 +35,9 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  const displayName = profile?.username || user?.email?.split('@')[0] || '';
+  // ✅ NEVER derive from email — always username or 'User'
+  const displayName = profile?.username || 'User';
+  const avatarLetter = displayName !== 'User' ? displayName[0].toUpperCase() : null;
 
   return (
     <>
@@ -75,7 +77,7 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
                     fontSize: 12.5,
                     color: activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)',
                     display: 'flex', alignItems: 'center', gap: 6,
-                    background: activeSection === 'profile' ? 'var(--surface-2)' : 'none',
+                    background: activeSection === 'profile' ? 'var(--bg-hover)' : 'none',
                     border: '1px solid',
                     borderColor: activeSection === 'profile' ? 'var(--border-active)' : 'transparent',
                     cursor: 'pointer',
@@ -84,12 +86,12 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
                     fontWeight: activeSection === 'profile' ? 600 : 400,
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = 'var(--surface-2)';
+                    e.currentTarget.style.background = 'var(--bg-hover)';
                     e.currentTarget.style.color = 'var(--text)';
                     e.currentTarget.style.borderColor = 'var(--border)';
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = activeSection === 'profile' ? 'var(--surface-2)' : 'none';
+                    e.currentTarget.style.background = activeSection === 'profile' ? 'var(--bg-hover)' : 'none';
                     e.currentTarget.style.color = activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)';
                     e.currentTarget.style.borderColor = activeSection === 'profile' ? 'var(--border-active)' : 'transparent';
                   }}
@@ -169,60 +171,38 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
           }}>
             <button onClick={() => handleNav('home')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: 9,
-                background: 'var(--green)', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <img src="/logo-512.png" alt="BuildUp" style={{ width: 26, height: 26, objectFit: "cover", borderRadius: 7, display: "block" }} />
+              <div style={{ width: 32, height: 32, borderRadius: 9, overflow: 'hidden', flexShrink: 0 }}>
+                <img src="/logo-512.png" alt="BuildUp" style={{ width: 32, height: 32, objectFit: 'cover', display: 'block' }} />
               </div>
               <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.3px' }}>BuildUp</span>
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button
-                onClick={onOpenCoach}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '6px 11px', borderRadius: 9,
-                  background: 'var(--green-glow)',
-                  border: '1px solid var(--border-active)',
-                  cursor: 'pointer', color: 'var(--green)',
-                  fontWeight: 600, fontSize: 12,
-                }}
-              >
+              <button onClick={onOpenCoach} style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 11px', borderRadius: 9,
+                background: 'var(--green-glow)', border: '1px solid var(--border-active)',
+                cursor: 'pointer', color: 'var(--green)', fontWeight: 600, fontSize: 12,
+              }}>
                 <Bot size={13} strokeWidth={2} />
                 <span>Coach</span>
-                <span style={{
-                  width: 5, height: 5, borderRadius: '50%',
-                  background: 'var(--green)',
-                  animation: 'pulse 2s infinite',
-                  flexShrink: 0,
-                }} />
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green)', animation: 'pulse 2s infinite', flexShrink: 0 }} />
               </button>
 
-              <button
-                onClick={() => handleNav('profile')}
-                style={{
-                  width: 34, height: 34, borderRadius: '50%',
-                  background: activeSection === 'profile' ? 'var(--green)' : 'var(--surface-2)',
-                  border: `2px solid ${activeSection === 'profile' ? 'var(--green)' : 'var(--border)'}`,
-                  cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: activeSection === 'profile' ? '#000' : 'var(--text-muted)',
-                  fontWeight: 700, fontSize: 13,
-                  transition: 'all 0.2s ease',
-                  flexShrink: 0,
-                }}
-                title="Profil"
-              >
-                {displayName ? displayName[0].toUpperCase() : <User size={14} />}
+              <button onClick={() => handleNav('profile')} style={{
+                width: 34, height: 34, borderRadius: '50%',
+                background: activeSection === 'profile' ? 'var(--green)' : 'var(--bg-card-2)',
+                border: `2px solid ${activeSection === 'profile' ? 'var(--green)' : 'var(--border)'}`,
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: activeSection === 'profile' ? '#000' : 'var(--text-muted)',
+                fontWeight: 700, fontSize: 13,
+                transition: 'all 0.2s ease', flexShrink: 0,
+              }} title="Profil">
+                {avatarLetter || <User size={14} />}
               </button>
             </div>
           </div>
-
-          {/* Spacer for fixed top bar */}
           <div style={{ height: 56 }} />
         </>
       )}
@@ -232,32 +212,22 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
           background: 'rgba(10,10,10,0.97)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
           borderTop: '1px solid var(--border)',
           display: 'flex', alignItems: 'center',
-          paddingTop: 6,
-          paddingBottom: 'calc(6px + env(safe-area-inset-bottom))',
+          paddingTop: 6, paddingBottom: 'calc(6px + env(safe-area-inset-bottom))',
         }}>
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
             return (
-              <button
-                key={item.id}
-                onClick={() => handleNav(item.id)}
-                style={{
-                  flex: 1,
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center',
-                  gap: 2,
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  padding: '4px 2px 6px',
-                  position: 'relative',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                {/* Active top bar */}
+              <button key={item.id} onClick={() => handleNav(item.id)} style={{
+                flex: 1, display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 2,
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '4px 2px 6px', position: 'relative',
+                WebkitTapHighlightColor: 'transparent',
+              }}>
                 {isActive && (
                   <span style={{
                     position: 'absolute', top: -6, left: '50%',
@@ -266,8 +236,6 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
                     background: 'var(--green)',
                   }} />
                 )}
-
-                {/* Icon */}
                 <div style={{
                   width: 44, height: 30,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -276,21 +244,12 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
                   transition: 'all 0.18s ease',
                   transform: isActive ? 'translateY(-1px) scale(1.05)' : 'scale(1)',
                 }}>
-                  <Icon
-                    size={21}
-                    strokeWidth={isActive ? 2.3 : 1.6}
-                    color={isActive ? 'var(--green)' : '#6b7280'}
-                  />
+                  <Icon size={21} strokeWidth={isActive ? 2.3 : 1.6} color={isActive ? 'var(--green)' : '#6b7280'} />
                 </div>
-
-                {/* Label */}
                 <span style={{
-                  fontSize: 9,
-                  fontWeight: isActive ? 700 : 400,
+                  fontSize: 9, fontWeight: isActive ? 700 : 400,
                   color: isActive ? 'var(--green)' : '#6b7280',
-                  letterSpacing: '0.01em',
-                  lineHeight: 1,
-                  transition: 'all 0.18s ease',
+                  letterSpacing: '0.01em', lineHeight: 1, transition: 'all 0.18s ease',
                 }}>
                   {item.label}
                 </span>
