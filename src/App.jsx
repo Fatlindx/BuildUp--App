@@ -25,9 +25,33 @@ export default function App() {
   const [authLoading, setAuthLoading]       = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
   const [activeSection, setActiveSection]   = useState('home');
+  const [navHistory, setNavHistory]         = useState(['home']);
   const [calorieGoal, setCalorieGoal]       = useState(2000);
   const [logHistory, setLogHistory]         = useState({});
   const [showCoach, setShowCoach]           = useState(false);
+  const [navHistory, setNavHistory]         = useState(['home']);
+
+  // ── Smart Navigation with History ──
+  const navigateTo = (section) => {
+    setActiveSection(section);
+    setNavHistory(prev => {
+      // Don't add duplicate consecutive entries
+      if (prev[prev.length - 1] === section) return prev;
+      return [...prev, section];
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const navigateBack = () => {
+    setNavHistory(prev => {
+      if (prev.length <= 1) return prev;
+      const newHistory = prev.slice(0, -1);
+      const previousSection = newHistory[newHistory.length - 1];
+      setActiveSection(previousSection);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      return newHistory;
+    });
+  };
 
   const handleSplashDone = () => {
     sessionStorage.setItem(SPLASH_KEY, '1');
@@ -144,7 +168,10 @@ export default function App() {
     <>
       <Navigation
         activeSection={activeSection}
-        setActiveSection={setActiveSection}
+        setActiveSection={navigateTo}
+        navigateBack={navigateBack}
+        canGoBack={navHistory.length > 1}
+        onGoBack={handleGoBack}
         user={user}
         profile={profile}
         onLogout={handleLogout}
@@ -155,7 +182,7 @@ export default function App() {
       <div key={activeSection} style={{ animation: 'pageIn 0.25s ease both' }}>
         {activeSection === 'home' && (
           <Home
-            setActiveSection={setActiveSection}
+            setActiveSection={navigateTo}
             calorieGoal={calorieGoal}
             totalCalories={totalCalories}
             dailyLog={dailyLog}
@@ -171,7 +198,7 @@ export default function App() {
           />
         )}
         {activeSection === 'calculator' && (
-          <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); setActiveSection('nutrition'); }} />
+          <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); handleSetActiveSection('nutrition'); }} />
         )}
         {activeSection === 'exercises' && <ExerciseLibrary user={user} profile={profile} />}
         {activeSection === 'progress' && (

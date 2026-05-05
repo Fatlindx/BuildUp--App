@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User } from 'lucide-react';
+import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User, ArrowLeft } from 'lucide-react';
 
 const navItems = [
   { id: 'home',       label: 'Home',        icon: Home },
@@ -19,7 +19,7 @@ const allNavItems = [
   { id: 'progress',   label: 'Fortschritt', icon: BarChart2 },
 ];
 
-export default function Navigation({ activeSection, setActiveSection, user, profile, onLogout, onOpenCoach }) {
+export default function Navigation({ activeSection, setActiveSection, navigateBack, canGoBack, user, profile, onLogout, onOpenCoach }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -52,6 +52,48 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
               </div>
               <span className="logo-text">BuildUp</span>
             </button>
+
+            {/* Back Button — Desktop */}
+            {canGoBack && activeSection !== 'home' && (
+              <button
+                onClick={navigateBack}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '6px 12px', borderRadius: 9,
+                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                  color: 'var(--text-muted)', cursor: 'pointer',
+                  fontSize: 12.5, fontWeight: 500,
+                  transition: 'all 0.18s ease', flexShrink: 0,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                title="Zurück"
+              >
+                <ArrowLeft size={14} />
+                <span>Zurück</span>
+              </button>
+            )}
+
+            {/* Zurück-Button */}
+            {canGoBack && activeSection !== 'home' && (
+              <button
+                onClick={onGoBack}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '6px 10px', borderRadius: 8,
+                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                  color: 'var(--text-muted)', cursor: 'pointer',
+                  fontSize: 12.5, fontWeight: 500,
+                  transition: 'all 0.15s ease', flexShrink: 0,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                title="Zurück"
+              >
+                <ChevronLeft size={15} />
+                <span>Zurück</span>
+              </button>
+            )}
 
             <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
               {allNavItems.map(item => {
@@ -169,15 +211,44 @@ export default function Navigation({ activeSection, setActiveSection, user, prof
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             height: 56,
           }}>
-            <button onClick={() => handleNav('home')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 9, overflow: 'hidden', flexShrink: 0 }}>
-                <img src="/logo-512.png" alt="BuildUp" style={{ width: 32, height: 32, objectFit: 'cover', display: 'block' }} />
-              </div>
-              <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.3px' }}>BuildUp</span>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {canGoBack && activeSection !== 'home' ? (
+                <button onClick={navigateBack} style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 34, height: 34, borderRadius: 9,
+                  color: 'var(--text-muted)',
+                  WebkitTapHighlightColor: 'transparent',
+                }}>
+                  <ArrowLeft size={20} color="var(--text)" />
+                </button>
+              ) : (
+                <button onClick={() => handleNav('home')}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 9, overflow: 'hidden', flexShrink: 0 }}>
+                    <img src="/logo-512.png" alt="BuildUp" style={{ width: 32, height: 32, objectFit: 'cover', display: 'block' }} />
+                  </div>
+                </button>
+              )}
+              <button onClick={() => handleNav('home')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.3px' }}>BuildUp</span>
+              </button>
+            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Mobile Zurück-Button */}
+              {canGoBack && activeSection !== 'home' && (
+                <button onClick={onGoBack} style={{
+                  width: 34, height: 34, borderRadius: 9,
+                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: 'var(--text-muted)',
+                  flexShrink: 0,
+                }}>
+                  <ChevronLeft size={18} />
+                </button>
+              )}
               <button onClick={onOpenCoach} style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 11px', borderRadius: 9,
