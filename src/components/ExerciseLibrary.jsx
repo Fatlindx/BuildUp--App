@@ -27,10 +27,12 @@ function Lightbox({ src, alt, onClose }) {
   if (!src) return null;
   return (
     <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      width: '100vw', height: '100vh', zIndex: 9999,
       background: 'rgba(0,0,0,0.97)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '20px', animation: 'fadeIn 0.15s ease', cursor: 'zoom-out',
+      boxSizing: 'border-box',
     }}>
       <button onClick={onClose} style={{
         position: 'absolute', top: 16, right: 16,
