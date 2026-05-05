@@ -14,8 +14,6 @@ import ProfilePage from './components/ProfilePage';
 import SplashScreen from './components/SplashScreen';
 
 const TODAY = new Date().toDateString();
-
-// Splash nur beim ersten Besuch pro Session
 const SPLASH_KEY = 'buildup_splash_shown';
 
 export default function App() {
@@ -30,14 +28,13 @@ export default function App() {
   const [logHistory, setLogHistory]         = useState({});
   const [showCoach, setShowCoach]           = useState(false);
 
-  // ── Smart Navigation with History ──
+  // ── Navigation mit History-Stack ──
   const navigateTo = (section) => {
-    setActiveSection(section);
     setNavHistory(prev => {
-      // Don't add duplicate consecutive entries
       if (prev[prev.length - 1] === section) return prev;
       return [...prev, section];
     });
+    setActiveSection(section);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
@@ -45,8 +42,7 @@ export default function App() {
     setNavHistory(prev => {
       if (prev.length <= 1) return prev;
       const newHistory = prev.slice(0, -1);
-      const previousSection = newHistory[newHistory.length - 1];
-      setActiveSection(previousSection);
+      setActiveSection(newHistory[newHistory.length - 1]);
       window.scrollTo({ top: 0, behavior: 'instant' });
       return newHistory;
     });
@@ -110,6 +106,7 @@ export default function App() {
     await supabase.auth.signOut();
     setUser(null); setProfile(null);
     setLogHistory({}); setCalorieGoal(2000); setShowCoach(false);
+    setNavHistory(['home']); setActiveSection('home');
   };
 
   const handleOnboardingComplete = (goal) => {
@@ -136,8 +133,7 @@ export default function App() {
       alignItems: 'center', justifyContent: 'center', gap: 16,
     }}>
       <div style={{
-        width: 72, height: 72,
-        borderRadius: 20, overflow: 'hidden',
+        width: 72, height: 72, borderRadius: 20, overflow: 'hidden',
         animation: 'loadingPulse 1.5s ease infinite',
         boxShadow: '0 0 30px rgba(34,197,94,0.25)',
       }}>
@@ -168,16 +164,14 @@ export default function App() {
       <Navigation
         activeSection={activeSection}
         setActiveSection={navigateTo}
-        navigateBack={navigateBack}
         canGoBack={navHistory.length > 1}
-        onGoBack={handleGoBack}
+        onGoBack={navigateBack}
         user={user}
         profile={profile}
         onLogout={handleLogout}
         onOpenCoach={() => setShowCoach(true)}
       />
 
-      {/* Page Transition Wrapper */}
       <div key={activeSection} style={{ animation: 'pageIn 0.25s ease both' }}>
         {activeSection === 'home' && (
           <Home
@@ -197,7 +191,7 @@ export default function App() {
           />
         )}
         {activeSection === 'calculator' && (
-          <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); handleSetActiveSection('nutrition'); }} />
+          <CalorieCalculator onSaveGoal={(g) => { handleSetCalorieGoal(g); navigateTo('nutrition'); }} />
         )}
         {activeSection === 'exercises' && <ExerciseLibrary user={user} profile={profile} />}
         {activeSection === 'progress' && (

@@ -19,7 +19,7 @@ const allNavItems = [
   { id: 'progress',   label: 'Fortschritt', icon: BarChart2 },
 ];
 
-export default function Navigation({ activeSection, setActiveSection, navigateBack, canGoBack, user, profile, onLogout, onOpenCoach }) {
+export default function Navigation({ activeSection, setActiveSection, canGoBack, onGoBack, user, profile, onLogout, onOpenCoach }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -56,7 +56,7 @@ export default function Navigation({ activeSection, setActiveSection, navigateBa
             {/* Back Button — Desktop */}
             {canGoBack && activeSection !== 'home' && (
               <button
-                onClick={navigateBack}
+                onClick={onGoBack}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '6px 12px', borderRadius: 9,
@@ -213,7 +213,7 @@ export default function Navigation({ activeSection, setActiveSection, navigateBa
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {canGoBack && activeSection !== 'home' ? (
-                <button onClick={navigateBack} style={{
+                <button onClick={onGoBack} style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 34, height: 34, borderRadius: 9,
