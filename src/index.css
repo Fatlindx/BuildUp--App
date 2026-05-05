@@ -470,6 +470,9 @@ img { max-width: 100%; }
 @media (max-width: 767px) {
   * { max-width: 100%; }
   img, video, canvas, svg { max-width: 100%; }
+  /* Critical Fix: position:fixed overlays must never inherit max-width constraints */
+  *[style*="position: fixed"] { max-width: none !important; max-height: none !important; width: 100vw !important; height: 100vh !important; }
+  .modal-overlay { max-width: none !important; max-height: none !important; width: 100vw !important; height: 100vh !important; }
   .home-container, .tracker-container, .calc-container, .progress-container, .library-header, .library-layout { padding-top: 24px; padding-bottom: calc(var(--mobile-bottom) + 24px); }
   body { padding-bottom: var(--mobile-bottom); }
   .home-stats-row { grid-template-columns: 1fr; gap: 12px; }
