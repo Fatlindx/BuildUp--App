@@ -29,7 +29,6 @@ export default function App() {
   const [calorieGoal, setCalorieGoal]       = useState(2000);
   const [logHistory, setLogHistory]         = useState({});
   const [showCoach, setShowCoach]           = useState(false);
-  const [navHistory, setNavHistory]         = useState(['home']);
 
   // ── Smart Navigation with History ──
   const navigateTo = (section) => {
