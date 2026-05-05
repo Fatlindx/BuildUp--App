@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User, ArrowLeft } from 'lucide-react';
+import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User, ChevronLeft } from 'lucide-react';
 
 const navItems = [
   { id: 'home',       label: 'Home',        icon: Home },
@@ -32,19 +32,19 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
   const handleNav = (id) => {
     setActiveSection(id);
     setMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  // ✅ NEVER derive from email — always username or 'User'
   const displayName = profile?.username || 'User';
   const avatarLetter = displayName !== 'User' ? displayName[0].toUpperCase() : null;
 
   return (
     <>
-      {/* ── DESKTOP TOP NAV ── */}
+      {/* ── DESKTOP NAV ── */}
       {!isMobile && (
         <nav className="nav">
           <div className="nav-container">
+
+            {/* Logo */}
             <button className="nav-logo" onClick={() => handleNav('home')}
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
               <div className="logo-icon" style={{ overflow: 'hidden', padding: 0 }}>
@@ -53,57 +53,32 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
               <span className="logo-text">BuildUp</span>
             </button>
 
-            {/* Back Button — Desktop */}
-            {canGoBack && activeSection !== 'home' && (
-              <button
-                onClick={onGoBack}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '6px 12px', borderRadius: 9,
-                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
-                  color: 'var(--text-muted)', cursor: 'pointer',
-                  fontSize: 12.5, fontWeight: 500,
-                  transition: 'all 0.18s ease', flexShrink: 0,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-                title="Zurück"
-              >
-                <ArrowLeft size={14} />
-                <span>Zurück</span>
-              </button>
-            )}
-
             {/* Zurück-Button */}
             {canGoBack && activeSection !== 'home' && (
-              <button
-                onClick={onGoBack}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 4,
-                  padding: '6px 10px', borderRadius: 8,
-                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
-                  color: 'var(--text-muted)', cursor: 'pointer',
-                  fontSize: 12.5, fontWeight: 500,
-                  transition: 'all 0.15s ease', flexShrink: 0,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-                title="Zurück"
+              <button onClick={onGoBack} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 9,
+                background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                color: 'var(--text-muted)', cursor: 'pointer',
+                fontSize: 12.5, fontWeight: 500, flexShrink: 0,
+                transition: 'all 0.18s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
               >
                 <ChevronLeft size={15} />
                 <span>Zurück</span>
               </button>
             )}
 
+            {/* Nav Links */}
             <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
               {allNavItems.map(item => {
                 const Icon = item.icon;
                 return (
-                  <button
-                    key={item.id}
+                  <button key={item.id}
                     className={`nav-link ${activeSection === item.id ? 'active' : ''}`}
-                    onClick={() => handleNav(item.id)}
-                  >
+                    onClick={() => handleNav(item.id)}>
                     <Icon size={15} strokeWidth={1.8} />
                     <span>{item.label}</span>
                   </button>
@@ -111,78 +86,47 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
               })}
             </div>
 
+            {/* Right Side */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               {user && (
-                <button
-                  onClick={() => handleNav('profile')}
-                  style={{
-                    fontSize: 12.5,
-                    color: activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)',
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    background: activeSection === 'profile' ? 'var(--bg-hover)' : 'none',
-                    border: '1px solid',
-                    borderColor: activeSection === 'profile' ? 'var(--border-active)' : 'transparent',
-                    cursor: 'pointer',
-                    padding: '5px 10px', borderRadius: 8,
-                    transition: 'all 0.2s ease',
-                    fontWeight: activeSection === 'profile' ? 600 : 400,
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = 'var(--bg-hover)';
-                    e.currentTarget.style.color = 'var(--text)';
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = activeSection === 'profile' ? 'var(--bg-hover)' : 'none';
-                    e.currentTarget.style.color = activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)';
-                    e.currentTarget.style.borderColor = activeSection === 'profile' ? 'var(--border-active)' : 'transparent';
-                  }}
-                  title="Profil öffnen"
-                >
+                <button onClick={() => handleNav('profile')} style={{
+                  fontSize: 12.5,
+                  color: activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  background: activeSection === 'profile' ? 'var(--bg-hover)' : 'none',
+                  border: '1px solid',
+                  borderColor: activeSection === 'profile' ? 'var(--border-active)' : 'transparent',
+                  cursor: 'pointer', padding: '5px 10px', borderRadius: 8,
+                  transition: 'all 0.2s ease',
+                  fontWeight: activeSection === 'profile' ? 600 : 400,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = activeSection === 'profile' ? 'var(--bg-hover)' : 'none'; e.currentTarget.style.color = activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)'; e.currentTarget.style.borderColor = activeSection === 'profile' ? 'var(--border-active)' : 'transparent'; }}
+                title="Profil öffnen">
                   <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', flexShrink: 0 }} />
                   {displayName}
                 </button>
               )}
-
               {user && (
-                <button
-                  onClick={onOpenCoach}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 7,
-                    padding: '7px 13px', borderRadius: 10,
-                    background: 'var(--green-glow)',
-                    border: '1px solid var(--border-active)',
-                    cursor: 'pointer', color: 'var(--green)',
-                    fontWeight: 600, fontSize: 12.5,
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = 'rgba(34,197,94,0.2)';
-                    e.currentTarget.style.borderColor = 'rgba(34,197,94,0.6)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'var(--green-glow)';
-                    e.currentTarget.style.borderColor = 'var(--border-active)';
-                  }}
-                  title="KI Coach öffnen"
-                >
+                <button onClick={onOpenCoach} style={{
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: '7px 13px', borderRadius: 10,
+                  background: 'var(--green-glow)', border: '1px solid var(--border-active)',
+                  cursor: 'pointer', color: 'var(--green)', fontWeight: 600, fontSize: 12.5,
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(34,197,94,0.2)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.6)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--green-glow)'; e.currentTarget.style.borderColor = 'var(--border-active)'; }}
+                title="KI Coach öffnen">
                   <Bot size={15} strokeWidth={2} />
                   <span>KI Coach</span>
-                  <span style={{
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: 'var(--green)', opacity: 0.8,
-                    animation: 'pulse 2s infinite'
-                  }} />
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', opacity: 0.8, animation: 'pulse 2s infinite' }} />
                 </button>
               )}
-
               {user && (
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={onLogout}
+                <button className="btn btn-ghost btn-sm" onClick={onLogout}
                   style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)' }}
-                  title="Ausloggen"
-                >
+                  title="Ausloggen">
                   <LogOut size={15} />
                   <span style={{ fontSize: 13 }}>Logout</span>
                 </button>
@@ -203,24 +147,21 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
         <>
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-            background: 'rgba(10,10,10,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: '1px solid var(--border)',
-            padding: '10px 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            height: 56,
+            background: 'rgba(10,10,10,0.97)', backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)',
+            padding: '10px 16px', display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between', height: 56,
           }}>
+            {/* Logo + Zurück */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {canGoBack && activeSection !== 'home' ? (
                 <button onClick={onGoBack} style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 34, height: 34, borderRadius: 9,
-                  color: 'var(--text-muted)',
-                  WebkitTapHighlightColor: 'transparent',
+                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: 'var(--text-muted)', flexShrink: 0,
                 }}>
-                  <ArrowLeft size={20} color="var(--text)" />
+                  <ChevronLeft size={18} />
                 </button>
               ) : (
                 <button onClick={() => handleNav('home')}
@@ -228,27 +169,13 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                   <div style={{ width: 32, height: 32, borderRadius: 9, overflow: 'hidden', flexShrink: 0 }}>
                     <img src="/logo-512.png" alt="BuildUp" style={{ width: 32, height: 32, objectFit: 'cover', display: 'block' }} />
                   </div>
+                  <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.3px' }}>BuildUp</span>
                 </button>
               )}
-              <button onClick={() => handleNav('home')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                <span style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.3px' }}>BuildUp</span>
-              </button>
             </div>
 
+            {/* Right: Coach + Avatar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {/* Mobile Zurück-Button */}
-              {canGoBack && activeSection !== 'home' && (
-                <button onClick={onGoBack} style={{
-                  width: 34, height: 34, borderRadius: 9,
-                  background: 'var(--bg-card-2)', border: '1px solid var(--border)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: 'var(--text-muted)',
-                  flexShrink: 0,
-                }}>
-                  <ChevronLeft size={18} />
-                </button>
-              )}
               <button onClick={onOpenCoach} style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '6px 11px', borderRadius: 9,
@@ -259,16 +186,13 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                 <span>Coach</span>
                 <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green)', animation: 'pulse 2s infinite', flexShrink: 0 }} />
               </button>
-
               <button onClick={() => handleNav('profile')} style={{
                 width: 34, height: 34, borderRadius: '50%',
                 background: activeSection === 'profile' ? 'var(--green)' : 'var(--bg-card-2)',
                 border: `2px solid ${activeSection === 'profile' ? 'var(--green)' : 'var(--border)'}`,
-                cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: activeSection === 'profile' ? '#000' : 'var(--text-muted)',
-                fontWeight: 700, fontSize: 13,
-                transition: 'all 0.2s ease', flexShrink: 0,
+                fontWeight: 700, fontSize: 13, transition: 'all 0.2s ease', flexShrink: 0,
               }} title="Profil">
                 {avatarLetter || <User size={14} />}
               </button>
@@ -282,9 +206,8 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
       {isMobile && (
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
-          background: 'rgba(10,10,10,0.97)',
-          backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-          borderTop: '1px solid var(--border)',
+          background: 'rgba(10,10,10,0.97)', backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)', borderTop: '1px solid var(--border)',
           display: 'flex', alignItems: 'center',
           paddingTop: 6, paddingBottom: 'calc(6px + env(safe-area-inset-bottom))',
         }}>
@@ -301,17 +224,13 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
               }}>
                 {isActive && (
                   <span style={{
-                    position: 'absolute', top: -6, left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 24, height: 2.5, borderRadius: 2,
-                    background: 'var(--green)',
+                    position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)',
+                    width: 24, height: 2.5, borderRadius: 2, background: 'var(--green)',
                   }} />
                 )}
                 <div style={{
-                  width: 44, height: 30,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  borderRadius: 10,
-                  background: isActive ? 'rgba(34,197,94,0.12)' : 'transparent',
+                  width: 44, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRadius: 10, background: isActive ? 'rgba(34,197,94,0.12)' : 'transparent',
                   transition: 'all 0.18s ease',
                   transform: isActive ? 'translateY(-1px) scale(1.05)' : 'scale(1)',
                 }}>
