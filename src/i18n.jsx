@@ -3,10 +3,10 @@
 // Sprachen: de (Standard), en, fr, es
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { de } from './locales/de';
-import { en } from './locales/en';
-import { fr } from './locales/fr';
-import { es } from './locales/es';
+import { de } from './locales/de.js';
+import { en } from './locales/en.js';
+import { fr } from './locales/fr.js';
+import { es } from './locales/es.js';
 
 const LOCALES = { de, en, fr, es };
 const STORAGE_KEY = 'buildup_lang';
