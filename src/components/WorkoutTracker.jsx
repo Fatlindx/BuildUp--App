@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { Trophy, useState, useEffect } from 'react';
 import {
   Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2,
   Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList,
@@ -100,7 +100,7 @@ function PauseTimer({ duration, onDone }) {
       animation: 'slideUp 0.3s ease',
     }}>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-        ☕ Pause
+        Pause
       </div>
       <div style={{ fontSize: 40, fontWeight: 900, color: 'var(--green)', letterSpacing: '-1.5px' }}>
         {formatDuration(remaining)}
@@ -130,22 +130,35 @@ export default function WorkoutTracker({ user, profile }) {
 
   const loadPlans = async () => {
     setLoading(true);
-    const { data } = await supabase.from('workout_plans').select('*')
-      .eq('user_id', user.id).order('created_at', { ascending: false });
-    setPlans(data || []);
-    setLoading(false);
+    try {
+      const { data } = await supabase.from('workout_plans').select('*')
+        .eq('user_id', user.id).order('created_at', { ascending: false });
+        setPlans(data || []);
+    } catch (err) {
+      console.error('Load plans error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadHistory = async () => {
-    const { data } = await supabase.from('workout_history').select('*')
-      .eq('user_id', user.id).order('created_at', { ascending: false }).limit(50);
-    setHistory(data || []);
+    try {
+      const { data } = await supabase.from('workout_history').select('*')
+        .eq('user_id', user.id).order('created_at', { ascending: false }).limit(50);
+      setHistory(data || []);
+    } catch (err) {
+      console.error('Load history error:', err);
+    }
   };
 
   const deletePlan = async (id) => {
     if (!confirm('Trainingsplan löschen?')) return;
-    await supabase.from('workout_plans').delete().eq('id', id);
-    setPlans(p => p.filter(x => x.id !== id));
+    try {
+      await supabase.from('workout_plans').delete().eq('id', id);
+      setPlans(p => p.filter(x => x.id !== id));
+    } catch (err) {
+      console.error('Delete plan error:', err);
+    }
   };
 
   const openEdit = (plan = null) => {
@@ -446,13 +459,18 @@ function CreateView({ editPlan, user, onSaved }) {
   const savePlan = async () => {
     if (!name.trim()) { alert('Bitte gib einen Namen ein.'); return; }
     setSaving(true);
+    try {
     const payload = { user_id: user.id, name: name.trim(), description: desc.trim(), plan_data: { days } };
     if (editPlan?.id) {
       await supabase.from('workout_plans').update(payload).eq('id', editPlan.id);
     } else {
       await supabase.from('workout_plans').insert(payload);
     }
-    setSaving(false);
+    } catch (err) {
+      console.error('Save plan error:', err);
+    } finally {
+      setSaving(false);
+    }
     onSaved();
   };
 
@@ -713,11 +731,15 @@ function WorkoutView({ plan, user, onDone, onBack }) {
         }
       }
     });
-    await supabase.from('workout_history').insert({
-      user_id: user.id, plan_id: plan.id, plan_name: plan.name,
-      day_name: currentDay.name, duration_minutes: durationMin,
-      total_volume: totalVolume, exercises_done: { sets: setsDone, values: setValues },
-    });
+    try {
+      await supabase.from('workout_history').insert({
+        user_id: user.id, plan_id: plan.id, plan_name: plan.name,
+        day_name: currentDay.name, duration_minutes: durationMin,
+        total_volume: totalVolume, exercises_done: { sets: setsDone, values: setValues },
+      });
+    } catch (err) {
+      console.error('Save workout history error:', err);
+    }
     setShowSummary(true);
   };
 
@@ -733,7 +755,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
     });
     return (
       <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center', padding: '48px 0' }}>
-        <div style={{ fontSize: 72, marginBottom: 16, animation: 'bounceIn 0.5s ease' }}>🏆</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}><Trophy size={56} color="#eab308" strokeWidth={1.5} /></div>
         <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.8px', marginBottom: 8 }}>Workout abgeschlossen!</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: 32 }}>{currentDay.name} · {plan.name}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
@@ -876,7 +898,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
               <div style={{ padding: '0 16px 14px' }}>
                 {/* Header */}
                 <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 1fr 44px', gap: 6, padding: '6px 4px 4px', borderBottom: '1px solid var(--border)' }}>
-                  {['SET', 'KG', 'REPS', '✓'].map(h => (
+                  {['SET', 'KG', 'REPS', ''].map(h => (
                     <span key={h} style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textAlign: 'center' }}>{h}</span>
                   ))}
                 </div>
@@ -958,7 +980,7 @@ function HistoryView({ history }) {
       background: 'var(--bg-card)', border: '1px solid var(--border)',
       borderRadius: 'var(--radius-xl)',
     }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>🏋️</div>
+      <div style={{ marginBottom: 16 }}><Dumbbell size={48} color="var(--green)" strokeWidth={1.3} /></div>
       <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Noch kein Workout abgeschlossen</h3>
       <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Starte deinen ersten Plan!</p>
     </div>
@@ -1044,7 +1066,7 @@ function HistoryView({ history }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18,
             }}>
-              {i === 0 ? '🏆' : '💪'}
+              {i === 0 ? <Trophy size={14} color='#eab308' /> : <Dumbbell size={14} color='var(--green)' />}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>

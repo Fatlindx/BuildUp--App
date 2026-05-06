@@ -1,6 +1,19 @@
 import { useState, useEffect } from 'react';
 import { User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, Flame, TrendingUp, Scale } from 'lucide-react';
 
+// Goal translation — maps DB/English values to German display names
+const GOAL_LABELS = {
+  muscle:           'Muskelaufbau',
+  Muskelaufbau:     'Muskelaufbau',
+  lose_weight:      'Gewicht verlieren',
+  'Gewicht verlieren': 'Gewicht verlieren',
+  fit:              'Fit bleiben',
+  'Fit bleiben':    'Fit bleiben',
+  endurance:        'Ausdauer verbessern',
+  'Ausdauer verbessern': 'Ausdauer verbessern',
+};
+const translateGoal = (g) => GOAL_LABELS[g] || g || '—';
+
 export default function ProfilePage({ user, profile, onUpdateProfile }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({

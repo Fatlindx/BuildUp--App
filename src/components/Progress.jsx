@@ -89,13 +89,13 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   const [weightLoaded, setWeightLoaded]       = useState(false);
   const [animatedPct, setAnimatedPct]         = useState(0);
 
-  const totalCal  = dailyLog.reduce((s, i) => s + i.calories, 0);
-  const totalProt = dailyLog.reduce((s, i) => s + (i.protein || 0), 0);
-  const totalCarb = dailyLog.reduce((s, i) => s + (i.carbs   || 0), 0);
-  const totalFat  = dailyLog.reduce((s, i) => s + (i.fat     || 0), 0);
+  const totalCal  = (dailyLog || []).reduce((s, i) => s + (i.calories || 0), 0);
+  const totalProt = (dailyLog || []).reduce((s, i) => s + (i.protein || 0), 0);
+  const totalCarb = (dailyLog || []).reduce((s, i) => s + (i.carbs || 0), 0);
+  const totalFat  = (dailyLog || []).reduce((s, i) => s + (i.fat || 0), 0);
   const pct = calorieGoal > 0 ? Math.min((totalCal / calorieGoal) * 100, 100) : 0;
   const streak = calcStreak(logHistory);
-  const totalDaysLogged = Object.values(logHistory).filter(l => l.length > 0).length;
+  const totalDaysLogged = Object.values(logHistory || {}).filter(l => Array.isArray(l) && l.length > 0).length;
 
   // Animate progress on mount
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
 
   const last7Days = getLast7Days();
   const weekData = last7Days.map(({ key, label, isToday }) => {
-    const log = logHistory[key] || [];
+    const log = (logHistory || {})[key] || [];
     const kcal = log.reduce((s, i) => s + i.calories, 0);
     const dayPct = calorieGoal > 0 && kcal > 0 ? Math.min(Math.round((kcal / calorieGoal) * 100), 100) : 0;
     return { day: label, pct: dayPct, kcal, active: isToday };
@@ -115,9 +115,14 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const { data } = await supabase.from('weight_logs').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(30);
-      if (data) setWeightLog(data);
-      setWeightLoaded(true);
+      try {
+        const { data } = await supabase.from('weight_logs').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(30);
+        if (data) setWeightLog(data);
+      } catch (err) {
+        console.error('Load weight error:', err);
+      } finally {
+        setWeightLoaded(true);
+      }
     };
     load();
   }, [user]);
@@ -127,16 +132,21 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
     if (!val || val < 20 || val > 500) return;
     setSavingWeight(true);
     const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase.from('weight_logs').upsert(
-      { user_id: user.id, date: today, weight: val }, { onConflict: 'user_id,date' }
-    ).select().single();
-    if (!error && data) {
-      setWeightLog(prev => {
-        const filtered = prev.filter(w => w.date !== today);
-        return [data, ...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
-      });
+    try {
+      const { data, error } = await supabase.from('weight_logs').upsert(
+        { user_id: user.id, date: today, weight: val }, { onConflict: 'user_id,date' }
+      ).select().single();
+      if (!error && data) {
+        setWeightLog(prev => {
+          const filtered = prev.filter(w => w.date !== today);
+          return [data, ...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+        });
+      }
+    } catch (err) {
+      console.error('Save weight error:', err);
+    } finally {
+      setWeightInput(''); setShowWeightInput(false); setSavingWeight(false);
     }
-    setWeightInput(''); setShowWeightInput(false); setSavingWeight(false);
   };
 
   const weightChart = weightLog.slice(0, 7).reverse();
@@ -178,7 +188,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   // P6: Wochentrend — Vergleich dieser Woche
   const daysWithData   = weekData.filter(d => d.kcal > 0).length;
   const avgKcal        = daysWithData > 0 ? Math.round(weekData.reduce((s,d) => s + d.kcal, 0) / daysWithData) : 0;
-  const daysOnTrack    = weekData.filter(d => calorieGoal > 0 && d.kcal >= calorieGoal * 0.8 && d.kcal <= calorieGoal * 1.1).length;
+  const daysOnTrack    = (calorieGoal > 0) ? weekData.filter(d => d.kcal >= calorieGoal * 0.8 && d.kcal <= calorieGoal * 1.1).length : 0;
   const weekScore      = daysWithData > 0 ? Math.round((daysOnTrack / daysWithData) * 100) : 0;
   const weekTrend      = weekScore >= 80 ? { text: 'Ausgezeichnete Woche', color: 'var(--green)', iconName: 'Trophy' }
     : weekScore >= 50 ? { text: 'Gute Woche',          color: '#4ade80',        iconName: 'TrendingUp' }

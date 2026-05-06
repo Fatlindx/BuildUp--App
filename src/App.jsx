@@ -68,23 +68,32 @@ export default function App() {
     if (!user) return;
     const load = async () => {
       setProfileLoading(true);
-      const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      setProfile(prof ?? null);
-      if (prof?.calorie_goal) setCalorieGoal(prof.calorie_goal);
-      const { data: logs } = await supabase.from('daily_logs').select('date, log').eq('user_id', user.id);
-      if (logs) {
-        const history = {};
-        logs.forEach(l => { history[l.date] = l.log; });
-        setLogHistory(history);
+      try {
+        const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        setProfile(prof ?? null);
+        if (prof?.calorie_goal) setCalorieGoal(prof.calorie_goal);
+        const { data: logs } = await supabase.from('daily_logs').select('date, log').eq('user_id', user.id);
+        if (logs) {
+          const history = {};
+          logs.forEach(l => { if (l.date && Array.isArray(l.log)) history[l.date] = l.log; });
+          setLogHistory(history);
+        }
+      } catch (err) {
+        console.error('Load profile error:', err);
+      } finally {
+        setProfileLoading(false);
       }
-      setProfileLoading(false);
     };
     load();
   }, [user]);
 
   const handleSetCalorieGoal = async (goal) => {
     setCalorieGoal(goal);
-    if (user) await supabase.from('profiles').upsert({ id: user.id, calorie_goal: goal });
+    if (user) {
+      try {
+        await supabase.from('profiles').upsert({ id: user.id, calorie_goal: goal });
+      } catch (err) { console.error('Save goal error:', err); }
+    }
   };
 
   const setDailyLog = async (updater) => {
@@ -96,7 +105,7 @@ export default function App() {
         supabase.from('daily_logs').upsert(
           { user_id: user.id, date: TODAY, log: newToday },
           { onConflict: 'user_id,date' }
-        );
+        ).catch(err => console.error('Save log error:', err));
       }
       return updated;
     });
@@ -119,8 +128,8 @@ export default function App() {
     if (!error) setProfile(prev => ({ ...prev, ...formData }));
   };
 
-  const dailyLog      = logHistory[TODAY] || [];
-  const totalCalories = dailyLog.reduce((s, i) => s + i.calories, 0);
+  const dailyLog      = (logHistory || {})[TODAY] || [];
+  const totalCalories = (dailyLog || []).reduce((s, i) => s + (i.calories || 0), 0);
 
   // ── Splash Screen ──
   if (showSplash) return <SplashScreen onDone={handleSplashDone} />;

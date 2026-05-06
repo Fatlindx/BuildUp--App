@@ -107,7 +107,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
                 {totalMl} <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }}>ml</span>
               </div>
               <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3 }}>
-                {done ? '🎯 Tagesziel erreicht!' : `${remaining * ML_PER_GLASS} ml noch übrig`}
+                {done ? 'Tagesziel erreicht' : `${remaining * ML_PER_GLASS} ml noch übrig`}
               </div>
             </div>
             {done && (
@@ -189,7 +189,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
           }}
         >
           <Droplets size={13} color={done ? '#22c55e' : waterColor} />
-          {done ? 'Tagesziel erreicht ✓' : `+ Glas hinzufügen (${waterGlasses}/${WATER_GOAL})`}
+          {done ? 'Tagesziel erreicht' : `+ Glas hinzufügen (${waterGlasses}/${WATER_GOAL})`}
         </button>
       </div>
 
@@ -199,7 +199,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
         padding: '8px 12px', background: 'rgba(96,165,250,0.05)',
         border: '1px solid rgba(96,165,250,0.1)', borderRadius: 8,
       }}>
-        💡 {waterGlasses === 0
+        {waterGlasses === 0
           ? 'Starte deinen Tag mit einem Glas Wasser!'
           : done
           ? 'Perfekt! Ausreichend Wasser fördert Konzentration und Stoffwechsel.'

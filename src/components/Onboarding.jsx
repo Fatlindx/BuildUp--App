@@ -6,18 +6,18 @@ import { Zap, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 const STEPS = ['ziel', 'geschlecht', 'koerper', 'aktivitaet', 'zusammenfassung'];
 
 const goals = [
-  { id: 'Muskelaufbau',        emoji: '💪', label: 'Muskelaufbau',        desc: 'Muskelmasse aufbauen & stärker werden' },
-  { id: 'Gewicht verlieren',   emoji: '🔥', label: 'Gewicht verlieren',   desc: 'Körperfett reduzieren & schlanker werden' },
-  { id: 'Fit bleiben',         emoji: '🏃', label: 'Fit bleiben',         desc: 'Gesund & aktiv im Alltag' },
-  { id: 'Ausdauer verbessern', emoji: '🚴', label: 'Ausdauer verbessern', desc: 'Cardio & Durchhaltevermögen steigern' },
+  { id: 'Muskelaufbau',        label: 'Muskelaufbau',        desc: 'Muskelmasse aufbauen & stärker werden' },
+  { id: 'Gewicht verlieren',   label: 'Gewicht verlieren',   desc: 'Körperfett reduzieren & schlanker werden' },
+  { id: 'Fit bleiben',         label: 'Fit bleiben',         desc: 'Gesund & aktiv im Alltag' },
+  { id: 'Ausdauer verbessern', label: 'Ausdauer verbessern', desc: 'Cardio & Durchhaltevermögen steigern' },
 ];
 
 const activityLevels = [
-  { id: 1.2,  label: 'Kaum Bewegung',       desc: 'Bürojob, kein Sport',             emoji: '🪑' },
-  { id: 1.375,label: 'Leicht aktiv',         desc: '1–3x Sport pro Woche',            emoji: '🚶' },
-  { id: 1.55, label: 'Mässig aktiv',         desc: '3–5x Sport pro Woche',            emoji: '🏋️' },
-  { id: 1.725,label: 'Sehr aktiv',           desc: '6–7x intensives Training',         emoji: '⚡' },
-  { id: 1.9,  label: 'Extrem aktiv',         desc: 'Tägliches Training + körperl. Job',emoji: '🔥' },
+  { id: 1.2,  label: 'Kaum Bewegung',       desc: 'Bürojob, kein Sport' },
+  { id: 1.375,label: 'Leicht aktiv',         desc: '1–3x Sport pro Woche' },
+  { id: 1.55, label: 'Mässig aktiv',         desc: '3–5x Sport pro Woche' },
+  { id: 1.725,label: 'Sehr aktiv',           desc: '6–7x intensives Training' },
+  { id: 1.9,  label: 'Extrem aktiv',         desc: 'Tägliches Training + körperl. Job' },
 ];
 
 // ── Kalorienberechnung (Mifflin-St Jeor) ──
@@ -88,18 +88,26 @@ export default function Onboarding({ user, onComplete }) {
   const handleComplete = async () => {
     if (!nutrition) return;
     setLoading(true);
-    await supabase.from('profiles').upsert({
-      id:              user.id,
-      goal:            data.goal,
-      gender:          data.gender,
-      age:             parseInt(data.age),
-      height:          parseInt(data.height),
-      weight:          parseFloat(data.weight),
-      activity_level:  data.activityLevel,
-      calorie_goal:    nutrition.calories,
-      onboarding_done: true,
-    });
-    onComplete(data.goal);
+    try {
+      await supabase.from('profiles').upsert({
+        id:              user.id,
+        goal:            data.goal,
+        gender:          data.gender,
+        age:             parseInt(data.age),
+        height:          parseInt(data.height),
+        weight:          parseFloat(data.weight),
+        activity_level:  data.activityLevel,
+        calorie_goal:    nutrition.calories,
+        onboarding_done: true,
+      });
+      onComplete(data.goal);
+    } catch (err) {
+      console.error('Onboarding save error:', err);
+      // Still complete even if save fails — user can update profile later
+      onComplete(data.goal);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const progress = ((step) / (STEPS.length - 1)) * 100;
@@ -151,7 +159,7 @@ export default function Onboarding({ user, onComplete }) {
           {currentStep === 'ziel' && (
             <>
               <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.5px', marginBottom: 6 }}>
-                Was ist dein Ziel? 🎯
+                Was ist dein Ziel?
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
                 Wir passen alles auf dein Ziel an.
@@ -191,15 +199,15 @@ export default function Onboarding({ user, onComplete }) {
           {currentStep === 'geschlecht' && (
             <>
               <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.5px', marginBottom: 6 }}>
-                Dein Geschlecht 👤
+                Dein Geschlecht
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
                 Wird für die genaue Kalorienberechnung benötigt.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {[
-                  { id: 'männlich', emoji: '♂️', label: 'Männlich' },
-                  { id: 'weiblich', emoji: '♀️', label: 'Weiblich' },
+                  { id: 'männlich', label: 'Männlich' },
+                  { id: 'weiblich', label: 'Weiblich' },
                 ].map(g => (
                   <button key={g.id} onClick={() => set('gender', g.id)} style={{
                     padding: '24px 16px', borderRadius: 'var(--radius)',
@@ -222,7 +230,7 @@ export default function Onboarding({ user, onComplete }) {
           {currentStep === 'koerper' && (
             <>
               <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.5px', marginBottom: 6 }}>
-                Deine Körperdaten 📏
+                Deine Körperdaten
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
                 Für deinen persönlichen Kalorienbedarf.
@@ -267,7 +275,7 @@ export default function Onboarding({ user, onComplete }) {
           {currentStep === 'aktivitaet' && (
             <>
               <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.5px', marginBottom: 6 }}>
-                Wie aktiv bist du? ⚡
+                Wie aktiv bist du?
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
                 Wähle deinen durchschnittlichen Alltag.
@@ -306,7 +314,7 @@ export default function Onboarding({ user, onComplete }) {
           {currentStep === 'zusammenfassung' && nutrition && (
             <>
               <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.5px', marginBottom: 4 }}>
-                Dein persönlicher Plan 🎯
+                Dein persönlicher Plan
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: 13.5, marginBottom: 20 }}>
                 Basierend auf deinen Daten berechnet.
@@ -410,7 +418,7 @@ export default function Onboarding({ user, onComplete }) {
               className="btn btn-primary"
               style={{ flex: 1, justifyContent: 'center', padding: 14, fontSize: 15 }}
             >
-              {loading ? 'Wird gespeichert...' : 'Loslegen 🚀'}
+              {loading ? 'Wird gespeichert...' : 'Loslegen'}
             </button>
           )}
         </div>

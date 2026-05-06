@@ -19,10 +19,10 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const totalCal  = dailyLog.reduce((s, i) => s + i.calories, 0);
-  const totalProt = dailyLog.reduce((s, i) => s + (i.protein || 0), 0);
-  const totalCarb = dailyLog.reduce((s, i) => s + (i.carbs || 0), 0);
-  const totalFat  = dailyLog.reduce((s, i) => s + (i.fat || 0), 0);
+  const totalCal  = (dailyLog || []).reduce((s, i) => s + (i.calories || 0), 0);
+  const totalProt = (dailyLog || []).reduce((s, i) => s + (i.protein || 0), 0);
+  const totalCarb = (dailyLog || []).reduce((s, i) => s + (i.carbs || 0), 0);
+  const totalFat  = (dailyLog || []).reduce((s, i) => s + (i.fat || 0), 0);
   const remaining = calorieGoal - totalCal;
   const pct       = calorieGoal > 0 ? Math.min(100, Math.round((totalCal / calorieGoal) * 100)) : 0;
 
@@ -341,7 +341,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
 
 // ── Welcome Message — Persönlich & Motivierend ──
 function buildWelcomeMessage(name, profile, calorieGoal, dailyLog) {
-  const totalCal  = dailyLog.reduce((s, i) => s + i.calories, 0);
+  const totalCal  = (dailyLog || []).reduce((s, i) => s + (i.calories || 0), 0);
   const remaining = calorieGoal - totalCal;
   const hour      = new Date().getHours();
   const greeting  = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
@@ -411,7 +411,7 @@ HEUTIGE STATS (${new Date().toLocaleDateString('de-DE')}):
 - Kalorien: ${totalCal} / ${calorieGoal} kcal (${Math.round((totalCal/calorieGoal)*100)}%)
 - Verbleibend: ${remaining > 0 ? `${remaining} kcal` : `${Math.abs(remaining)} kcal über Ziel`}
 - Protein: ${totalProt}g | Carbs: ${totalCarb}g | Fette: ${totalFat}g
-- Mahlzeiten: ${dailyLog.length > 0 ? dailyLog.map(i => i.name).join(', ') : 'Noch keine'}
+- Mahlzeiten: ${(dailyLog || []).length > 0 ? dailyLog.map(i => i.name).join(', ') : 'Noch keine'}
 
 DEIN FACHWISSEN: Makros, Kalorien, Muskelaufbau, Gewichtsabnahme, Krafttraining, Cardio, HIIT, Supplements, Regeneration, Trainingspläne aller Level. Bei themenfremden Fragen freundlich auf Fitness & Ernährung hinweisen.`;
 }

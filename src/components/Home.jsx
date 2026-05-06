@@ -26,7 +26,7 @@ function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour) {
     color: '#60a5fa',
     iconName: 'Activity',
   };
-  if (hour < 10 && dailyLog.length === 0) return {
+  if (hour < 10 && (dailyLog || []).length === 0) return {
     title: 'Guten Morgen.',
     subtitle: 'Starte deinen Tag mit einer guten Mahlzeit.',
     color: '#f97316',
@@ -91,9 +91,9 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   const pct = calorieGoal > 0 ? Math.min((totalCalories / calorieGoal) * 100, 100) : 0;
   const remaining = Math.max(calorieGoal - totalCalories, 0);
 
-  const totalProtein = dailyLog.reduce((s, i) => s + (i.protein || 0), 0);
-  const totalCarbs   = dailyLog.reduce((s, i) => s + (i.carbs   || 0), 0);
-  const totalFat     = dailyLog.reduce((s, i) => s + (i.fat     || 0), 0);
+  const totalProtein = (dailyLog || []).reduce((s, i) => s + (i.protein || 0), 0);
+  const totalCarbs   = (dailyLog || []).reduce((s, i) => s + (i.carbs || 0), 0);
+  const totalFat     = (dailyLog || []).reduce((s, i) => s + (i.fat || 0), 0);
 
   const macros = [
     { label: 'Protein',       value: totalProtein, unit: 'g', color: '#ef4444' },
@@ -109,22 +109,22 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
 
   // ── P8: Kleine Erfolge — Tages-Meilensteine ──
   const miniMilestones = [];
-  if (dailyLog.length >= 3) miniMilestones.push({ iconName: 'UtensilsCrossed', text: '3 Mahlzeiten heute' });
+  if ((dailyLog || []).length >= 3) miniMilestones.push({ iconName: 'UtensilsCrossed', text: '3 Mahlzeiten heute' });
   if (totalProtein >= 100)  miniMilestones.push({ iconName: 'Dumbbell',        text: '100g Protein erreicht' });
   if (pct >= 100)           miniMilestones.push({ iconName: 'Target',           text: 'Tagesziel erreicht' });
   if (pct >= 50 && pct < 100) miniMilestones.push({ iconName: 'TrendingUp',    text: 'Halbzeit geschafft' });
 
   // ── Toast Feedback ──
   const [toast, setToast] = useState({ show: false, message: '' });
-  const prevLogLength = useState(dailyLog.length)[0];
+  const prevLogLength = useState((dailyLog || []).length)[0];
 
   useEffect(() => {
-    if (dailyLog.length > 0 && dailyLog.length > prevLogLength) {
-      const last = dailyLog[dailyLog.length - 1];
+    if ((dailyLog || []).length > 0 && (dailyLog || []).length > prevLogLength) {
+      const last = dailyLog[(dailyLog || []).length - 1];
       setToast({ show: true, message: `${last.name} hinzugefügt` });
       setTimeout(() => setToast({ show: false, message: '' }), 2500);
     }
-  }, [dailyLog.length]);
+  }, [(dailyLog || []).length]);
 
   // ── Kontextbasierte Kalorien-Reaktion ──
   const calorieReaction = () => {
@@ -240,13 +240,13 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                 </div>
 
                 {/* Mahlzeiten-Zähler */}
-                {dailyLog.length > 0 && (
+                {(dailyLog || []).length > 0 && (
                   <div style={{
                     marginTop: 10, fontSize: 11.5, color: 'var(--text-muted)',
                     display: 'flex', alignItems: 'center', gap: 4,
                   }}>
                     <UtensilsCrossed size={11} />
-                    {dailyLog.length} {dailyLog.length === 1 ? 'Mahlzeit' : 'Mahlzeiten'} heute
+                    {(dailyLog || []).length} {(dailyLog || []).length === 1 ? 'Mahlzeit' : 'Mahlzeiten'} heute
                   </div>
                 )}
               </div>
@@ -289,7 +289,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
           <div className="home-mini-stats">
             <div className="mini-stat-card" onClick={() => setActiveSection('nutrition')}>
               <div className="mini-stat-icon"><UtensilsCrossed size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
-              <div className="mini-stat-value">{dailyLog.length}</div>
+              <div className="mini-stat-value">{(dailyLog || []).length}</div>
               <div className="mini-stat-label">Mahlzeiten heute</div>
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('exercises')}>
@@ -346,7 +346,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
         </div>
 
         {/* Recent Meals */}
-        {dailyLog.length > 0 && (
+        {(dailyLog || []).length > 0 && (
           <div className="home-section">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h2 className="home-section-title" style={{ marginBottom: 0 }}>Heutige Mahlzeiten</h2>
@@ -356,7 +356,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
               </button>
             </div>
             <div className="recent-meals">
-              {dailyLog.slice(-4).reverse().map((item, i) => (
+              {(dailyLog || []).slice(-4).reverse().map((item, i) => (
                 <div key={i} className="recent-meal-row" style={{
                   animation: `slideUpFade 0.3s ${i * 0.05}s ease both`,
                 }}>

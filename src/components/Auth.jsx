@@ -82,7 +82,7 @@ export default function Auth({ onLogin }) {
             username: username.trim(),
           });
         }
-        setSuccess('📧 Bestätigungsmail gesendet! Prüfe dein Postfach und klicke auf den Bestätigungslink.');
+        setSuccess('Bestätigungsmail gesendet! Prüfe dein Postfach und klicke auf den Bestätigungslink.');
         setMode('login');
 
       } else if (mode === 'forgot') {
@@ -90,7 +90,7 @@ export default function Auth({ onLogin }) {
           redirectTo: window.location.origin,
         });
         if (error) throw error;
-        setSuccess('✅ Reset-E-Mail gesendet! Prüfe deinen Posteingang.');
+        setSuccess('Reset-E-Mail gesendet! Prüfe deinen Posteingang.');
       }
     } catch (e) {
       setError(translateError(e.message));
@@ -242,7 +242,7 @@ export default function Auth({ onLogin }) {
               color: '#f87171', lineHeight: 1.5,
               display: 'flex', alignItems: 'flex-start', gap: 8,
             }}>
-              <span style={{ flexShrink: 0, fontSize: 15 }}>⚠️</span>
+              <AlertTriangle size={15} style={{ flexShrink: 0, color: "#f97316" }} />
               {error}
             </div>
           )}

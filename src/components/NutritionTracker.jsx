@@ -79,10 +79,10 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
   const showResults = search.trim().length > 0 || filterCat !== "Alle";
 
   const totals = useMemo(() => ({
-    calories: dailyLog.reduce((s, i) => s + (i.calories || 0), 0),
-    protein:  dailyLog.reduce((s, i) => s + (i.protein  || 0), 0),
-    carbs:    dailyLog.reduce((s, i) => s + (i.carbs    || 0), 0),
-    fat:      dailyLog.reduce((s, i) => s + (i.fat      || 0), 0),
+    calories: (dailyLog || []).reduce((s, i) => s + (i.calories || 0), 0),
+    protein:  (dailyLog || []).reduce((s, i) => s + (i.protein || 0), 0),
+    carbs:    (dailyLog || []).reduce((s, i) => s + (i.carbs || 0), 0),
+    fat:      (dailyLog || []).reduce((s, i) => s + (i.fat || 0), 0),
   }), [dailyLog]);
 
   const goalProtein = calorieGoal > 0 ? Math.round((calorieGoal * 0.30) / 4) : 0;
@@ -398,13 +398,13 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
             <div className="tracker-card">
               <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 Tagesprotokoll
-                {dailyLog.length > 0 && (
+                {(dailyLog || []).length > 0 && (
                   <span style={{ marginLeft: "auto", fontSize: 12.5, color: "var(--text-muted)", fontWeight: 400 }}>
-                    {dailyLog.length} {dailyLog.length === 1 ? "Eintrag" : "Einträge"}
+                    {(dailyLog || []).length} {(dailyLog || []).length === 1 ? "Eintrag" : "Einträge"}
                   </span>
                 )}
               </h3>
-              {dailyLog.length === 0 ? (
+              {(dailyLog || []).length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-icon"><Leaf size={38} strokeWidth={1.2} color="var(--text-muted)" /></div>
                   <p>Noch keine Mahlzeiten eingetragen.</p>

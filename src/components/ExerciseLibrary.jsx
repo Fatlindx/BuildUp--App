@@ -183,7 +183,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
                 ))}
               </div>
               <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
-                💡 {rec.note}
+                {rec.note}
               </div>
             </div>
 
@@ -467,11 +467,15 @@ export default function ExerciseLibrary({ user, profile }) {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const { data } = await supabase
-        .from('favorite_exercises')
-        .select('exercise_id')
-        .eq('user_id', user.id);
-      if (data) setFavorites(new Set(data.map(f => f.exercise_id)));
+      try {
+        const { data } = await supabase
+          .from('favorite_exercises')
+          .select('exercise_id')
+          .eq('user_id', user.id);
+        if (data) setFavorites(new Set(data.map(f => f.exercise_id)));
+      } catch (err) {
+        console.error('Load favorites error:', err);
+      }
     };
     load();
   }, [user]);
@@ -486,13 +490,23 @@ export default function ExerciseLibrary({ user, profile }) {
       isFav ? next.delete(exerciseId) : next.add(exerciseId);
       return next;
     });
-    if (isFav) {
-      await supabase.from('favorite_exercises').delete()
-        .eq('user_id', user.id).eq('exercise_id', exerciseId);
-    } else {
-      await supabase.from('favorite_exercises').upsert({
-        user_id: user.id, exercise_id: exerciseId,
+    try {
+      if (isFav) {
+        await supabase.from('favorite_exercises').delete()
+          .eq('user_id', user.id).eq('exercise_id', exerciseId);
+      } else {
+        await supabase.from('favorite_exercises').upsert({
+          user_id: user.id, exercise_id: exerciseId,
+        });
+      }
+    } catch (err) {
+      // Rollback optimistic update on error
+      setFavorites(prev => {
+        const next = new Set(prev);
+        isFav ? next.add(exerciseId) : next.delete(exerciseId);
+        return next;
       });
+      console.error('Toggle favorite error:', err);
     }
   }, [user, favorites]);
 
@@ -537,7 +551,7 @@ export default function ExerciseLibrary({ user, profile }) {
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg-card-2)', borderRadius: 10, padding: 4 }}>
             {[
               { id: 'all',       label: 'Alle Übungen' },
-              { id: 'favorites', label: `❤️ Favoriten${favorites.size > 0 ? ` (${favorites.size})` : ''}` },
+              { id: 'favorites', label: `Favoriten${favorites.size > 0 ? ` (${favorites.size})` : ''}` },
             ].map(t => (
               <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
                 padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -587,7 +601,7 @@ export default function ExerciseLibrary({ user, profile }) {
               <div className="no-results-icon"><Heart size={38} strokeWidth={1.2} /></div>
               <p style={{ marginBottom: 8 }}>Noch keine Favoriten gespeichert.</p>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-                Klicke auf das ❤️ auf einer Übungskarte um sie zu speichern.
+                Klicke auf das Herz-Symbol auf einer Übungskarte um sie zu speichern.
               </p>
               <button className="btn btn-secondary btn-sm" onClick={() => setActiveTab('all')}>
                 Alle Übungen anzeigen
