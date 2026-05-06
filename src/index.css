@@ -36,6 +36,14 @@
   --sp-5:  20px;
   --sp-6:  24px;
 
+  /* ── Icon Scale ── */
+  --icon-xs:   12px;
+  --icon-sm:   14px;
+  --icon-base: 16px;
+  --icon-md:   18px;
+  --icon-lg:   22px;
+  --icon-xl:   32px;
+
   /* ── Typography Scale ── */
   --fs-xs:   10px;
   --fs-sm:   12px;

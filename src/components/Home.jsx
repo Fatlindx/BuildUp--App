@@ -1,6 +1,6 @@
 import {
-  UtensilsCrossed, Dumbbell, BarChart2, Flame, Plus, Calculator, ChevronRight, MessageCircle, Target, Activity, TrendingUp, CheckCircle2, Sunrise
-} from 'lucide-react';
+  UtensilsCrossed, Dumbbell, BarChart2, Flame, Plus, Calculator, ChevronRight, MessageCircle, Target, Activity, TrendingUp, CheckCircle2, Sunrise, Clock
+} from 'lucide-react';;
 import { useState, useEffect } from 'react';
 
 // ── Dynamische Motivations-Texte ──
@@ -14,25 +14,25 @@ function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour) {
   if (pct >= 85) return {
     title: 'Fast am Ziel.',
     subtitle: `Noch ${(calorieGoal - totalCalories).toLocaleString()} kcal verbleibend.`,
-    color: '#4ade80',
+    color: 'var(--green-bright)',
     iconName: 'TrendingUp',
   };
   if (pct >= 50) return {
     title: 'Auf Kurs.',
     subtitle: 'Du machst heute gute Fortschritte.',
-    color: '#60a5fa',
+    color: 'var(--blue-light)',
     iconName: 'Activity',
   };
   if (hour < 10 && (dailyLog || []).length === 0) return {
     title: 'Guten Morgen.',
     subtitle: 'Starte deinen Tag mit einer guten Mahlzeit.',
-    color: '#f97316',
+    color: 'var(--orange)',
     iconName: 'Sunrise',
   };
   if (hour >= 18 && pct < 30) return {
     title: 'Heute noch nachholen.',
     subtitle: 'Du hast heute wenig gegessen.',
-    color: '#f97316',
+    color: 'var(--orange)',
     iconName: 'Clock',
   };
   return {
@@ -80,10 +80,55 @@ function FeedbackToast({ message, show }) {
   );
 }
 
-export default function Home({ setActiveSection, calorieGoal, totalCalories, dailyLog, username }) {
+export default function Home({ setActiveSection, calorieGoal, totalCalories, dailyLog, logHistory, username }) {
   const hour = new Date().getHours();
   const greeting     = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
   const greetingIcon = null; // Icons werden inline gerendert
+
+  // ── P7: Retention Logic ──
+  const TODAY = new Date().toISOString().split('T')[0];
+  const history = logHistory || {};
+
+  // Streak berechnen
+  const calcStreak = () => {
+    let streak = 0;
+    const d = new Date();
+    // Start from yesterday (today might not be done yet)
+    d.setDate(d.getDate() - 1);
+    for (let i = 0; i < 60; i++) {
+      const key = d.toISOString().split('T')[0];
+      if ((history[key] || []).length > 0) {
+        streak++;
+        d.setDate(d.getDate() - 1);
+      } else break;
+    }
+    // Also count today if logged
+    if ((history[TODAY] || []).length > 0 || (dailyLog || []).length > 0) streak++;
+    return streak;
+  };
+  const streak = calcStreak();
+
+  // Gestern nicht getrackt?
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = yesterday.toISOString().split('T')[0];
+  const loggedYesterday = (history[yesterdayKey] || []).length > 0;
+  const loggedToday = (dailyLog || []).length > 0 || (history[TODAY] || []).length > 0;
+  const showNudge = !loggedYesterday && !loggedToday && hour >= 9; // Nudge nur ab 9 Uhr
+
+  // Wochenstatistik
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
+  const daysTrackedThisWeek = weekDays.filter(d =>
+    d === TODAY ? loggedToday : (history[d] || []).length > 0
+  ).length;
+
+  // Weekly Summary — Sonntag oder wenn genug Daten (>= 3 Tage diese Woche)
+  const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+  const showWeeklySummary = daysTrackedThisWeek >= 3 && isWeekend && streak > 0;
 
   const pct = calorieGoal > 0 ? Math.min((totalCalories / calorieGoal) * 100, 100) : 0;
   const remaining = Math.max(calorieGoal - totalCalories, 0);
@@ -93,9 +138,9 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   const totalFat     = (dailyLog || []).reduce((s, i) => s + (i.fat || 0), 0);
 
   const macros = [
-    { label: 'Protein',       value: totalProtein, unit: 'g', color: '#ef4444' },
-    { label: 'Kohlenhydrate', value: totalCarbs,   unit: 'g', color: '#f97316' },
-    { label: 'Fette',         value: totalFat,     unit: 'g', color: '#eab308' },
+    { label: 'Protein',       value: totalProtein, unit: 'g', color: 'var(--red)' },
+    { label: 'Kohlenhydrate', value: totalCarbs,   unit: 'g', color: 'var(--orange)' },
+    { label: 'Fette',         value: totalFat,     unit: 'g', color: 'var(--yellow)' },
   ];
 
   const quote = motivationQuotes[new Date().getDate() % motivationQuotes.length];
@@ -127,20 +172,20 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   const calorieReaction = () => {
     if (!calorieGoal) return null;
     if (pct >= 100) return { text: 'Tagesziel erreicht', color: '#22c55e' };
-    if (pct >= 85)  return { text: 'Fast geschafft', color: '#4ade80' };
-    if (pct >= 50)  return { text: 'Auf Kurs', color: '#60a5fa' };
+    if (pct >= 85)  return { text: 'Fast geschafft', color: 'var(--green-bright)' };
+    if (pct >= 50)  return { text: 'Auf Kurs', color: 'var(--blue-light)' };
     if (pct > 0)    return { text: 'Gut gestartet', color: 'var(--text-muted)' };
     return { text: 'Noch nichts gegessen', color: 'var(--text-muted)' };
   };
   const reaction = calorieReaction();
 
   const muscleGroups = [
-    { name: 'Brust',     color: '#ef4444' },
-    { name: 'Rücken',    color: '#3b82f6' },
-    { name: 'Beine',     color: '#f97316' },
-    { name: 'Schultern', color: '#a855f7' },
+    { name: 'Brust',     color: 'var(--red)' },
+    { name: 'Rücken',    color: 'var(--blue)' },
+    { name: 'Beine',     color: 'var(--orange)' },
+    { name: 'Schultern', color: 'var(--purple)' },
     { name: 'Bizeps',    color: '#22c55e' },
-    { name: 'Core',      color: '#eab308' },
+    { name: 'Core',      color: 'var(--yellow)' },
   ];
 
   const showName = username && username !== 'User';
@@ -208,6 +253,98 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
           </div>
         </div>
 
+        {/* ── P7: Retention Cards ── */}
+
+        {/* Streak Banner — nur wenn Streak > 1 */}
+        {streak > 1 && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 16px', borderRadius: 12, marginBottom: 12,
+            background: streak >= 7
+              ? 'linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.03))'
+              : 'var(--bg-card)',
+            border: `1px solid ${streak >= 7 ? 'var(--border-active)' : 'var(--border)'}`,
+            animation: 'slideUpFade 0.3s ease both',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Flame size={16} color={streak >= 7 ? 'var(--green)' : 'var(--orange)'} strokeWidth={2} />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
+                  {streak} Tage Streak
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                  {streak >= 7 ? 'Aussergewöhnliche Konstanz.' : `Noch ${7 - streak} Tage bis zum 7-Tage-Streak.`}
+                </div>
+              </div>
+            </div>
+            {daysTrackedThisWeek > 0 && (
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>
+                  {daysTrackedThisWeek}/7
+                </div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>diese Woche</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Konsistenz-Nudge — wenn gestern nicht getrackt */}
+        {showNudge && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '11px 16px', borderRadius: 12, marginBottom: 12,
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            animation: 'slideUpFade 0.35s ease both', cursor: 'pointer',
+          }}
+          onClick={() => setActiveSection('nutrition')}
+          >
+            <Clock size={15} color="var(--text-muted)" strokeWidth={2} style={{ flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                Gestern pausiert — heute wieder starten?
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                Kleine Schritte zählen auch. Jetzt tracken.
+              </div>
+            </div>
+            <ChevronRight size={14} color="var(--text-muted)" />
+          </div>
+        )}
+
+        {/* Weekly Summary — Wochenende mit genug Daten */}
+        {showWeeklySummary && (
+          <div style={{
+            padding: '14px 16px', borderRadius: 12, marginBottom: 12,
+            background: 'linear-gradient(135deg, rgba(34,197,94,0.06), var(--bg-card))',
+            border: '1px solid var(--border-active)',
+            animation: 'slideUpFade 0.4s ease both',
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+              letterSpacing: '0.7px', color: 'var(--green)', marginBottom: 10 }}>
+              Deine Woche
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              {[
+                { label: 'Tage aktiv',  value: `${daysTrackedThisWeek}/7`, color: 'var(--green)' },
+                { label: 'Streak',      value: `${streak} Tage`,          color: 'var(--orange)' },
+                { label: 'Ziel-Tage',   value: calorieGoal > 0 ? `${weekDays.filter(d => {
+                    const log = d === TODAY ? dailyLog : (history[d] || []);
+                    const kcal = (log || []).reduce((s,i) => s + (i.calories||0), 0);
+                    return kcal >= calorieGoal * 0.85;
+                  }).length}` : '—', color: 'var(--blue-light)' },
+              ].map(s => (
+                <div key={s.label} style={{
+                  background: 'var(--bg-card-2)', borderRadius: 10, padding: '10px',
+                  textAlign: 'center', border: '1px solid var(--border)',
+                }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Stats Row */}
         <div className="home-stats-row">
           {/* Calorie Ring */}
@@ -220,7 +357,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
               <div>
                 <div className="stat-label">Heute gegessen</div>
                 <div className="stat-value" style={{
-                  color: pct >= 100 ? 'var(--green)' : pct >= 85 ? '#4ade80' : 'var(--green)',
+                  color: pct >= 100 ? 'var(--green)' : pct >= 85 ? 'var(--green-bright)' : 'var(--green)',
                   transition: 'color 0.3s ease',
                 }}>
                   {totalCalories.toLocaleString()}
@@ -254,7 +391,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                   <circle
                     cx="65" cy="65" r="54"
                     fill="none"
-                    stroke={pct >= 100 ? '#22c55e' : pct >= 85 ? '#4ade80' : 'var(--green)'}
+                    stroke={pct >= 100 ? '#22c55e' : pct >= 85 ? 'var(--green-bright)' : 'var(--green)'}
                     strokeWidth="12"
                     strokeLinecap="round"
                     strokeDasharray={circumference}
@@ -320,21 +457,21 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('exercises')}>
               <div className="qa-icon" style={{ background: 'rgba(59,130,246,0.15)' }}>
-                <Dumbbell size={22} color="#3b82f6" />
+                <Dumbbell size={22} color="var(--blue)" />
               </div>
               <div className="qa-label">Übungen entdecken</div>
               <div className="qa-sub">71 Übungen</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('calculator')}>
               <div className="qa-icon" style={{ background: 'rgba(239,68,68,0.15)' }}>
-                <Calculator size={22} color="#ef4444" />
+                <Calculator size={22} color="var(--red)" />
               </div>
               <div className="qa-label">Kalorienbedarf</div>
               <div className="qa-sub">Mifflin-St Jeor</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('progress')}>
               <div className="qa-icon" style={{ background: 'rgba(234,179,8,0.15)' }}>
-                <BarChart2 size={22} color="#eab308" />
+                <BarChart2 size={22} color="var(--yellow)" />
               </div>
               <div className="qa-label">Fortschritt ansehen</div>
               <div className="qa-sub">Statistiken & Ziele</div>

@@ -67,7 +67,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   };
 
   // Motivations-Farbe basierend auf Fortschritt
-  const progressColor = pct >= 100 ? '#ef4444' : pct >= 80 ? '#4ade80' : 'var(--green)';
+  const progressColor = pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--green-bright)' : 'var(--green)';
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -102,7 +102,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
                 boxShadow: '0 0 24px rgba(34,197,94,0.4), 0 0 0 1px rgba(34,197,94,0.2)',
                 position: 'relative',
               }}>
-                <Bot size={24} color="#000" strokeWidth={2.5} />
+                <Bot size={22} color="#000" strokeWidth={2.5} />
                 {/* Online indicator */}
                 <div style={{
                   position: 'absolute', bottom: 2, right: 2,
@@ -161,9 +161,9 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
           {/* Makros + Profil Tags */}
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             {[
-              { iconName: 'Dumbbell', label: 'Protein', value: `${totalProt}g`, color: '#ef4444' },
-              { iconName: 'Wheat', label: 'Carbs',   value: `${totalCarb}g`, color: '#f97316' },
-              { iconName: 'Droplets', label: 'Fette',   value: `${totalFat}g`,  color: '#eab308' },
+              { iconName: 'Dumbbell', label: 'Protein', value: `${totalProt}g`, color: 'var(--red)' },
+              { iconName: 'Wheat', label: 'Carbs',   value: `${totalCarb}g`, color: 'var(--orange)' },
+              { iconName: 'Droplets', label: 'Fette',   value: `${totalFat}g`,  color: 'var(--yellow)' },
             ].map(m => (
               <div key={m.label} style={{
                 display: 'flex', alignItems: 'center', gap: 4,

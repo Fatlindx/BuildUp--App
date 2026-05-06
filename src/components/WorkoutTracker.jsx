@@ -6,8 +6,8 @@ import { supabase } from '../supabase';
 import { exercises } from '../data/exercises';
 
 const muscleColors = {
-  Brust: '#ef4444', Rücken: '#3b82f6', Schultern: '#a855f7',
-  Beine: '#f97316', Bizeps: '#22c55e', Trizeps: '#06b6d4', Core: '#eab308',
+  Brust: 'var(--red)', Rücken: 'var(--blue)', Schultern: 'var(--purple)',
+  Beine: 'var(--orange)', Bizeps: '#22c55e', Trizeps: '#06b6d4', Core: 'var(--yellow)',
 };
 
 // ── Quick-Start Templates ──────────────────────────────────────────────────
@@ -249,8 +249,8 @@ function PlansView({ plans, loading, onEdit, onDelete, onStart, onNew, history }
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
           {[
             { label: 'Workouts', value: totalWorkouts, icon: <Trophy size={18} color="var(--green)" /> },
-            { label: 'Gesamt Volumen', value: `${totalVolume.toLocaleString()} kg`, icon: <Dumbbell size={18} color="#3b82f6" /> },
-            { label: 'Trainingszeit', value: `${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}m`, icon: <Clock size={18} color="#a855f7" /> },
+            { label: 'Gesamt Volumen', value: `${totalVolume.toLocaleString()} kg`, icon: <Dumbbell size={18} color="var(--blue)" /> },
+            { label: 'Trainingszeit', value: `${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}m`, icon: <Clock size={18} color="var(--purple)" /> },
           ].map(s => (
             <div key={s.label} style={{
               background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -753,7 +753,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
     });
     return (
       <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center', padding: '48px 0' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}><Trophy size={56} color="#eab308" strokeWidth={1.5} /></div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}><Trophy size={56} color="var(--yellow)" strokeWidth={1.5} /></div>
         <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.8px', marginBottom: 8 }}>Workout abgeschlossen!</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: 32 }}>{currentDay.name} · {plan.name}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
@@ -880,7 +880,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
                   <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 2 }}>{exercise.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                     {ex.sets} Sets · {ex.reps} Reps · {ex.weight > 0 ? `${ex.weight} kg` : 'Körpergewicht'}
-                    {ex.note && <span style={{ color: '#a855f7', marginLeft: 6 }}>· {ex.note}</span>}
+                    {ex.note && <span style={{ color: 'var(--purple)', marginLeft: 6 }}>· {ex.note}</span>}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -996,9 +996,9 @@ function HistoryView({ history }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
           { label: 'Workouts', value: totalWorkouts, color: 'var(--green)' },
-          { label: 'Gesamt Volumen', value: `${totalVolume.toLocaleString()}kg`, color: '#3b82f6' },
-          { label: 'Ø Dauer', value: `${avgDuration} min`, color: '#a855f7' },
-          { label: 'Bestes Volumen', value: `${bestVolume.toLocaleString()}kg`, color: '#f97316' },
+          { label: 'Gesamt Volumen', value: `${totalVolume.toLocaleString()}kg`, color: 'var(--blue)' },
+          { label: 'Ø Dauer', value: `${avgDuration} min`, color: 'var(--purple)' },
+          { label: 'Bestes Volumen', value: `${bestVolume.toLocaleString()}kg`, color: 'var(--orange)' },
         ].map(s => (
           <div key={s.label} style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -1064,7 +1064,7 @@ function HistoryView({ history }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18,
             }}>
-              {i === 0 ? <Trophy size={14} color='#eab308' /> : <Dumbbell size={14} color='var(--green)' />}
+              {i === 0 ? <Trophy size={14} color='var(--yellow)' /> : <Dumbbell size={14} color='var(--green)' />}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>
@@ -1080,7 +1080,7 @@ function HistoryView({ history }) {
                 <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Dauer</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#3b82f6' }}>{h.total_volume?.toLocaleString()} kg</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--blue)' }}>{h.total_volume?.toLocaleString()} kg</div>
                 <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Volumen</div>
               </div>
             </div>

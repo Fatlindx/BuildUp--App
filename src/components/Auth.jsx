@@ -242,7 +242,7 @@ export default function Auth({ onLogin }) {
               color: '#f87171', lineHeight: 1.5,
               display: 'flex', alignItems: 'flex-start', gap: 8,
             }}>
-              <AlertTriangle size={15} style={{ flexShrink: 0, color: "#f97316" }} />
+              <AlertTriangle size={15} style={{ flexShrink: 0, color: "var(--orange)" }} />
               {error}
             </div>
           )}

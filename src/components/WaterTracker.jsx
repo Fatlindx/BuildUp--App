@@ -15,7 +15,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
 
   const getWaterColor = () => {
     if (pct >= 100) return '#22c55e';
-    if (pct >= 75)  return '#60a5fa';
+    if (pct >= 75)  return 'var(--blue-light)';
     if (pct >= 50)  return '#38bdf8';
     if (pct >= 25)  return '#7dd3fc';
     return '#93c5fd';
@@ -117,7 +117,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
                 background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)',
                 padding: '3px 8px', borderRadius: 100,
               }}>
-                <Trophy size={10} /> Ziel!
+                <Trophy size={12} /> Ziel!
               </div>
             )}
           </div>

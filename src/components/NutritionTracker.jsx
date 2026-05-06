@@ -141,9 +141,9 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
   const getCatColor = (cat) => {
     const map = {
-      "Frühstück": "#fb923c", "Hauptgericht": "#3b82f6",
-      "Snack": "#22c55e", "Getränk": "#60a5fa",
-      "Fitness Meal": "#a855f7", "Gescannt": "#22c55e",
+      "Frühstück": "#fb923c", "Hauptgericht": "var(--blue)",
+      "Snack": "#22c55e", "Getränk": "var(--blue-light)",
+      "Fitness Meal": "var(--purple)", "Gescannt": "#22c55e",
     };
     return map[cat] || "#64748b";
   };
@@ -180,7 +180,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               </span>
               <span style={{
                 fontSize: 12, fontWeight: 700, padding: '2px 10px', borderRadius: 100,
-                color: pct >= 100 ? '#ef4444' : 'var(--green)',
+                color: pct >= 100 ? 'var(--red)' : 'var(--green)',
                 background: pct >= 100 ? 'rgba(239,68,68,0.1)' : 'var(--green-glow)',
                 border: `1px solid ${pct >= 100 ? 'rgba(239,68,68,0.3)' : 'var(--border-active)'}`,
                 whiteSpace: 'nowrap', flexShrink: 0,
@@ -192,7 +192,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
             <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden', marginBottom: 10 }}>
               <div style={{
                 height: '100%', width: `${pct}%`, borderRadius: 100,
-                background: pct >= 100 ? '#ef4444' : 'linear-gradient(90deg, var(--green-dark), var(--green))',
+                background: pct >= 100 ? 'var(--red)' : 'linear-gradient(90deg, var(--green-dark), var(--green))',
                 transition: 'width 0.6s ease',
                 boxShadow: pct > 0 ? '0 0 8px rgba(34,197,94,0.4)' : 'none',
               }} />
@@ -200,9 +200,9 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
             {/* Makros row */}
             <div style={{ display: 'flex', gap: 16 }}>
               {[
-                { label: 'Protein', value: totals.protein, color: '#ef4444' },
-                { label: 'Carbs',   value: totals.carbs,   color: '#f97316' },
-                { label: 'Fette',   value: totals.fat,     color: '#eab308' },
+                { label: 'Protein', value: totals.protein, color: 'var(--red)' },
+                { label: 'Carbs',   value: totals.carbs,   color: 'var(--orange)' },
+                { label: 'Fette',   value: totals.fat,     color: 'var(--yellow)' },
               ].map(m => (
                 <div key={m.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: m.color }}>{m.value}g</span>
@@ -475,7 +475,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 </>
               ) : (
                 <div style={{ textAlign: "center", padding: "16px 0" }}>
-                  <Target size={34} strokeWidth={1.2} color="var(--text-muted)" style={{ marginBottom: 8 }} />
+                  <Target size={32} strokeWidth={1.2} color="var(--text-muted)" style={{ marginBottom: 8 }} />
                   <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>
                     Kein Tagesziel gesetzt.<br />Nutze den Rechner oder setze es manuell.
                   </p>
@@ -501,14 +501,14 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
             <div className="tracker-card">
               <h3>Makronährstoffe</h3>
               <div className="macro-bars">
-                <MacroRow label="Protein"       value={totals.protein} goal={goalProtein} unit="g" color="#ef4444" />
-                <MacroRow label="Kohlenhydrate" value={totals.carbs}   goal={goalCarbs}   unit="g" color="#f97316" />
-                <MacroRow label="Fette"         value={totals.fat}     goal={goalFat}     unit="g" color="#eab308" />
+                <MacroRow label="Protein"       value={totals.protein} goal={goalProtein} unit="g" color="var(--red)" />
+                <MacroRow label="Kohlenhydrate" value={totals.carbs}   goal={goalCarbs}   unit="g" color="var(--orange)" />
+                <MacroRow label="Fette"         value={totals.fat}     goal={goalFat}     unit="g" color="var(--yellow)" />
               </div>
             </div>
 
             <div className="tracker-card">
-              <h3><Droplets size={16} color="#60a5fa" /> Wassertracker</h3>
+              <h3><Droplets size={16} color="var(--blue-light)" /> Wassertracker</h3>
               <WaterTracker waterGlasses={waterGlasses} setWaterGlasses={setWaterGlasses} />
             </div>
 

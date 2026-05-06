@@ -34,7 +34,7 @@ function calcStreak(logHistory) {
 // ── P3: Smooth Gradient Progress Bar ──
 function GradientProgressBar({ value, max, height = 10 }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
-  const color = pct >= 100 ? '#ef4444' : pct >= 85 ? '#4ade80' : pct >= 50 ? '#22c55e' : '#22c55e';
+  const color = pct >= 100 ? 'var(--red)' : pct >= 85 ? 'var(--green-bright)' : pct >= 50 ? '#22c55e' : '#22c55e';
   const glow  = pct >= 100 ? 'rgba(239,68,68,0.4)' : 'rgba(34,197,94,0.4)';
 
   return (
@@ -51,7 +51,7 @@ function GradientProgressBar({ value, max, height = 10 }) {
         {/* Fill */}
         <div style={{
           height: '100%', width: `${pct}%`,
-          background: `linear-gradient(90deg, ${pct >= 100 ? '#ef4444' : '#16a34a'}, ${color})`,
+          background: `linear-gradient(90deg, ${pct >= 100 ? 'var(--red)' : '#16a34a'}, ${color})`,
           borderRadius: 100,
           transition: 'width 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'relative',
@@ -155,7 +155,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   const weightDiff = latestWeight && oldestWeight && weightLog.length > 1 ? (latestWeight - oldestWeight).toFixed(1) : null;
   const bmi = latestWeight && profile?.height ? (latestWeight / ((profile.height / 100) ** 2)).toFixed(1) : null;
   const bmiCategory = bmi ? bmi < 18.5 ? 'Untergewicht' : bmi < 25 ? 'Normalgewicht' : bmi < 30 ? 'Übergewicht' : 'Adipositas' : null;
-  const bmiColor = bmi ? bmi < 18.5 ? '#60a5fa' : bmi < 25 ? 'var(--green)' : bmi < 30 ? '#f97316' : '#ef4444' : 'var(--green)';
+  const bmiColor = bmi ? bmi < 18.5 ? 'var(--blue-light)' : bmi < 25 ? 'var(--green)' : bmi < 30 ? 'var(--orange)' : 'var(--red)' : 'var(--green)';
 
   const stats = [
     { label: 'Heute gegessen', value: `${totalCal} kcal`,    icon: UtensilsCrossed },
@@ -165,21 +165,21 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   ];
 
   const achievements = [
-    { icon: Flame,      color: '#f97316', title: 'Erster Eintrag',  desc: 'Erste Mahlzeit geloggt',       done: Object.values(logHistory).some(l => l.length > 0) },
+    { icon: Flame,      color: 'var(--orange)', title: 'Erster Eintrag',  desc: 'Erste Mahlzeit geloggt',       done: Object.values(logHistory).some(l => l.length > 0) },
     { icon: Target,     color: '#22c55e', title: 'Ziel gesetzt',    desc: 'Kalorienziel konfiguriert',     done: calorieGoal > 0 },
-    { icon: Dumbbell,   color: '#3b82f6', title: '3 Mahlzeiten',    desc: 'Heute 3+ Mahlzeiten getrackt', done: dailyLog.length >= 3 },
-    { icon: Star,       color: '#eab308', title: 'Protein-Profi',   desc: '80g+ Protein heute',            done: totalProt >= 80 },
-    { icon: Trophy,     color: '#a855f7', title: 'Kalorienbudget',  desc: 'Innerhalb des Tagesziels',      done: pct >= 80 && pct <= 100 && calorieGoal > 0 },
+    { icon: Dumbbell,   color: 'var(--blue)', title: '3 Mahlzeiten',    desc: 'Heute 3+ Mahlzeiten getrackt', done: dailyLog.length >= 3 },
+    { icon: Star,       color: 'var(--yellow)', title: 'Protein-Profi',   desc: '80g+ Protein heute',            done: totalProt >= 80 },
+    { icon: Trophy,     color: 'var(--purple)', title: 'Kalorienbudget',  desc: 'Innerhalb des Tagesziels',      done: pct >= 80 && pct <= 100 && calorieGoal > 0 },
     { icon: Rocket,     color: '#06b6d4', title: 'Konstanz',        desc: 'App 3+ Tage genutzt',           done: totalDaysLogged >= 3 },
     { icon: Scale,      color: '#ec4899', title: 'Gewicht geloggt', desc: 'Erstes Gewicht eingetragen',    done: weightLog.length > 0 },
     { icon: TrendingUp, color: '#22c55e', title: '7-Tage-Streak',   desc: '7 Tage in Folge getrackt',     done: streak >= 7 },
   ];
 
   // P6: Tagesstatus mit Icon
-  const statusText = pct >= 100 ? { text: 'Über Ziel',     color: '#ef4444',          iconName: 'AlertCircle',  bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)'   }
-    : pct >= 85 ? { text: 'Fast am Ziel',   color: '#4ade80',          iconName: 'TrendingUp',   bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
+  const statusText = pct >= 100 ? { text: 'Über Ziel',     color: 'var(--red)',          iconName: 'AlertCircle',  bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)'   }
+    : pct >= 85 ? { text: 'Fast am Ziel',   color: 'var(--green-bright)',          iconName: 'TrendingUp',   bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
     : pct >= 50 ? { text: 'On Track',        color: 'var(--green)',     iconName: 'CheckCircle2', bg: 'var(--green-glow)',     border: 'var(--border-active)'  }
-    : pct > 0   ? { text: 'Gestartet',       color: '#60a5fa',          iconName: 'Activity',     bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
+    : pct > 0   ? { text: 'Gestartet',       color: 'var(--blue-light)',          iconName: 'Activity',     bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
     : { text: 'Noch nichts',   color: 'var(--text-muted)',   iconName: 'Minus',        bg: 'var(--bg-card-2)',     border: 'var(--border)'         };
 
   // P6: Wochentrend — Vergleich dieser Woche
@@ -188,8 +188,8 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   const daysOnTrack    = (calorieGoal > 0) ? weekData.filter(d => d.kcal >= calorieGoal * 0.8 && d.kcal <= calorieGoal * 1.1).length : 0;
   const weekScore      = daysWithData > 0 ? Math.round((daysOnTrack / daysWithData) * 100) : 0;
   const weekTrend      = weekScore >= 80 ? { text: 'Ausgezeichnete Woche', color: 'var(--green)', iconName: 'Trophy' }
-    : weekScore >= 50 ? { text: 'Gute Woche',          color: '#4ade80',        iconName: 'TrendingUp' }
-    : weekScore >  0  ? { text: 'Woche im Aufbau',     color: '#f97316',        iconName: 'Activity' }
+    : weekScore >= 50 ? { text: 'Gute Woche',          color: 'var(--green-bright)',        iconName: 'TrendingUp' }
+    : weekScore >  0  ? { text: 'Woche im Aufbau',     color: 'var(--orange)',        iconName: 'Activity' }
     : { text: 'Diese Woche starten', color: 'var(--text-muted)', iconName: 'Target' };
 
   return (
@@ -276,7 +276,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
               {totalCal.toLocaleString()} kcal gegessen
             </span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: pct >= 100 ? '#ef4444' : 'var(--green)' }}>
+            <span style={{ fontSize: 16, fontWeight: 800, color: pct >= 100 ? 'var(--red)' : 'var(--green)' }}>
               {Math.round(animatedPct)}%
             </span>
           </div>
@@ -297,9 +297,9 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           {/* P3: Makro Progress Bars */}
           <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              { label: 'Protein', value: totalProt, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.30) / 4) : 0, unit: 'g', color: '#ef4444' },
-              { label: 'Kohlenhydrate', value: totalCarb, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.45) / 4) : 0, unit: 'g', color: '#f97316' },
-              { label: 'Fette', value: totalFat, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.25) / 9) : 0, unit: 'g', color: '#eab308' },
+              { label: 'Protein', value: totalProt, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.30) / 4) : 0, unit: 'g', color: 'var(--red)' },
+              { label: 'Kohlenhydrate', value: totalCarb, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.45) / 4) : 0, unit: 'g', color: 'var(--orange)' },
+              { label: 'Fette', value: totalFat, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.25) / 9) : 0, unit: 'g', color: 'var(--yellow)' },
             ].map(m => {
               const mPct = m.goal > 0 ? Math.min((m.value / m.goal) * 100, 100) : 0;
               return (
@@ -337,7 +337,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                 {/* P8: Streak Milestone Badge — Lucide Icons */}
                 <span style={{
                   fontSize: 12, fontWeight: 700,
-                  color: streak >= 30 ? '#eab308' : streak >= 14 ? '#a855f7' : streak >= 7 ? '#22c55e' : '#f97316',
+                  color: streak >= 30 ? 'var(--yellow)' : streak >= 14 ? 'var(--purple)' : streak >= 7 ? '#22c55e' : 'var(--orange)',
                   background: streak >= 30 ? 'rgba(234,179,8,0.1)' : streak >= 14 ? 'rgba(168,85,247,0.1)' : streak >= 7 ? 'rgba(34,197,94,0.1)' : 'rgba(249,115,22,0.08)',
                   border: `1px solid ${streak >= 30 ? 'rgba(234,179,8,0.25)' : streak >= 14 ? 'rgba(168,85,247,0.25)' : streak >= 7 ? 'rgba(34,197,94,0.25)' : 'rgba(249,115,22,0.2)'}`,
                   padding: '4px 12px', borderRadius: 100,
@@ -479,7 +479,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
               </div>
               {weightDiff !== null && (
                 <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: parseFloat(weightDiff) < 0 ? 'var(--green)' : parseFloat(weightDiff) > 0 ? '#f97316' : 'var(--text)' }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: parseFloat(weightDiff) < 0 ? 'var(--green)' : parseFloat(weightDiff) > 0 ? 'var(--orange)' : 'var(--text)' }}>
                     {parseFloat(weightDiff) > 0 ? '+' : ''}{weightDiff}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>kg Veränderung</div>
@@ -603,7 +603,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                 }}>
                   <div style={{ fontSize: 28, lineHeight: 1 }}>
                     {a.done
-                      ? <Icon size={26} strokeWidth={1.5} color={a.color} />
+                      ? <Icon size={22} strokeWidth={1.5} color={a.color} />
                       : <Lock size={22} strokeWidth={1.5} color="var(--text-muted)" />}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: a.done ? 'var(--text)' : 'var(--text-muted)' }}>
@@ -636,7 +636,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             : 'var(--bg-card)',
         }}>
           <div className="motivation-icon">
-            <TrendingUp size={36} strokeWidth={1.5} color={streak >= 7 ? '#eab308' : 'var(--green)'} />
+            <TrendingUp size={36} strokeWidth={1.5} color={streak >= 7 ? 'var(--yellow)' : 'var(--green)'} />
           </div>
           <div style={{ flex: 1 }}>
             {/* P8: Streak Milestone Messages */}
@@ -669,8 +669,8 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 {[
                   { label: 'Tage getrackt',  value: `${daysWithData}/7`,       color: 'var(--green)' },
-                  { label: 'Ø Kalorien',     value: `${avgKcal.toLocaleString()} kcal`, color: '#60a5fa' },
-                  { label: 'On Track Tage',  value: `${daysOnTrack} Tage`,     color: '#4ade80' },
+                  { label: 'Ø Kalorien',     value: `${avgKcal.toLocaleString()} kcal`, color: 'var(--blue-light)' },
+                  { label: 'On Track Tage',  value: `${daysOnTrack} Tage`,     color: 'var(--green-bright)' },
                 ].map(s => (
                   <div key={s.label} style={{
                     background: 'var(--bg-card-2)', border: '1px solid var(--border)',

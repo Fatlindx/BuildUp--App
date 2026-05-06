@@ -302,7 +302,7 @@ export default function Onboarding({ user, onComplete }) {
                       background: data.activityLevel === a.id ? 'var(--green)' : 'transparent',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      {data.activityLevel === a.id && <Check size={10} color="#000" strokeWidth={3} />}
+                      {data.activityLevel === a.id && <Check size={12} color="#000" strokeWidth={3} />}
                     </div>
                   </button>
                 ))}
@@ -345,9 +345,9 @@ export default function Onboarding({ user, onComplete }) {
               {/* Makros */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
                 {[
-                  { label: 'Protein', value: nutrition.protein, unit: 'g', color: '#ef4444' },
-                  { label: 'Carbs',   value: nutrition.carbs,   unit: 'g', color: '#f97316' },
-                  { label: 'Fette',   value: nutrition.fat,     unit: 'g', color: '#eab308' },
+                  { label: 'Protein', value: nutrition.protein, unit: 'g', color: 'var(--red)' },
+                  { label: 'Carbs',   value: nutrition.carbs,   unit: 'g', color: 'var(--orange)' },
+                  { label: 'Fette',   value: nutrition.fat,     unit: 'g', color: 'var(--yellow)' },
                 ].map(m => (
                   <div key={m.label} style={{
                     background: 'var(--bg-card-2)', border: '1px solid var(--border)',
@@ -398,7 +398,7 @@ export default function Onboarding({ user, onComplete }) {
               className="btn btn-secondary"
               style={{ padding: '13px 20px', flexShrink: 0 }}
             >
-              <ChevronLeft size={17} />
+              <ChevronLeft size={16} />
             </button>
           )}
 
@@ -409,7 +409,7 @@ export default function Onboarding({ user, onComplete }) {
               className="btn btn-primary"
               style={{ flex: 1, justifyContent: 'center', padding: 14, fontSize: 15 }}
             >
-              Weiter <ChevronRight size={17} />
+              Weiter <ChevronRight size={16} />
             </button>
           ) : (
             <button

@@ -6,8 +6,8 @@ import { supabase } from '../supabase';
 import { exercises, muscleGroups, difficulties, equipmentTypes } from '../data/exercises';
 
 const muscleColors = {
-  Brust: '#ef4444', Rücken: '#3b82f6', Schultern: '#a855f7',
-  Beine: '#f97316', Bizeps: '#22c55e', Trizeps: '#06b6d4', Core: '#eab308',
+  Brust: 'var(--red)', Rücken: 'var(--blue)', Schultern: 'var(--purple)',
+  Beine: 'var(--orange)', Bizeps: '#22c55e', Trizeps: '#06b6d4', Core: 'var(--yellow)',
 };
 
 // Sets/Reps Empfehlungen nach Ziel
@@ -98,7 +98,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
                   cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0,
                 }}
               >
-                <Heart size={16} color={isFavorite ? '#ef4444' : 'var(--text-muted)'} fill={isFavorite ? '#ef4444' : 'none'} />
+                <Heart size={16} color={isFavorite ? 'var(--red)' : 'var(--text-muted)'} fill={isFavorite ? 'var(--red)' : 'none'} />
               </button>
               <button className="modal-close" onClick={onClose}><X size={18} /></button>
             </div>
@@ -278,12 +278,12 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
                 padding: '12px', borderRadius: 12,
                 background: isFavorite ? 'rgba(239,68,68,0.1)' : 'var(--bg-card-2)',
                 border: `1px solid ${isFavorite ? 'rgba(239,68,68,0.3)' : 'var(--border)'}`,
-                color: isFavorite ? '#ef4444' : 'var(--text-muted)',
+                color: isFavorite ? 'var(--red)' : 'var(--text-muted)',
                 cursor: 'pointer', fontSize: 14, fontWeight: 600,
                 transition: 'all 0.2s ease',
               }}
             >
-              <Heart size={16} fill={isFavorite ? '#ef4444' : 'none'} />
+              <Heart size={16} fill={isFavorite ? 'var(--red)' : 'none'} />
               {isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
             </button>
           </div>
@@ -338,7 +338,7 @@ function ExerciseCard({ exercise, onClick, index, isFavorite, onToggleFavorite }
             background: `linear-gradient(135deg, ${color}18, ${color}06)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Dumbbell size={40} strokeWidth={1.5} color={color} />
+            <Dumbbell size={38} strokeWidth={1.5} color={color} />
           </div>
         )}
         <div style={{

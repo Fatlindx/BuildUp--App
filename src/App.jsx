@@ -188,6 +188,7 @@ export default function App() {
             calorieGoal={calorieGoal}
             totalCalories={totalCalories}
             dailyLog={dailyLog}
+            logHistory={logHistory}
             username={profile?.username}
           />
         )}

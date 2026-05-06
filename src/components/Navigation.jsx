@@ -235,7 +235,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                   transition: 'all 0.18s ease',
                   transform: isActive ? 'translateY(-1px) scale(1.05)' : 'scale(1)',
                 }}>
-                  <Icon size={21} strokeWidth={isActive ? 2.3 : 1.6} color={isActive ? 'var(--green)' : '#6b7280'} />
+                  <Icon size={22} strokeWidth={isActive ? 2.3 : 1.6} color={isActive ? 'var(--green)' : '#6b7280'} />
                 </div>
                 <span style={{
                   fontSize: 9, fontWeight: isActive ? 700 : 400,
