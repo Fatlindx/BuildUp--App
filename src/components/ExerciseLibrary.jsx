@@ -487,6 +487,18 @@ export default function ExerciseLibrary({ user, profile }) {
   const [favorites,     setFavorites]     = useState(new Set());
   const [activeTab,     setActiveTab]     = useState('all'); // 'all' | 'favorites'
   const [isMobile,      setIsMobile]      = useState(window.innerWidth < 768);
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('recently_viewed_exercises') || '[]'); }
+    catch { return []; }
+  });
+
+  const trackViewed = useCallback((exerciseId) => {
+    setRecentlyViewed(prev => {
+      const updated = [exerciseId, ...prev.filter(id => id !== exerciseId)].slice(0, 6);
+      try { sessionStorage.setItem('recently_viewed_exercises', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+  }, []);
 
   // Debounce search
   useEffect(() => {

@@ -1,0 +1,66 @@
+{
+  "name": "BuildUp — Dein Premium Fitness-Begleiter",
+  "short_name": "BuildUp",
+  "description": "Tracke Kalorien, trainiere smarter und erreiche deine Fitnessziele mit deinem persönlichen KI Coach.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "lang": "de",
+  "categories": ["fitness", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "BuildUp Fitness App"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ernährung tracken",
+      "short_name": "Ernährung",
+      "url": "/?section=nutrition",
+      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Training starten",
+      "short_name": "Training",
+      "url": "/?section=workout",
+      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

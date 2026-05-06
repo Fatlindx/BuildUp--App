@@ -964,15 +964,15 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   }
   .filter-panel .filter-chips::-webkit-scrollbar { display: none; }
 
-  /* Exercise grid: 2 columns on mobile */
+  /* Exercise grid: 1 Spalte auf kleinen Screens (< 430px) */
   .exercise-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
-  /* Card name smaller on mobile */
+  /* Card name normal on mobile */
   .exercise-card-name {
-    font-size: 13px !important;
+    font-size: 14px !important;
   }
 
   /* Search bar top sticky on mobile */
@@ -983,6 +983,17 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     background: var(--bg);
     padding: 8px 0;
     margin-bottom: 4px;
+  }
+}
+
+/* ── Exercise grid: 2 Spalten ab 430px (iPhone Plus+) ── */
+@media (min-width: 430px) and (max-width: 767px) {
+  .exercise-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .exercise-card-name {
+    font-size: 13px !important;
   }
 }
 
