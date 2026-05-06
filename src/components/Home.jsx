@@ -1,7 +1,8 @@
 import {
   UtensilsCrossed, Dumbbell, BarChart2, Flame, Plus, Calculator, ChevronRight, MessageCircle, Target, Activity, TrendingUp, CheckCircle2, Sunrise, Clock
-} from 'lucide-react';;
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useI18n } from '../i18n.jsx';
 
 // ── Dynamische Motivations-Texte ──
 function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour) {

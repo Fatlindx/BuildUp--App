@@ -43,6 +43,22 @@ function calculateNutrition(data) {
 
 export default function Onboarding({ user, onComplete }) {
   const { t, lang } = useI18n();
+
+  const goals = [
+    { id: 'Muskelaufbau',        label: 'Muskelaufbau',        desc: 'Muskelmasse aufbauen & stärker werden' },
+    { id: 'Gewicht verlieren',   label: 'Gewicht verlieren',   desc: 'Körperfett reduzieren & schlanker werden' },
+    { id: 'Fit bleiben',         label: 'Fit bleiben',         desc: 'Gesund & aktiv im Alltag' },
+    { id: 'Ausdauer verbessern', label: 'Ausdauer verbessern', desc: 'Cardio & Durchhaltevermögen steigern' },
+  ];
+
+  const activityLevels = [
+    { id: 1.2,   label: t('onboarding.activity_levels.sedentary'), desc: t('onboarding.activity_descs.sedentary') },
+    { id: 1.375, label: t('onboarding.activity_levels.light'),     desc: t('onboarding.activity_descs.light') },
+    { id: 1.55,  label: t('onboarding.activity_levels.moderate'),  desc: t('onboarding.activity_descs.moderate') },
+    { id: 1.725, label: t('onboarding.activity_levels.active'),    desc: t('onboarding.activity_descs.active') },
+    { id: 1.9,   label: t('onboarding.activity_levels.extra'),     desc: t('onboarding.activity_descs.extra') },
+  ];
+
   const [step, setStep]     = useState(0);
   const [loading, setLoading] = useState(false);
   const [data, setData]     = useState({

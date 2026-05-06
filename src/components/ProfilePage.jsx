@@ -4,18 +4,7 @@ import {
   User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, TrendingUp, Scale
 } from 'lucide-react';
 
-// Goal translation — maps DB/English values to German display names
-const GOAL_LABELS = {
-  muscle:           'Muskelaufbau',
-  Muskelaufbau:     'Muskelaufbau',
-  lose_weight:      'Gewicht verlieren',
-  'Gewicht verlieren': 'Gewicht verlieren',
-  fit:              'Fit bleiben',
-  'Fit bleiben':    'Fit bleiben',
-  endurance:        'Ausdauer verbessern',
-  'Ausdauer verbessern': 'Ausdauer verbessern',
-};
-// translateGoal from i18n.jsx
+// translateGoal imported from i18n.jsx
 
 export default function ProfilePage({ user, profile, onUpdateProfile }) {
   const { t, lang, setLang } = useI18n();
