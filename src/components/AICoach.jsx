@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User, Loader, Zap } from 'lucide-react';
+import { X, Send, Bot, Sparkles, TrendingUp, Utensils, Dumbbell, Droplets } from 'lucide-react';
 
 export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const displayName = profile?.username || profile?.full_name?.split(' ')[0] || 'du';
@@ -12,6 +12,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   ]);
   const [input, setInput]     = useState('');
   const [loading, setLoading] = useState(false);
+  const [typing, setTyping]   = useState(false);
   const bottomRef             = useRef(null);
 
   useEffect(() => {
@@ -23,22 +24,21 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const totalCarb = dailyLog.reduce((s, i) => s + (i.carbs || 0), 0);
   const totalFat  = dailyLog.reduce((s, i) => s + (i.fat || 0), 0);
   const remaining = calorieGoal - totalCal;
+  const pct       = calorieGoal > 0 ? Math.min(100, Math.round((totalCal / calorieGoal) * 100)) : 0;
 
-  // Build personalized system prompt
-  const systemPrompt = buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog });
-
-  // Build personalized quick questions based on profile
+  const systemPrompt   = buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog });
   const quickQuestions = buildQuickQuestions(profile, totalCal, calorieGoal, totalProt);
 
   const sendMessage = async (text) => {
     const msgText = text || input.trim();
     if (!msgText || loading) return;
 
-    const userMessage = { role: 'user', content: msgText };
+    const userMessage    = { role: 'user', content: msgText };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput('');
     setLoading(true);
+    setTyping(true);
 
     try {
       const response = await fetch('/api/ai-coach', {
@@ -56,228 +56,240 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
       if (data.error) throw new Error(typeof data.error === 'object' ? JSON.stringify(data.error) : data.error);
 
       const reply = data.content?.[0]?.text || 'Entschuldigung, keine Antwort erhalten.';
+      setTyping(false);
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
     } catch (e) {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `❌ Fehler: ${e.message}`,
-      }]);
+      setTyping(false);
+      setMessages(prev => [...prev, { role: 'assistant', content: `❌ Fehler: ${e.message}` }]);
     } finally {
       setLoading(false);
     }
   };
 
-  const caloriePercent = Math.min(100, Math.round((totalCal / calorieGoal) * 100));
+  // Motivations-Farbe basierend auf Fortschritt
+  const progressColor = pct >= 100 ? '#ef4444' : pct >= 80 ? '#4ade80' : 'var(--green)';
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal"
-        style={{ maxWidth: 540, display: 'flex', flexDirection: 'column', height: '82vh' }}
+        style={{ maxWidth: 560, display: 'flex', flexDirection: 'column', height: '85vh' }}
         onClick={e => e.stopPropagation()}
       >
-        {/* ── Header ── */}
-        <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 18 }}>
-          <div className="modal-header-inner">
-            <div style={{
-              width: 44, height: 44, borderRadius: 13, flexShrink: 0,
-              background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 20px rgba(34,197,94,0.35)',
-            }}>
-              <Bot size={21} color="#000" strokeWidth={2.5} />
+        {/* ── Header — Premium Coach Identity ── */}
+        <div style={{
+          padding: '20px 24px 16px',
+          borderBottom: '1px solid var(--border)',
+          background: 'linear-gradient(135deg, rgba(34,197,94,0.06) 0%, transparent 60%)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Glow hinter dem Header */}
+          <div style={{
+            position: 'absolute', top: -40, right: -40,
+            width: 120, height: 120,
+            background: 'radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              {/* Coach Avatar — Premium */}
+              <div style={{
+                width: 50, height: 50, borderRadius: 15, flexShrink: 0,
+                background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 0 24px rgba(34,197,94,0.4), 0 0 0 1px rgba(34,197,94,0.2)',
+                position: 'relative',
+              }}>
+                <Bot size={24} color="#000" strokeWidth={2.5} />
+                {/* Online indicator */}
+                <div style={{
+                  position: 'absolute', bottom: 2, right: 2,
+                  width: 10, height: 10, borderRadius: '50%',
+                  background: 'var(--green)',
+                  border: '2px solid var(--bg-card)',
+                  boxShadow: '0 0 6px rgba(34,197,94,0.8)',
+                }} />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0, letterSpacing: '-0.3px' }}>
+                    BuildUp Coach
+                  </h2>
+                  <Sparkles size={13} color="var(--green)" />
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--green)', margin: '3px 0 0', fontWeight: 500 }}>
+                  Persönlicher Coach von {displayName}
+                </p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                  {profile?.goal ? `Ziel: ${profile.goal}` : 'Dein Fitness-Experte'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="modal-title" style={{ fontSize: 17 }}>BuildUp Coach</h2>
-              <p style={{ fontSize: 11.5, color: 'var(--green)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-                Persönlicher Coach von {displayName}
-              </p>
-            </div>
+            <button className="modal-close" onClick={onClose}><X size={18} /></button>
           </div>
-          <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
 
-        {/* ── Stats Bar ── */}
+        {/* ── Tagesstatus — Kompakt aber informativ ── */}
         <div style={{
           padding: '12px 24px',
           borderBottom: '1px solid var(--border)',
           background: 'var(--bg-card-2)',
         }}>
-          {/* Kalorienprogress */}
+          {/* Progress Row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
-              TAGESFORTSCHRITT
+            <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+              Tagesfortschritt
             </span>
-            <span style={{ fontSize: 11, color: caloriePercent >= 100 ? '#f87171' : 'var(--green)', fontWeight: 700 }}>
-              {totalCal} / {calorieGoal} kcal
+            <span style={{ fontSize: 12, fontWeight: 700, color: progressColor }}>
+              {totalCal.toLocaleString()} / {calorieGoal.toLocaleString()} kcal · {pct}%
             </span>
-          </div>
-          <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 100, marginBottom: 10, overflow: 'hidden' }}>
-            <div style={{
-              height: '100%', borderRadius: 100,
-              width: `${caloriePercent}%`,
-              background: caloriePercent >= 100 ? '#f87171' : 'var(--green)',
-              transition: 'width 0.5s ease',
-            }} />
-          </div>
-          {/* Makros */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-            {[
-              { label: 'Protein', value: totalProt, unit: 'g', color: '#ef4444' },
-              { label: 'Carbs',   value: totalCarb, unit: 'g', color: '#f97316' },
-              { label: 'Fette',   value: totalFat,  unit: 'g', color: '#eab308' },
-            ].map(s => (
-              <div key={s.label} style={{
-                background: 'rgba(255,255,255,0.03)', borderRadius: 8,
-                padding: '7px 10px', textAlign: 'center',
-                border: '1px solid var(--border)',
-              }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: s.color }}>
-                  {s.value}<span style={{ fontSize: 9, fontWeight: 500 }}>{s.unit}</span>
-                </div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>{s.label}</div>
-              </div>
-            ))}
           </div>
 
-          {/* Profile Tags */}
-          {profile && (
-            <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
-              {profile.goal && (
-                <span style={{
-                  fontSize: 10, padding: '2px 8px', borderRadius: 100,
-                  background: 'var(--green-glow)', color: 'var(--green)',
-                  border: '1px solid var(--border-active)', fontWeight: 600,
-                }}>
-                  🎯 {profile.goal}
-                </span>
-              )}
-              {profile.weight && (
-                <span style={{
-                  fontSize: 10, padding: '2px 8px', borderRadius: 100,
-                  background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)',
-                  border: '1px solid var(--border)',
-                }}>
-                  ⚖️ {profile.weight} kg
-                </span>
-              )}
-              {profile.height && (
-                <span style={{
-                  fontSize: 10, padding: '2px 8px', borderRadius: 100,
-                  background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)',
-                  border: '1px solid var(--border)',
-                }}>
-                  📏 {profile.height} cm
-                </span>
-              )}
-              {remaining > 0 && (
-                <span style={{
-                  fontSize: 10, padding: '2px 8px', borderRadius: 100,
-                  background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)',
-                  border: '1px solid var(--border)',
-                }}>
-                  🔥 {remaining} kcal übrig
-                </span>
-              )}
-            </div>
-          )}
+          {/* Progress Bar */}
+          <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 100, marginBottom: 12, overflow: 'hidden' }}>
+            <div style={{
+              height: '100%', borderRadius: 100, width: `${pct}%`,
+              background: `linear-gradient(90deg, var(--green-dark), ${progressColor})`,
+              transition: 'width 0.6s ease',
+              boxShadow: pct > 0 ? `0 0 8px ${progressColor}60` : 'none',
+            }} />
+          </div>
+
+          {/* Makros + Profil Tags */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            {[
+              { icon: '🥩', label: 'Protein', value: `${totalProt}g`, color: '#ef4444' },
+              { icon: '🍞', label: 'Carbs',   value: `${totalCarb}g`, color: '#f97316' },
+              { icon: '🥑', label: 'Fette',   value: `${totalFat}g`,  color: '#eab308' },
+            ].map(m => (
+              <div key={m.label} style={{
+                display: 'flex', alignItems: 'center', gap: 4,
+                padding: '3px 8px', borderRadius: 100,
+                background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+                fontSize: 11,
+              }}>
+                <span>{m.icon}</span>
+                <span style={{ color: m.color, fontWeight: 700 }}>{m.value}</span>
+              </div>
+            ))}
+
+            {/* Separator */}
+            <div style={{ width: 1, height: 14, background: 'var(--border)' }} />
+
+            {/* Profile Info */}
+            {profile?.weight && (
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>⚖️ {profile.weight}kg</span>
+            )}
+            {profile?.height && (
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>📏 {profile.height}cm</span>
+            )}
+            {remaining > 0 && (
+              <span style={{
+                fontSize: 11, padding: '2px 7px', borderRadius: 100,
+                background: 'var(--green-glow)', color: 'var(--green)',
+                border: '1px solid var(--border-active)', fontWeight: 600,
+              }}>
+                🔥 {remaining} kcal übrig
+              </span>
+            )}
+          </div>
         </div>
 
         {/* ── Messages ── */}
         <div style={{
-          flex: 1, overflowY: 'auto', padding: '20px 24px',
-          display: 'flex', flexDirection: 'column', gap: 14,
+          flex: 1, overflowY: 'auto', padding: '20px 20px',
+          display: 'flex', flexDirection: 'column', gap: 12,
         }}>
           {messages.map((msg, i) => (
             <div key={i} style={{
               display: 'flex', gap: 10,
               flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
-              alignItems: 'flex-start',
+              alignItems: 'flex-end',
+              animation: 'slideUpFade 0.25s ease both',
             }}>
               {/* Avatar */}
               <div style={{
-                width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                background: msg.role === 'user' ? 'var(--green-glow)' : 'var(--bg-card-2)',
-                border: `1px solid ${msg.role === 'user' ? 'var(--border-active)' : 'var(--border)'}`,
+                width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
+                background: msg.role === 'user'
+                  ? 'linear-gradient(135deg, var(--green-dark), var(--green))'
+                  : 'var(--bg-hover)',
+                border: `1px solid ${msg.role === 'user' ? 'var(--green)' : 'var(--border)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: msg.role === 'user' ? '0 0 10px rgba(34,197,94,0.25)' : 'none',
               }}>
                 {msg.role === 'user'
-                  ? <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)' }}>
-                      {displayName[0]?.toUpperCase()}
+                  ? <span style={{ fontSize: 12, fontWeight: 800, color: '#000' }}>
+                      {(displayName[0] || 'U').toUpperCase()}
                     </span>
-                  : <Bot size={13} color="var(--text-secondary)" />}
+                  : <Bot size={14} color="var(--green)" />}
               </div>
 
               {/* Bubble */}
               <div style={{
-                maxWidth: '78%',
-                padding: '11px 15px',
-                borderRadius: 14,
+                maxWidth: '80%',
+                padding: '12px 16px',
+                borderRadius: 18,
                 background: msg.role === 'user'
-                  ? 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08))'
+                  ? 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08))'
                   : 'var(--bg-card)',
-                border: `1px solid ${msg.role === 'user' ? 'var(--border-active)' : 'var(--border)'}`,
+                border: `1px solid ${msg.role === 'user' ? 'rgba(34,197,94,0.3)' : 'var(--border)'}`,
                 fontSize: 13.5, lineHeight: 1.65, color: 'var(--text)',
-                borderTopRightRadius: msg.role === 'user' ? 4 : 14,
-                borderTopLeftRadius: msg.role === 'assistant' ? 4 : 14,
+                borderBottomRightRadius: msg.role === 'user' ? 4 : 18,
+                borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 18,
                 whiteSpace: 'pre-wrap',
+                boxShadow: msg.role === 'user' ? '0 2px 12px rgba(34,197,94,0.1)' : 'none',
               }}>
                 {msg.content}
               </div>
             </div>
           ))}
 
-          {/* Loading */}
-          {loading && (
-            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          {/* Typing Indicator */}
+          {typing && (
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', animation: 'slideUpFade 0.25s ease both' }}>
               <div style={{
-                width: 28, height: 28, borderRadius: '50%',
-                background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                width: 30, height: 30, borderRadius: '50%',
+                background: 'var(--bg-hover)', border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Bot size={13} color="var(--text-secondary)" />
+                <Bot size={14} color="var(--green)" />
               </div>
               <div style={{
-                padding: '11px 15px', borderRadius: 14, borderTopLeftRadius: 4,
+                padding: '12px 16px', borderRadius: 18, borderBottomLeftRadius: 4,
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
-                display: 'flex', alignItems: 'center', gap: 8,
+                display: 'flex', alignItems: 'center', gap: 4,
               }}>
-                <div style={{ display: 'flex', gap: 4 }}>
-                  {[0, 1, 2].map(i => (
-                    <span key={i} style={{
-                      width: 5, height: 5, borderRadius: '50%',
-                      background: 'var(--green)', display: 'inline-block',
-                      animation: `bounce 1s ease ${i * 0.15}s infinite`,
-                    }} />
-                  ))}
-                </div>
-                <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>Coach denkt nach...</span>
+                {[0, 1, 2].map(i => (
+                  <div key={i} style={{
+                    width: 6, height: 6, borderRadius: '50%', background: 'var(--green)',
+                    animation: `typingDot 1.2s ease ${i * 0.2}s infinite`,
+                  }} />
+                ))}
               </div>
             </div>
           )}
           <div ref={bottomRef} />
         </div>
 
-        {/* ── Quick Questions ── */}
-        {messages.length <= 1 && (
-          <div style={{ padding: '0 24px 12px' }}>
-            <p style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 8 }}>
+        {/* ── Quick Questions — nur beim Start ── */}
+        {messages.length <= 1 && !loading && (
+          <div style={{ padding: '8px 20px 12px' }}>
+            <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: 8 }}>
               Schnellfragen für dich
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {quickQuestions.map(q => (
-                <button
-                  key={q}
-                  onClick={() => sendMessage(q)}
-                  style={{
-                    fontSize: 12, padding: '6px 12px', borderRadius: 100,
-                    background: 'var(--bg-card)', border: '1px solid var(--border)',
-                    color: 'var(--text-secondary)', cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green)'; e.currentTarget.style.color = 'var(--green)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                <button key={q} onClick={() => sendMessage(q)} style={{
+                  fontSize: 11.5, padding: '6px 12px', borderRadius: 100,
+                  background: 'var(--bg-card)', border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)', cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green)'; e.currentTarget.style.color = 'var(--green)'; e.currentTarget.style.background = 'var(--green-glow)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
                 >
                   {q}
                 </button>
@@ -288,13 +300,14 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
 
         {/* ── Input ── */}
         <div style={{
-          padding: '14px 24px 20px',
+          padding: '12px 20px 20px',
           borderTop: '1px solid var(--border)',
           display: 'flex', gap: 10,
+          background: 'var(--bg-card)',
         }}>
           <input
             className="form-input"
-            placeholder="Frag mich alles über Training & Ernährung..."
+            placeholder={`Frag ${displayName === 'du' ? 'mich' : 'deinen Coach'} alles über Training & Ernährung...`}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
@@ -313,9 +326,9 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
       </div>
 
       <style>{`
-        @keyframes bounce {
-          0%, 60%, 100% { transform: translateY(0); }
-          30% { transform: translateY(-5px); }
+        @keyframes typingDot {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-5px); opacity: 1; }
         }
         @keyframes pulse {
           0%, 100% { opacity: 0.5; transform: scale(1); }
@@ -326,120 +339,113 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   );
 }
 
-// ── Helper: Welcome Message ──
+// ── Welcome Message — Persönlich & Motivierend ──
 function buildWelcomeMessage(name, profile, calorieGoal, dailyLog) {
-  const totalCal = dailyLog.reduce((s, i) => s + i.calories, 0);
+  const totalCal  = dailyLog.reduce((s, i) => s + i.calories, 0);
   const remaining = calorieGoal - totalCal;
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const hour      = new Date().getHours();
+  const greeting  = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const firstName = name === 'du' ? '' : `, ${name}`;
 
-  let msg = `${greeting}, ${name}! 💪\n\n`;
+  // Dynamische Begrüssung basierend auf Ziel + Tageszeit
+  const goalGreetings = {
+    'Muskelaufbau':        `Heute ist ein neuer Tag um stärker zu werden 💪`,
+    'Gewicht verlieren':   `Jeder Tag ist eine neue Chance auf deinen Körper hinzuarbeiten 🎯`,
+    'Fit bleiben':         `Bleib konsequent — das ist der Schlüssel zum Erfolg ⚡`,
+    'Ausdauer verbessern': `Dein Körper wird sich anpassen — vertrau dem Prozess 🏃`,
+  };
+  const motivLine = goalGreetings[profile?.goal] || `Bereit für heute? Ich bin hier um dir zu helfen 🚀`;
 
-  if (profile?.goal) {
-    msg += `Ich sehe dein Ziel ist **${profile.goal}** — ich bin hier um dir dabei zu helfen.\n\n`;
-  }
+  let msg = `${greeting}${firstName}! 👋\n\n${motivLine}\n\n`;
 
+  // Kontext-basierte Nachricht
   if (totalCal === 0) {
-    msg += `Du hast heute noch nichts geloggt. Soll ich dir sagen was du essen solltest um dein Ziel zu erreichen?`;
+    msg += `Du hast heute noch nichts gegessen. Soll ich dir einen Ernährungsplan für heute vorschlagen?`;
+  } else if (remaining > 500) {
+    msg += `Du hast heute ${totalCal} kcal gegessen — noch ${remaining} kcal bis zum Ziel. Was kann ich dir empfehlen?`;
   } else if (remaining > 0) {
-    msg += `Du hast heute ${totalCal} kcal gegessen — noch ${remaining} kcal bis zu deinem Ziel. Gut gemacht!`;
+    msg += `Fast am Ziel! Nur noch ${remaining} kcal übrig. Du machst das großartig! 🔥`;
   } else {
-    msg += `Du hast dein Kalorienziel von ${calorieGoal} kcal heute bereits erreicht. 🎯`;
+    msg += `Du hast dein Tagesziel erreicht! 🏆 Wie kann ich dir sonst helfen?`;
   }
 
   return msg;
 }
 
-// ── Helper: System Prompt ──
+// ── System Prompt — Coach Persönlichkeit ──
 function buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog }) {
   const name = profile?.username || profile?.full_name?.split(' ')[0] || 'der User';
 
-  // Calculate BMI if we have height and weight
   let bmiInfo = '';
   if (profile?.weight && profile?.height) {
-    const bmi = (profile.weight / ((profile.height / 100) ** 2)).toFixed(1);
+    const bmi    = (profile.weight / ((profile.height / 100) ** 2)).toFixed(1);
     const bmiCat = bmi < 18.5 ? 'Untergewicht' : bmi < 25 ? 'Normalgewicht' : bmi < 30 ? 'Übergewicht' : 'Adipositas';
     bmiInfo = `\n- BMI: ${bmi} (${bmiCat})`;
   }
 
-  // Goal-specific strategy
   const goalStrategy = {
-    'Muskelaufbau': 'Kalorienüberschuss ~300-500 kcal, hohe Proteinzufuhr (2-2.5g/kg), Krafttraining fokus',
-    'Gewicht verlieren': 'Kaloriendefizit ~300-500 kcal, moderate Proteinzufuhr (1.6-2g/kg), Kombination Kraft + Cardio',
-    'Fit bleiben': 'Kalorienbilanz ausgewogen, gute Makroverteilung, abwechslungsreiches Training',
-    'Ausdauer verbessern': 'Moderate Kalorien, Kohlenhydratfokus, progressives Ausdauertraining',
+    'Muskelaufbau':        'Kalorienüberschuss ~300-500 kcal, hohe Proteinzufuhr (2-2.5g/kg KG), Fokus auf Krafttraining',
+    'Gewicht verlieren':   'Kaloriendefizit ~300-500 kcal, moderate Proteinzufuhr (1.6-2g/kg KG), Kombination aus Kraft + Cardio',
+    'Fit bleiben':         'Ausgeglichene Kalorienbilanz, gute Makroverteilung, abwechslungsreiches Training',
+    'Ausdauer verbessern': 'Moderate Kalorien mit Kohlenhydratfokus, progressives Ausdauertraining',
   };
-  const strategy = goalStrategy[profile?.goal] || 'Individuelle Strategie basierend auf den Zielen';
+  const strategy = goalStrategy[profile?.goal] || 'Individuelle Strategie je nach Zielen';
 
-  return `Du bist der persönliche BuildUp Coach von ${name}. Du kennst ${name} genau und redest ihn/sie direkt an.
+  return `Du bist Max, der persönliche Fitness-Coach von ${name} in der BuildUp App. Du kennst ${name} und seine/ihre Daten genau.
 
-NUTZERPROFIL:
-- Name: ${name}
+DEINE PERSÖNLICHKEIT:
+- Motivierend, direkt, ehrlich — keine leeren Floskeln
+- Du sprichst ${name} immer beim Namen an
+- Du machst konkrete, personalisierte Empfehlungen basierend auf den echten Daten
+- Kurze, klare Antworten unter 180 Wörter — kein unnötiges Drumherum
+- Manchmal humorvoll, immer professionell
+- Antworte immer auf Deutsch
+
+PROFIL VON ${name.toUpperCase()}:
 - Ziel: ${profile?.goal || 'Nicht gesetzt'}
 - Gewicht: ${profile?.weight ? `${profile.weight} kg` : 'Nicht angegeben'}
 - Grösse: ${profile?.height ? `${profile.height} cm` : 'Nicht angegeben'}${bmiInfo}
-- Strategie für "${profile?.goal || 'allgemein'}": ${strategy}
+- Strategie: ${strategy}
 
-HEUTIGE DATEN (${new Date().toLocaleDateString('de-DE')}):
-- Kalorienziel: ${calorieGoal} kcal
-- Gegessen: ${totalCal} kcal (${Math.round((totalCal/calorieGoal)*100)}% des Ziels)
-- Noch übrig: ${remaining > 0 ? `${remaining} kcal` : `${Math.abs(remaining)} kcal über Ziel`}
-- Protein: ${totalProt}g | Kohlenhydrate: ${totalCarb}g | Fette: ${totalFat}g
-- Mahlzeiten: ${dailyLog.length > 0 ? dailyLog.map(i => i.name).join(', ') : 'Noch nichts gegessen'}
+HEUTIGE STATS (${new Date().toLocaleDateString('de-DE')}):
+- Kalorien: ${totalCal} / ${calorieGoal} kcal (${Math.round((totalCal/calorieGoal)*100)}%)
+- Verbleibend: ${remaining > 0 ? `${remaining} kcal` : `${Math.abs(remaining)} kcal über Ziel`}
+- Protein: ${totalProt}g | Carbs: ${totalCarb}g | Fette: ${totalFat}g
+- Mahlzeiten: ${dailyLog.length > 0 ? dailyLog.map(i => i.name).join(', ') : 'Noch keine'}
 
-DEIN COACHING-STIL:
-- Sprich ${name} direkt und persönlich an — du kennst seine/ihre Daten
-- Beziehe dich immer auf die echten Nutzerdaten wenn relevant
-- Motivierend aber ehrlich — keine leeren Floskeln
-- Konkrete, umsetzbare Empfehlungen
-- Unter 200 Wörter pro Antwort
-- Antworte immer auf Deutsch
-- Erwähne nie dass du eine KI bist
-
-DEIN WISSEN:
-- Makronährstoffe, Kalorienmanagement, Muskelaufbau, Gewichtsabnahme
-- Krafttraining, Cardio, HIIT, alle Sportarten
-- Supplements, Vitamine, Schlaf, Regeneration
-- Trainingspläne Anfänger bis Fortgeschrittene
-- Bei komplett themenfremden Fragen: freundlich auf Fitness & Ernährung hinweisen`;
+DEIN FACHWISSEN: Makros, Kalorien, Muskelaufbau, Gewichtsabnahme, Krafttraining, Cardio, HIIT, Supplements, Regeneration, Trainingspläne aller Level. Bei themenfremden Fragen freundlich auf Fitness & Ernährung hinweisen.`;
 }
 
-// ── Helper: Personalized Quick Questions ──
+// ── Quick Questions — Personalisiert ──
 function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt) {
   const questions = [];
   const remaining = calorieGoal - totalCal;
 
-  // Goal-specific questions
   if (profile?.goal === 'Muskelaufbau') {
     questions.push('Wie viel Protein brauche ich täglich?');
-    questions.push('Welche Übungen für maximalen Muskelaufbau?');
+    questions.push('Was sind die besten Übungen für Muskelaufbau?');
   } else if (profile?.goal === 'Gewicht verlieren') {
     questions.push('Wie erstelle ich ein Kaloriendefizit?');
-    questions.push('Welches Cardio verbrennt am meisten?');
+    questions.push('Welches Training verbrennt am meisten Kalorien?');
   } else {
     questions.push('Gib mir einen Trainingsplan');
     questions.push('Was sind die besten Übungen für Bauch?');
   }
 
-  // Data-driven questions
   if (totalCal === 0) {
     questions.push('Was soll ich heute essen?');
   } else if (remaining > 200) {
-    questions.push(`Ich habe noch ${remaining} kcal — was soll ich essen?`);
+    questions.push(`Noch ${remaining} kcal übrig — was empfiehlst du?`);
   }
 
-  if (totalProt < 50) {
-    questions.push('Wie bekomme ich mehr Protein?');
-  }
+  if (totalProt < 50) questions.push('Wie bekomme ich mehr Protein?');
 
-  // Weight/height based
   if (profile?.weight && profile?.height) {
-    questions.push('Wie ist mein aktueller BMI zu bewerten?');
+    questions.push('Wie ist mein BMI zu bewerten?');
   } else {
-    questions.push('Wie viel Wasser sollte ich trinken?');
+    questions.push('Wie viel Wasser sollte ich täglich trinken?');
   }
 
-  // Always include
   questions.push('Wie ist mein heutiger Fortschritt?');
 
   return questions.slice(0, 6);

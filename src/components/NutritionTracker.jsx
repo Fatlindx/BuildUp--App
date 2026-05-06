@@ -1,5 +1,5 @@
 ﻿import { useState, useMemo, useEffect } from "react";
-import { Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine } from "lucide-react";
+import { Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine, Clock, Star, Zap } from "lucide-react";
 import { foodDatabase, foodCategories } from "../data/foods";
 import BarcodeScanner from "./BarcodeScanner";
 import WaterTracker from "./WaterTracker";
@@ -8,7 +8,7 @@ function ProgressBar({ value, max, color, height = 7 }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
     <div className="progress-bar-track" style={{ height }}>
-      <div className="progress-bar-fill" style={{ width: `${pct}%`, background: color }} />
+      <div className="progress-bar-fill" style={{ width: `${pct}%`, background: color, transition: 'width 0.6s ease' }} />
     </div>
   );
 }
@@ -31,6 +31,22 @@ function MacroRow({ label, value, goal, unit, color }) {
   );
 }
 
+// P5: Letzte Mahlzeiten aus sessionStorage
+function getRecentFoods() {
+  try {
+    return JSON.parse(sessionStorage.getItem('recent_foods') || '[]');
+  } catch { return []; }
+}
+
+function saveRecentFood(food) {
+  try {
+    const recent = getRecentFoods();
+    const filtered = recent.filter(f => f.id !== food.id);
+    const updated = [food, ...filtered].slice(0, 6);
+    sessionStorage.setItem('recent_foods', JSON.stringify(updated));
+  } catch {}
+}
+
 export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog, setDailyLog }) {
   const [search, setSearch]               = useState("");
   const [filterCat, setFilterCat]         = useState("Alle");
@@ -39,8 +55,9 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
   const [manualGoal, setManualGoal]       = useState("");
   const [showGoalInput, setShowGoalInput] = useState(false);
   const [showScanner, setShowScanner]     = useState(false);
+  const [recentFoods, setRecentFoods]     = useState(getRecentFoods);
+  const [addedId, setAddedId]             = useState(null); // P5: Success feedback
 
-  // Wassertracker — persistiert in sessionStorage
   const [waterGlasses, setWaterGlasses] = useState(() => {
     const saved = sessionStorage.getItem('water_glasses');
     return saved ? parseInt(saved) : 0;
@@ -72,8 +89,14 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
   const goalCarbs   = calorieGoal > 0 ? Math.round((calorieGoal * 0.45) / 4) : 0;
   const goalFat     = calorieGoal > 0 ? Math.round((calorieGoal * 0.25) / 9) : 0;
   const remaining   = calorieGoal > 0 ? calorieGoal - totals.calories : null;
+  const pct         = calorieGoal > 0 ? Math.min(100, Math.round((totals.calories / calorieGoal) * 100)) : 0;
 
-  const selectFood = (food) => { setSelectedFood(food); setQty("1"); setSearch(""); setFilterCat("Alle"); };
+  const selectFood = (food) => {
+    setSelectedFood(food);
+    setQty("1");
+    setSearch("");
+    setFilterCat("Alle");
+  };
 
   const q = parseFloat(qty) || 1;
   const preview = selectedFood ? {
@@ -83,15 +106,28 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
     fat:  Math.round(selectedFood.fat      * q),
   } : null;
 
-  const addToLog = () => {
-    if (!selectedFood || q <= 0) return;
-    setDailyLog(log => [...log, {
-      id: Date.now(), name: selectedFood.name, category: selectedFood.category,
-      serving: selectedFood.serving,
-      calories: Math.round(selectedFood.calories * q), protein: Math.round(selectedFood.protein * q),
-      carbs: Math.round(selectedFood.carbs * q), fat: Math.round(selectedFood.fat * q),
-    }]);
-    setSelectedFood(null); setQty("1");
+  const addToLog = (foodOverride) => {
+    const food = foodOverride || selectedFood;
+    if (!food || q <= 0) return;
+    const entry = {
+      id: Date.now(), name: food.name, category: food.category,
+      serving: food.serving,
+      calories: Math.round(food.calories * (foodOverride ? 1 : q)),
+      protein:  Math.round(food.protein  * (foodOverride ? 1 : q)),
+      carbs:    Math.round(food.carbs    * (foodOverride ? 1 : q)),
+      fat:      Math.round(food.fat      * (foodOverride ? 1 : q)),
+    };
+    setDailyLog(log => [...log, entry]);
+
+    // P5: Update recent foods
+    saveRecentFood(food);
+    setRecentFoods(getRecentFoods());
+
+    // P5: Success flash
+    setAddedId(food.id);
+    setTimeout(() => setAddedId(null), 1200);
+
+    if (!foodOverride) { setSelectedFood(null); setQty("1"); }
   };
 
   const removeEntry = (id) => setDailyLog(log => log.filter(i => i.id !== id));
@@ -102,16 +138,24 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
   };
 
   const getCatColor = (cat) => {
-    if (cat === "Frühstück")    return "#fb923c";
-    if (cat === "Hauptgericht") return "#3b82f6";
-    if (cat === "Snack")        return "#22c55e";
-    if (cat === "Getränk")      return "#60a5fa";
-    if (cat === "Fitness Meal") return "#a855f7";
-    if (cat === "Gescannt")     return "#22c55e";
-    return "#64748b";
+    const map = {
+      "Frühstück": "#fb923c", "Hauptgericht": "#3b82f6",
+      "Snack": "#22c55e", "Getränk": "#60a5fa",
+      "Fitness Meal": "#a855f7", "Gescannt": "#22c55e",
+    };
+    return map[cat] || "#64748b";
   };
 
-  const quickFoods = [0, 5, 35, 55, 147, 171].map(i => foodDatabase[i]).filter(Boolean);
+  // P5: Favoriten zuerst — häufig geloggte Mahlzeiten
+  const frequentFoods = useMemo(() => {
+    const freq = {};
+    dailyLog.forEach(item => { freq[item.name] = (freq[item.name] || 0) + 1; });
+    return Object.entries(freq)
+      .sort(([,a],[,b]) => b - a)
+      .slice(0, 4)
+      .map(([name]) => foodDatabase.find(f => f.name === name))
+      .filter(Boolean);
+  }, [dailyLog]);
 
   return (
     <div className="page">
@@ -121,6 +165,51 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
           <p>Verfolge Kalorien und Makronährstoffe aus 205+ Lebensmitteln.</p>
         </div>
 
+        {/* P5: Tages-Status Bar — sofort sichtbar oben */}
+        {calorieGoal > 0 && (
+          <div style={{
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            borderRadius: 14, padding: '14px 20px', marginBottom: 20,
+            display: 'flex', alignItems: 'center', gap: 16,
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                  {totals.calories.toLocaleString()} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ {calorieGoal.toLocaleString()} kcal</span>
+                </span>
+                <span style={{
+                  fontSize: 11.5, fontWeight: 700, padding: '2px 10px', borderRadius: 100,
+                  color: pct >= 100 ? '#ef4444' : 'var(--green)',
+                  background: pct >= 100 ? 'rgba(239,68,68,0.1)' : 'var(--green-glow)',
+                  border: `1px solid ${pct >= 100 ? 'rgba(239,68,68,0.3)' : 'var(--border-active)'}`,
+                }}>
+                  {pct}% · {remaining !== null && remaining > 0 ? `${remaining} kcal übrig` : 'Ziel erreicht 🎯'}
+                </span>
+              </div>
+              <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', width: `${pct}%`, borderRadius: 100,
+                  background: pct >= 100 ? '#ef4444' : 'linear-gradient(90deg, var(--green-dark), var(--green))',
+                  transition: 'width 0.6s ease',
+                  boxShadow: pct > 0 ? '0 0 8px rgba(34,197,94,0.4)' : 'none',
+                }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
+              {[
+                { label: 'P', value: totals.protein, color: '#ef4444' },
+                { label: 'K', value: totals.carbs,   color: '#f97316' },
+                { label: 'F', value: totals.fat,     color: '#eab308' },
+              ].map(m => (
+                <div key={m.label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: m.color }}>{m.value}g</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{m.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="tracker-layout">
           <div>
             {/* Mahlzeit hinzufügen */}
@@ -129,15 +218,87 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Plus size={16} /> Mahlzeit hinzufügen
                 </span>
-                <button
-                  className="btn btn-secondary btn-sm"
+                <button className="btn btn-secondary btn-sm"
                   style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-                  onClick={() => setShowScanner(true)}
-                >
+                  onClick={() => setShowScanner(true)}>
                   <ScanLine size={14} /> Barcode scannen
                 </button>
               </h3>
 
+              {/* P5: Zuletzt gegessen — oben sichtbar ohne Suche */}
+              {!selectedFood && !showResults && (
+                <>
+                  {recentFoods.length > 0 && (
+                    <div style={{ marginBottom: 14 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <Clock size={12} color="var(--text-muted)" />
+                        <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                          Zuletzt gegessen
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                        {recentFoods.map(food => (
+                          <div key={food.id} style={{
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            padding: '9px 12px', borderRadius: 10,
+                            background: addedId === food.id ? 'rgba(34,197,94,0.1)' : 'var(--bg-card-2)',
+                            border: `1px solid ${addedId === food.id ? 'rgba(34,197,94,0.3)' : 'var(--border)'}`,
+                            cursor: 'pointer', transition: 'all 0.2s ease',
+                          }}
+                          onClick={() => selectFood(food)}>
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{food.name}</div>
+                              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{food.serving}</div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <span style={{ fontSize: 12, color: 'var(--green)', fontWeight: 700 }}>{food.calories} kcal</span>
+                              <button
+                                onClick={e => { e.stopPropagation(); addToLog(food); }}
+                                style={{
+                                  width: 28, height: 28, borderRadius: 8,
+                                  background: 'var(--green-glow)', border: '1px solid var(--border-active)',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  cursor: 'pointer', color: 'var(--green)',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                title="Direkt hinzufügen"
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* P5: Häufig gegessen (aus heutigem Log) */}
+                  {frequentFoods.length > 0 && (
+                    <div style={{ marginBottom: 14 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <Star size={12} color="var(--text-muted)" />
+                        <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                          Häufig gegessen
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {frequentFoods.map(f => (
+                          <button key={f.id} onClick={() => selectFood(f)} style={{
+                            fontSize: 12, padding: '5px 11px', borderRadius: 100,
+                            background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+                            color: 'var(--green)', cursor: 'pointer', fontWeight: 600,
+                            transition: 'all 0.15s ease',
+                          }}>
+                            ⭐ {f.name.split(' ')[0]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Kategorie Filter */}
               <div className="category-filter-chips">
                 {foodCategories.map(cat => (
                   <button key={cat} className={`category-chip ${filterCat === cat ? "active" : ""}`}
@@ -147,17 +308,15 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 ))}
               </div>
 
+              {/* Suche */}
               <div className="food-search-wrap">
                 <div className="food-search-input-row" style={{ position: "relative" }}>
                   <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", pointerEvents: "none" }}>
                     <Search size={15} />
                   </span>
-                  <input
-                    className="form-input"
-                    type="text"
+                  <input className="form-input" type="text"
                     placeholder="Lebensmittel suchen..."
-                    value={search}
-                    style={{ paddingLeft: 36 }}
+                    value={search} style={{ paddingLeft: 36 }}
                     onChange={e => { setSearch(e.target.value); setSelectedFood(null); }}
                   />
                   {(search || filterCat !== "Alle") && (
@@ -169,10 +328,15 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 </div>
               </div>
 
+              {/* Suchergebnisse */}
               {showResults && (searchResults.length > 0 ? (
                 <div className="food-results">
                   {searchResults.map(food => (
-                    <div key={food.id} className="food-result-item" onClick={() => selectFood(food)}>
+                    <div key={food.id} className="food-result-item" onClick={() => selectFood(food)}
+                      style={{
+                        background: addedId === food.id ? 'rgba(34,197,94,0.08)' : undefined,
+                        transition: 'background 0.3s ease',
+                      }}>
                       <div>
                         <div className="food-result-name">{food.name}</div>
                         <div className="food-result-meta">{food.serving} — P: {food.protein}g / K: {food.carbs}g / F: {food.fat}g</div>
@@ -186,6 +350,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 </div>
               ) : <div className="no-food-found">Kein Lebensmittel gefunden.</div>)}
 
+              {/* Portion auswählen */}
               {selectedFood && (
                 <div className="portion-row">
                   <div className="form-group">
@@ -195,7 +360,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                     </label>
                     <input className="form-input" type="number" min="0.25" step="0.25"
                       placeholder="Portionen" value={qty}
-                      onChange={e => setQty(e.target.value)} />
+                      onChange={e => setQty(e.target.value)} autoFocus />
                     {preview && (
                       <span style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 4, display: "block" }}>
                         = {preview.cal} kcal — P: {preview.prot}g / K: {preview.carb}g / F: {preview.fat}g
@@ -203,7 +368,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                     )}
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                    <button className="btn btn-primary btn-sm" onClick={addToLog}>
+                    <button className="btn btn-primary btn-sm" onClick={() => addToLog()}>
                       <Plus size={14} /> Hinzufügen
                     </button>
                     <button className="btn btn-ghost btn-sm" onClick={() => { setSelectedFood(null); setQty("1"); }}>
@@ -213,11 +378,12 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 </div>
               )}
 
-              {!selectedFood && !search && filterCat === "Alle" && (
+              {/* Schnellzugriff */}
+              {!selectedFood && !search && filterCat === "Alle" && recentFoods.length === 0 && (
                 <div className="quick-add-section">
                   <div className="quick-add-label">Schnellzugriff:</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    {quickFoods.map(f => (
+                    {[0, 5, 35, 55, 147, 171].map(i => foodDatabase[i]).filter(Boolean).map(f => (
                       <button key={f.id} className="chip" onClick={() => selectFood(f)}>
                         {f.name.split(" ")[0]}
                       </button>
@@ -241,13 +407,15 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 <div className="empty-state">
                   <div className="empty-icon"><Leaf size={38} strokeWidth={1.2} color="var(--text-muted)" /></div>
                   <p>Noch keine Mahlzeiten eingetragen.</p>
-                  <p className="empty-hint">Suche oben nach einem Lebensmittel oder scanne einen Barcode.</p>
+                  <p className="empty-hint">Nutze die Schnellzugriff-Buttons oder suche oben.</p>
                 </div>
               ) : (
                 <>
                   <div className="log-list">
-                    {dailyLog.map(item => (
-                      <div key={item.id} className="log-item">
+                    {dailyLog.map((item, idx) => (
+                      <div key={item.id} className="log-item" style={{
+                        animation: `slideUpFade 0.25s ${idx * 0.04}s ease both`,
+                      }}>
                         <div className="log-item-dot" style={{ background: getCatColor(item.category) }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="log-item-name">{item.name}</div>
@@ -281,7 +449,6 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
           {/* Right Column */}
           <div>
-            {/* Kalorienübersicht */}
             <div className="tracker-card">
               <h3>Kalorienübersicht</h3>
               {calorieGoal > 0 ? (
@@ -299,7 +466,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                     color={totals.calories <= calorieGoal ? "var(--green)" : "#f87171"} height={8} />
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--text-muted)", marginTop: 7 }}>
                     <span>0</span>
-                    <span style={{ fontWeight: 600 }}>{Math.round((totals.calories / calorieGoal) * 100)}%</span>
+                    <span style={{ fontWeight: 600 }}>{pct}%</span>
                     <span>{calorieGoal.toLocaleString()} kcal</span>
                   </div>
                 </>
@@ -321,16 +488,13 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 <div style={{ display: "flex", gap: 7 }}>
                   <input className="form-input" type="number" placeholder="kcal Ziel" value={manualGoal}
                     onChange={e => setManualGoal(e.target.value)} style={{ flex: 1 }}
-                    onKeyDown={e => e.key === "Enter" && saveManualGoal()} />
+                    onKeyDown={e => e.key === "Enter" && saveManualGoal()} autoFocus />
                   <button className="btn btn-primary btn-sm" onClick={saveManualGoal}>OK</button>
-                  <button className="btn btn-ghost btn-sm" onClick={() => setShowGoalInput(false)}>
-                    <X size={14} />
-                  </button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setShowGoalInput(false)}><X size={14} /></button>
                 </div>
               )}
             </div>
 
-            {/* Makronährstoffe */}
             <div className="tracker-card">
               <h3>Makronährstoffe</h3>
               <div className="macro-bars">
@@ -340,13 +504,11 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               </div>
             </div>
 
-            {/* Wassertracker — neu */}
             <div className="tracker-card">
               <h3><Droplets size={16} color="#60a5fa" /> Wassertracker</h3>
               <WaterTracker waterGlasses={waterGlasses} setWaterGlasses={setWaterGlasses} />
             </div>
 
-            {/* Tip Box */}
             <div className="tip-box" style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
               <Lightbulb size={16} color="var(--green)" style={{ flexShrink: 0, marginTop: 2 }} />
               <span>Trinke täglich 2–3 Liter Wasser für optimale Leistung und Fettstoffwechsel.</span>
@@ -357,10 +519,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
       {showScanner && (
         <BarcodeScanner
-          onAddFood={(food) => {
-            setDailyLog(log => [...log, food]);
-            setShowScanner(false);
-          }}
+          onAddFood={(food) => { setDailyLog(log => [...log, food]); setShowScanner(false); }}
           onClose={() => setShowScanner(false)}
         />
       )}
