@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
-  Search, X, Dumbbell, Target, Zap, Package, ZoomIn, Heart, ChevronDown, ChevronUp, TrendingUp
+  Search, X, Dumbbell, Target, Zap, Package, ZoomIn, Heart, ChevronDown, ChevronUp, TrendingUp, Flame
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { exercises, muscleGroups, difficulties, equipmentTypes } from '../data/exercises';
