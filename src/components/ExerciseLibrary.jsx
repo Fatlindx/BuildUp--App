@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
-  Search, X, Dumbbell, Target, Zap, Package, Flame, ZoomIn, Heart, ChevronDown, ChevronUp
+  Search, X, Dumbbell, Target, Zap, Package, ZoomIn, Heart, ChevronDown, ChevronUp, TrendingUp
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { exercises, muscleGroups, difficulties, equipmentTypes } from '../data/exercises';
@@ -12,11 +12,11 @@ const muscleColors = {
 
 // Sets/Reps Empfehlungen nach Ziel
 const setsRepsMap = {
-  Muskelaufbau:        { sets: '3–4', reps: '8–12',  rest: '60–90s',  note: 'Hypertrophie-Bereich' },
-  'Gewicht verlieren': { sets: '3',   reps: '15–20', rest: '30–45s',  note: 'Hohes Volumen, kurze Pause' },
-  Kraft:               { sets: '4–5', reps: '3–6',   rest: '3–5 min', note: 'Maximalkraft' },
-  Ausdauer:            { sets: '2–3', reps: '20–25', rest: '20–30s',  note: 'Ausdauer & Kondition' },
-  Standard:            { sets: '3',   reps: '10–15', rest: '60s',     note: 'Allgemeine Fitness' },
+  Muskelaufbau:        { sets: '3–4', reps: '8–12',  rest: '60–90s',  note: 'Hypertrophie-Bereich',   progress: 'Gewicht +2.5kg wenn alle Sätze vollständig' },
+  'Gewicht verlieren': { sets: '3',   reps: '15–20', rest: '30–45s',  note: 'Hohes Volumen, kurze Pause', progress: 'Reps erhöhen, dann Gewicht steigern' },
+  Kraft:               { sets: '4–5', reps: '3–6',   rest: '3–5 min', note: 'Maximalkraft',            progress: 'Gewicht +5kg nach 2 erfolgreichen Sessions' },
+  Ausdauer:            { sets: '2–3', reps: '20–25', rest: '20–30s',  note: 'Ausdauer & Kondition',   progress: 'Sätze erhöhen, dann Pause verkürzen' },
+  Standard:            { sets: '3',   reps: '10–15', rest: '60s',     note: 'Allgemeine Fitness',      progress: 'Alle 2 Wochen Gewicht oder Reps erhöhen' },
 };
 
 function DifficultyBadge({ level }) {
@@ -187,6 +187,19 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
                 {rec.note}
               </div>
+              {rec.progress && (
+                <div style={{
+                  marginTop: 10, paddingTop: 10,
+                  borderTop: '1px solid rgba(34,197,94,0.15)',
+                  display: 'flex', alignItems: 'flex-start', gap: 7,
+                }}>
+                  <TrendingUp size={13} color="var(--green)" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <strong style={{ color: 'var(--text)', fontWeight: 600 }}>Progression: </strong>
+                    {rec.progress}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Über diese Übung */}
@@ -333,7 +346,12 @@ function ExerciseCard({ exercise, onClick, index, isFavorite, onToggleFavorite }
           display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px 12px',
           background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 30%, rgba(0,0,0,0.75) 100%)',
         }}>
-          <span className="exercise-card-category">{exercise.category}</span>
+          {/* Nur Compound/Isolation Badge — relevant für Training */}
+          {(exercise.category === 'COMPOUND' || exercise.category === 'ISOLATIONSÜBUNG') && (
+            <span className="exercise-card-category" style={{ fontSize: 9 }}>
+              {exercise.category === 'COMPOUND' ? 'COMPOUND' : 'ISOLATION'}
+            </span>
+          )}
           <h3 className="exercise-card-name">{exercise.name}</h3>
         </div>
       </div>
@@ -367,7 +385,7 @@ function ExerciseCard({ exercise, onClick, index, isFavorite, onToggleFavorite }
 }
 
 // ─── Filter Panel (Mobile collapsible) ────────────────────────────────────────
-function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff, filterEquip, setFilterEquip, hasFilters, resetFilters, filteredCount, counts, isMobile }) {
+function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff, filterEquip, setFilterEquip, hasFilters, resetFilters, filteredCount, counts, isMobile, sortBy, setSortBy }) {
   const [open, setOpen] = useState(!isMobile);
 
   return (
@@ -431,6 +449,23 @@ function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff,
               ))}
             </div>
           </div>
+          {/* P5: Sort */}
+          <div className="filter-group">
+            <label><TrendingUp size={12} /> Sortierung</label>
+            <div className="filter-chips">
+              {[
+                { value: 'default',    label: 'Standard' },
+                { value: 'name',       label: 'A – Z' },
+                { value: 'difficulty', label: 'Schwierigkeit' },
+              ].map(s => (
+                <button key={s.value} className={`chip ${sortBy === s.value ? 'active' : ''}`}
+                  onClick={() => setSortBy(s.value)}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="filter-count">
             <strong>{filteredCount}</strong> Übung{filteredCount !== 1 ? 'en' : ''} gefunden
           </div>
@@ -447,6 +482,7 @@ export default function ExerciseLibrary({ user, profile }) {
   const [filterMuscle,  setFilterMuscle]  = useState('Alle');
   const [filterDiff,    setFilterDiff]    = useState('Alle');
   const [filterEquip,   setFilterEquip]   = useState('Alle');
+  const [sortBy,        setSortBy]        = useState('default'); // default | name | difficulty
   const [selected,      setSelected]      = useState(null);
   const [favorites,     setFavorites]     = useState(new Set());
   const [activeTab,     setActiveTab]     = useState('all'); // 'all' | 'favorites'
@@ -577,9 +613,42 @@ export default function ExerciseLibrary({ user, profile }) {
           hasFilters={hasFilters} resetFilters={resetFilters}
           filteredCount={displayedExercises.length}
           counts={counts} isMobile={isMobile}
+          sortBy={sortBy} setSortBy={setSortBy}
         />
 
         <div>
+          {/* P5: Zuletzt angesehen */}
+          {recentlyViewed.length > 0 && !debouncedSearch && !hasFilters && activeTab === 'all' && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{
+                fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.8px', color: 'var(--text-muted)',
+                marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <Target size={11} /> Zuletzt angesehen
+              </div>
+              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                {recentlyViewed
+                  .map(id => exercises.find(ex => ex.id === id))
+                  .filter(Boolean)
+                  .map(ex => (
+                    <button key={ex.id} onClick={() => { setSelected(ex); trackViewed(ex.id); }}
+                      style={{
+                        fontSize: 12, padding: '5px 12px', borderRadius: 100,
+                        background: 'var(--bg-card)', border: '1px solid var(--border)',
+                        color: 'var(--text-secondary)', cursor: 'pointer',
+                        transition: 'all 0.15s ease', fontWeight: 500,
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green)'; e.currentTarget.style.color = 'var(--green)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                    >
+                      {ex.name}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+
           {/* Suchfeld */}
           <div className="search-bar">
             <Search size={16} className="search-icon" />

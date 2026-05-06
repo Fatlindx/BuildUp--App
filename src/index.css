@@ -937,3 +937,70 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 /* ── Performance Hints ── */
 .modal { will-change: transform, opacity; }
 .progress-bar-fill { will-change: width; }
+
+/* ═══════════════════════════════════════════════════════════════
+   P5 — ÜBUNGSBIBLIOTHEK PREMIUM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Mobile: Filter Panel als horizontaler Scroll ── */
+@media (max-width: 767px) {
+  .filter-panel {
+    position: sticky;
+    top: 56px;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px !important;
+    margin: 0 -16px;
+  }
+
+  /* Filter Chips horizontal scroll */
+  .filter-panel .filter-chips {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-panel .filter-chips::-webkit-scrollbar { display: none; }
+
+  /* Exercise grid: 2 columns on mobile */
+  .exercise-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Card name smaller on mobile */
+  .exercise-card-name {
+    font-size: 13px !important;
+  }
+
+  /* Search bar top sticky on mobile */
+  .search-bar {
+    position: sticky;
+    top: calc(56px + var(--filter-height, 48px));
+    z-index: 9;
+    background: var(--bg);
+    padding: 8px 0;
+    margin-bottom: 4px;
+  }
+}
+
+/* ── Exercise Card Premium ── */
+.exercise-card {
+  transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) ease !important;
+}
+.exercise-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+}
+.exercise-card:active {
+  transform: scale(0.97) !important;
+}
+
+/* ── Filter Group Labels ── */
+.filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
