@@ -40,7 +40,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
     setEditing(false);
   };
 
-  // ✅ NEVER derive from email — always username or 'User'
+  // NEVER derive from email — always username or 'User'
   const displayName = profile?.username || 'User';
   const avatarLetter = displayName !== 'User' ? displayName[0].toUpperCase() : null;
 

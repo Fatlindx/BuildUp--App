@@ -8,47 +8,41 @@ import { useState, useEffect } from 'react';
 
 // ── Dynamische Motivations-Texte ──
 function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour) {
-  // Ziel erreicht
   if (pct >= 100) return {
-    title: 'Perfekt getroffen! 🎯',
-    subtitle: 'Tagesziel erreicht. Bleib auf Kurs.',
+    title: 'Tagesziel erreicht.',
+    subtitle: 'Starke Leistung heute. Bleib auf Kurs.',
     color: '#22c55e',
-    icon: '🏆',
+    iconName: 'CheckCircle2',
   };
-  // Fast da
   if (pct >= 85) return {
-    title: 'Du bist nah dran 💪',
-    subtitle: `Noch ${(calorieGoal - totalCalories).toLocaleString()} kcal bis zum Ziel.`,
+    title: 'Fast am Ziel.',
+    subtitle: `Noch ${(calorieGoal - totalCalories).toLocaleString()} kcal verbleibend.`,
     color: '#4ade80',
-    icon: '🔥',
+    iconName: 'TrendingUp',
   };
-  // Guter Fortschritt
   if (pct >= 50) return {
-    title: 'Stark unterwegs ⚡',
-    subtitle: 'Du bist heute auf Kurs.',
+    title: 'Auf Kurs.',
+    subtitle: 'Du machst heute gute Fortschritte.',
     color: '#60a5fa',
-    icon: '📈',
+    iconName: 'Activity',
   };
-  // Morgens mit nichts gegessen
   if (hour < 10 && dailyLog.length === 0) return {
-    title: `Guten Morgen! ☀️`,
+    title: 'Guten Morgen.',
     subtitle: 'Starte deinen Tag mit einer guten Mahlzeit.',
     color: '#f97316',
-    icon: '🌅',
+    iconName: 'Sunrise',
   };
-  // Abends noch wenig
   if (hour >= 18 && pct < 30) return {
-    title: 'Heute noch nachholen ⏰',
+    title: 'Heute noch nachholen.',
     subtitle: 'Du hast heute wenig gegessen.',
     color: '#f97316',
-    icon: '⚠️',
+    iconName: 'Clock',
   };
-  // Standard — noch am Start
   return {
-    title: 'Bereit für dein Training?',
+    title: 'Bereit für heute?',
     subtitle: 'Verfolge deine Ernährung und erreiche deine Ziele.',
     color: 'var(--text)',
-    icon: null,
+    iconName: null,
   };
 }
 
@@ -70,18 +64,20 @@ function FeedbackToast({ message, show }) {
     <div style={{
       position: 'fixed', bottom: 90, left: '50%', transform: 'translateX(-50%)',
       zIndex: 9000,
-      background: 'rgba(34,197,94,0.95)',
-      backdropFilter: 'blur(12px)',
-      color: '#000',
+      background: 'rgba(15,15,15,0.92)',
+      backdropFilter: 'blur(16px)',
+      border: '1px solid rgba(34,197,94,0.25)',
+      color: 'var(--text)',
       padding: '10px 20px',
-      borderRadius: 100,
-      fontSize: 13.5, fontWeight: 700,
+      borderRadius: 10,
+      fontSize: 13, fontWeight: 500,
       display: 'flex', alignItems: 'center', gap: 8,
       animation: 'toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both',
-      boxShadow: '0 4px 24px rgba(34,197,94,0.4)',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
       whiteSpace: 'nowrap',
+      letterSpacing: '-0.1px',
     }}>
-      <CheckCircle2 size={15} />
+      <CheckCircle2 size={14} color="var(--green)" strokeWidth={2} />
       {message}
     </div>
   );
@@ -90,7 +86,7 @@ function FeedbackToast({ message, show }) {
 export default function Home({ setActiveSection, calorieGoal, totalCalories, dailyLog, username }) {
   const hour = new Date().getHours();
   const greeting     = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
-  const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '☀️' : hour < 18 ? '⚡' : '🌆';
+  const greetingIcon = null; // Icons werden inline gerendert
 
   const pct = calorieGoal > 0 ? Math.min((totalCalories / calorieGoal) * 100, 100) : 0;
   const remaining = Math.max(calorieGoal - totalCalories, 0);
@@ -113,10 +109,10 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
 
   // ── P8: Kleine Erfolge — Tages-Meilensteine ──
   const miniMilestones = [];
-  if (dailyLog.length >= 3) miniMilestones.push({ icon: '🍽️', text: '3 Mahlzeiten heute' });
-  if (totalProtein >= 100)  miniMilestones.push({ icon: '💪', text: '100g Protein erreicht' });
-  if (pct >= 100)           miniMilestones.push({ icon: '🎯', text: 'Tagesziel erreicht!' });
-  if (pct >= 50 && pct < 100) miniMilestones.push({ icon: '⚡', text: 'Halbzeit geschafft' });
+  if (dailyLog.length >= 3) miniMilestones.push({ iconName: 'UtensilsCrossed', text: '3 Mahlzeiten heute' });
+  if (totalProtein >= 100)  miniMilestones.push({ iconName: 'Dumbbell',        text: '100g Protein erreicht' });
+  if (pct >= 100)           miniMilestones.push({ iconName: 'Target',           text: 'Tagesziel erreicht' });
+  if (pct >= 50 && pct < 100) miniMilestones.push({ iconName: 'TrendingUp',    text: 'Halbzeit geschafft' });
 
   // ── Toast Feedback ──
   const [toast, setToast] = useState({ show: false, message: '' });
@@ -125,7 +121,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   useEffect(() => {
     if (dailyLog.length > 0 && dailyLog.length > prevLogLength) {
       const last = dailyLog[dailyLog.length - 1];
-      setToast({ show: true, message: `${last.name} hinzugefügt ✓` });
+      setToast({ show: true, message: `${last.name} hinzugefügt` });
       setTimeout(() => setToast({ show: false, message: '' }), 2500);
     }
   }, [dailyLog.length]);
@@ -133,10 +129,10 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   // ── Kontextbasierte Kalorien-Reaktion ──
   const calorieReaction = () => {
     if (!calorieGoal) return null;
-    if (pct >= 100) return { text: 'Tagesziel erreicht! 🏆', color: '#22c55e' };
-    if (pct >= 85)  return { text: 'Fast geschafft! 💪', color: '#4ade80' };
-    if (pct >= 50)  return { text: 'Du bist auf Kurs ⚡', color: '#60a5fa' };
-    if (pct > 0)    return { text: 'Gut gestartet 🌱', color: 'var(--text-muted)' };
+    if (pct >= 100) return { text: 'Tagesziel erreicht', color: '#22c55e' };
+    if (pct >= 85)  return { text: 'Fast geschafft', color: '#4ade80' };
+    if (pct >= 50)  return { text: 'Auf Kurs', color: '#60a5fa' };
+    if (pct > 0)    return { text: 'Gut gestartet', color: 'var(--text-muted)' };
     return { text: 'Noch nichts gegessen', color: 'var(--text-muted)' };
   };
   const reaction = calorieReaction();
@@ -160,8 +156,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
         <div className="home-hero">
           <div>
             <div className="home-greeting" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>{greetingIcon}</span>
-              {greeting}{showName ? `, ${username}` : ''}!
+              {greeting}{showName ? `, ${username}` : ''}
             </div>
 
             {/* Dynamischer Status-Titel */}
@@ -186,22 +181,27 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                   fontSize: 12, fontWeight: 600, color: reaction.color,
                   animation: 'slideUpFade 0.4s ease both',
                 }}>
-                  <TrendingUp size={12} />
+                  <TrendingUp size={11} strokeWidth={2} />
                   {reaction.text}
                 </div>
               )}
               {/* P8: Mini-Erfolge als Chips */}
-              {miniMilestones.map((m, i) => (
-                <div key={i} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)',
-                  padding: '4px 10px', borderRadius: 100,
-                  fontSize: 11.5, fontWeight: 600, color: 'var(--green)',
-                  animation: `slideUpFade 0.35s ${i * 0.08}s ease both`,
-                }}>
-                  {m.icon} {m.text}
-                </div>
-              ))}
+              {miniMilestones.map((m, i) => {
+                const IconMap = { UtensilsCrossed, Dumbbell, Target, TrendingUp };
+                const MIcon = IconMap[m.iconName];
+                return (
+                  <div key={i} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)',
+                    padding: '4px 10px', borderRadius: 100,
+                    fontSize: 11.5, fontWeight: 600, color: 'var(--green)',
+                    animation: `slideUpFade 0.35s ${i * 0.08}s ease both`,
+                  }}>
+                    {MIcon && <MIcon size={11} strokeWidth={2} />}
+                    {m.text}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -269,7 +269,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                     {Math.round(pct)}%
                   </text>
                   <text x="65" y="78" textAnchor="middle" fill="var(--text-secondary)" fontSize="10">
-                    {pct >= 100 ? 'Ziel ✓' : 'Ziel'}
+                    {pct >= 100 ? 'Ziel' : 'Ziel'}
                   </text>
                 </svg>
               </div>
@@ -299,7 +299,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('progress')}>
               <div className="mini-stat-icon"><BarChart2 size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
-              <div className="mini-stat-value">{calorieGoal > 0 ? '✓' : '—'}</div>
+              <div className="mini-stat-value">{calorieGoal > 0 ? <CheckCircle2 size={16} color="var(--green)" strokeWidth={2} /> : <span style={{color:"var(--text-muted)"}}>—</span>}</div>
               <div className="mini-stat-label">Ziel gesetzt</div>
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('calculator')}>

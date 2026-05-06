@@ -3,7 +3,8 @@ import { supabase } from '../supabase';
 import {
   UtensilsCrossed, Target, Dumbbell, ClipboardList,
   Flame, Star, Trophy, Rocket, Lock, TrendingUp,
-  Scale, Plus, ChevronDown, ChevronUp, Check, Zap
+  Scale, Plus, ChevronDown, ChevronUp, Check, Zap,
+  AlertCircle, CheckCircle2, Activity, Minus, Award, Crown
 } from 'lucide-react';
 
 function getLast7Days() {
@@ -168,21 +169,21 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   ];
 
   // P6: Tagesstatus mit Icon
-  const statusText = pct >= 100 ? { text: 'Über Ziel',      color: '#ef4444', icon: '🔴', bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)'   }
-    : pct >= 85 ? { text: 'Fast geschafft', color: '#4ade80', icon: '🟢', bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
-    : pct >= 50 ? { text: 'On Track',       color: 'var(--green)', icon: '✅', bg: 'var(--green-glow)',   border: 'var(--border-active)'  }
-    : pct > 0   ? { text: 'Gut gestartet',  color: '#60a5fa', icon: '🔵', bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
-    : { text: 'Noch nichts',  color: 'var(--text-muted)', icon: '⚪', bg: 'var(--bg-card-2)', border: 'var(--border)' };
+  const statusText = pct >= 100 ? { text: 'Über Ziel',     color: '#ef4444',          iconName: 'AlertCircle',  bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)'   }
+    : pct >= 85 ? { text: 'Fast am Ziel',   color: '#4ade80',          iconName: 'TrendingUp',   bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
+    : pct >= 50 ? { text: 'On Track',        color: 'var(--green)',     iconName: 'CheckCircle2', bg: 'var(--green-glow)',     border: 'var(--border-active)'  }
+    : pct > 0   ? { text: 'Gestartet',       color: '#60a5fa',          iconName: 'Activity',     bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
+    : { text: 'Noch nichts',   color: 'var(--text-muted)',   iconName: 'Minus',        bg: 'var(--bg-card-2)',     border: 'var(--border)'         };
 
   // P6: Wochentrend — Vergleich dieser Woche
   const daysWithData   = weekData.filter(d => d.kcal > 0).length;
   const avgKcal        = daysWithData > 0 ? Math.round(weekData.reduce((s,d) => s + d.kcal, 0) / daysWithData) : 0;
   const daysOnTrack    = weekData.filter(d => calorieGoal > 0 && d.kcal >= calorieGoal * 0.8 && d.kcal <= calorieGoal * 1.1).length;
   const weekScore      = daysWithData > 0 ? Math.round((daysOnTrack / daysWithData) * 100) : 0;
-  const weekTrend      = weekScore >= 80 ? { text: 'Ausgezeichnete Woche', color: 'var(--green)', icon: '🏆' }
-    : weekScore >= 50 ? { text: 'Gute Woche',          color: '#4ade80',        icon: '💪' }
-    : weekScore >  0  ? { text: 'Woche im Aufbau',     color: '#f97316',        icon: '📈' }
-    : { text: 'Diese Woche starten', color: 'var(--text-muted)', icon: '🎯' };
+  const weekTrend      = weekScore >= 80 ? { text: 'Ausgezeichnete Woche', color: 'var(--green)', iconName: 'Trophy' }
+    : weekScore >= 50 ? { text: 'Gute Woche',          color: '#4ade80',        iconName: 'TrendingUp' }
+    : weekScore >  0  ? { text: 'Woche im Aufbau',     color: '#f97316',        iconName: 'Activity' }
+    : { text: 'Diese Woche starten', color: 'var(--text-muted)', iconName: 'Target' };
 
   return (
     <div className="page">
@@ -194,30 +195,40 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <p>Behalte deine Ziele im Blick und bleibe motiviert.</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {/* Tagesstatus Badge */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 14px', borderRadius: 100,
-              background: statusText.bg, border: `1px solid ${statusText.border}`,
-              fontSize: 12.5, fontWeight: 700, color: statusText.color,
-              animation: 'slideUpFade 0.4s ease both',
-            }}>
-              <span>{statusText.icon}</span>
-              <span>{statusText.text}</span>
-            </div>
+            {/* P6: Tagesstatus Badge — Lucide Icons */}
+            {(() => {
+              const iconMap = { AlertCircle, TrendingUp, CheckCircle2, Activity, Minus };
+              const SI = iconMap[statusText.iconName];
+              return (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '6px 14px', borderRadius: 100,
+                  background: statusText.bg, border: `1px solid ${statusText.border}`,
+                  fontSize: 12.5, fontWeight: 700, color: statusText.color,
+                  animation: 'slideUpFade 0.4s ease both',
+                }}>
+                  {SI && <SI size={13} strokeWidth={2} />}
+                  <span>{statusText.text}</span>
+                </div>
+              );
+            })()}
             {/* Wochentrend Badge */}
-            {daysWithData > 0 && (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '6px 14px', borderRadius: 100,
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                fontSize: 12.5, fontWeight: 600, color: weekTrend.color,
-                animation: 'slideUpFade 0.4s 0.1s ease both',
-              }}>
-                <span>{weekTrend.icon}</span>
-                <span>{weekTrend.text}</span>
-              </div>
-            )}
+            {daysWithData > 0 && (() => {
+              const iconMap = { Trophy, TrendingUp, Activity, Target };
+              const WI = iconMap[weekTrend.iconName];
+              return (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '6px 14px', borderRadius: 100,
+                  background: 'var(--bg-card)', border: '1px solid var(--border)',
+                  fontSize: 12.5, fontWeight: 600, color: weekTrend.color,
+                  animation: 'slideUpFade 0.4s 0.1s ease both',
+                }}>
+                  {WI && <WI size={13} strokeWidth={2} />}
+                  <span>{weekTrend.text}</span>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -316,20 +327,22 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <h3 className="progress-card-title" style={{ marginBottom: 0 }}>Wochenverlauf</h3>
             {streak > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {/* P8: Streak Milestone Badge */}
+                {/* P8: Streak Milestone Badge — Lucide Icons */}
                 <span style={{
                   fontSize: 12, fontWeight: 700,
                   color: streak >= 30 ? '#eab308' : streak >= 14 ? '#a855f7' : streak >= 7 ? '#22c55e' : '#f97316',
-                  background: streak >= 30 ? 'rgba(234,179,8,0.12)' : streak >= 14 ? 'rgba(168,85,247,0.12)' : streak >= 7 ? 'rgba(34,197,94,0.12)' : 'rgba(249,115,22,0.1)',
-                  border: `1px solid ${streak >= 30 ? 'rgba(234,179,8,0.3)' : streak >= 14 ? 'rgba(168,85,247,0.3)' : streak >= 7 ? 'rgba(34,197,94,0.3)' : 'rgba(249,115,22,0.25)'}`,
+                  background: streak >= 30 ? 'rgba(234,179,8,0.1)' : streak >= 14 ? 'rgba(168,85,247,0.1)' : streak >= 7 ? 'rgba(34,197,94,0.1)' : 'rgba(249,115,22,0.08)',
+                  border: `1px solid ${streak >= 30 ? 'rgba(234,179,8,0.25)' : streak >= 14 ? 'rgba(168,85,247,0.25)' : streak >= 7 ? 'rgba(34,197,94,0.25)' : 'rgba(249,115,22,0.2)'}`,
                   padding: '4px 12px', borderRadius: 100,
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  animation: streak > 0 ? 'pulse 3s infinite' : 'none',
+                  display: 'flex', alignItems: 'center', gap: 6,
                 }}>
-                  {streak >= 30 ? '👑' : streak >= 14 ? '💜' : streak >= 7 ? '🔥' : '⚡'}
-                  {' '}{streak} Tag{streak !== 1 ? 'e' : ''} Streak
-                  {streak >= 7 && <span style={{ fontSize: 9, opacity: 0.8 }}>
-                    {streak >= 30 ? ' · Legende' : streak >= 14 ? ' · Elite' : ' · Profi'}
+                  {streak >= 30 ? <Crown size={12} strokeWidth={2} /> :
+                   streak >= 14 ? <Award size={12} strokeWidth={2} /> :
+                   streak >= 7  ? <Flame size={12} strokeWidth={2} /> :
+                                  <Zap size={12} strokeWidth={2} />}
+                  {streak} Tag{streak !== 1 ? 'e' : ''} Streak
+                  {streak >= 7 && <span style={{ fontSize: 9, opacity: 0.7, letterSpacing: '0.3px' }}>
+                    {streak >= 30 ? '· Legende' : streak >= 14 ? '· Elite' : '· Profi'}
                   </span>}
                 </span>
               </div>
@@ -599,7 +612,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                       color: a.color, border: `1px solid ${a.color}44`,
                       marginTop: 2,
                     }}>
-                      Erreicht ✓
+                      Erreicht
                     </div>
                   )}
                 </div>
@@ -621,26 +634,26 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           <div style={{ flex: 1 }}>
             {/* P8: Streak Milestone Messages */}
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
-              {streak >= 30 ? '👑 Legendärer Status!' :
-               streak >= 14 ? '💜 Elite-Level erreicht!' :
-               streak >= 7  ? '🏆 Aussergewöhnlich!' :
-               streak >= 3  ? '🔥 Starke Konstanz!' :
-               streak === 1  ? '⚡ Erster Schritt!' :
-               'Bleib am Ball!'}
+              {streak >= 30 ? 'Legendärer Status' :
+               streak >= 14 ? 'Elite-Level erreicht' :
+               streak >= 7  ? 'Aussergewöhnlich' :
+               streak >= 3  ? 'Starke Konstanz' :
+               streak === 1  ? 'Erster Schritt' :
+               'Bleib am Ball'}
             </div>
             <div style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, marginBottom: 12 }}>
               {totalDaysLogged === 0
                 ? 'Fang heute an – jede Mahlzeit bringt dich näher ans Ziel.'
                 : streak >= 30
-                  ? `Unglaublich — ${streak} Tage in Folge! Du bist eine Inspiration. 🌟`
+                  ? `${streak} Tage in Folge. Bemerkenswerte Disziplin.`
                   : streak >= 14
-                    ? `${streak} Tage non-stop! Das ist Elite-Level Disziplin. Keep going! 💪`
+                    ? `${streak} Tage non-stop. Das ist Elite-Level Disziplin.`
                     : streak >= 7
-                      ? `${streak} Tage Streak! Du bist auf dem besten Weg zum Ziel.`
+                      ? `${streak} Tage Streak. Du bist auf dem besten Weg.`
                       : streak >= 3
-                        ? `${streak} Tage in Folge! Weiter so, du bist auf einem guten Weg.`
+                        ? `${streak} Tage in Folge. Weiter so.`
                         : streak === 1
-                          ? 'Heute war dein erster Schritt — morgen der zweite. Du schaffst das!'
+                          ? 'Erster Schritt gesetzt. Morgen weiter.'
                           : `Super! Du hast heute ${dailyLog.length} Mahlzeit${dailyLog.length !== 1 ? 'en' : ''} geloggt.`}
             </div>
 
@@ -675,8 +688,9 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                   background: 'var(--bg-card-2)', border: '1px solid var(--border)',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                    🎯 Nächste Milestone
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Target size={12} strokeWidth={1.8} />
+                    Nächste Milestone
                   </span>
                   <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--green)' }}>
                     {daysLeft} {daysLeft === 1 ? 'Tag' : 'Tage'} bis {next}-Tage Streak

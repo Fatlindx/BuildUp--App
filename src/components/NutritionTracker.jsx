@@ -183,7 +183,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                   background: pct >= 100 ? 'rgba(239,68,68,0.1)' : 'var(--green-glow)',
                   border: `1px solid ${pct >= 100 ? 'rgba(239,68,68,0.3)' : 'var(--border-active)'}`,
                 }}>
-                  {pct}% · {remaining !== null && remaining > 0 ? `${remaining} kcal übrig` : 'Ziel erreicht 🎯'}
+                  {pct}% · {remaining !== null && remaining > 0 ? `${remaining} kcal übrig` : 'Tagesziel erreicht'}
                 </span>
               </div>
               <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden' }}>
@@ -289,7 +289,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                             color: 'var(--green)', cursor: 'pointer', fontWeight: 600,
                             transition: 'all 0.15s ease',
                           }}>
-                            ⭐ {f.name.split(' ')[0]}
+                            {f.name.split(' ')[0]}
                           </button>
                         ))}
                       </div>

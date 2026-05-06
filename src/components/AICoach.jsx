@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, Sparkles, TrendingUp, Utensils, Dumbbell, Droplets } from 'lucide-react';
+import { X, Send, Bot, Sparkles, TrendingUp, Dumbbell, Droplets, Scale, Ruler } from 'lucide-react';
 
 export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const displayName = profile?.username || profile?.full_name?.split(' ')[0] || 'du';
@@ -60,7 +60,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
     } catch (e) {
       setTyping(false);
-      setMessages(prev => [...prev, { role: 'assistant', content: `❌ Fehler: ${e.message}` }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `Fehler: ${e.message}` }]);
     } finally {
       setLoading(false);
     }
@@ -161,9 +161,9 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
           {/* Makros + Profil Tags */}
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             {[
-              { icon: '🥩', label: 'Protein', value: `${totalProt}g`, color: '#ef4444' },
-              { icon: '🍞', label: 'Carbs',   value: `${totalCarb}g`, color: '#f97316' },
-              { icon: '🥑', label: 'Fette',   value: `${totalFat}g`,  color: '#eab308' },
+              { iconName: 'Dumbbell', label: 'Protein', value: `${totalProt}g`, color: '#ef4444' },
+              { iconName: 'Wheat', label: 'Carbs',   value: `${totalCarb}g`, color: '#f97316' },
+              { iconName: 'Droplets', label: 'Fette',   value: `${totalFat}g`,  color: '#eab308' },
             ].map(m => (
               <div key={m.label} style={{
                 display: 'flex', alignItems: 'center', gap: 4,
@@ -181,10 +181,10 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
 
             {/* Profile Info */}
             {profile?.weight && (
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>⚖️ {profile.weight}kg</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><Scale size={11} strokeWidth={1.8} /> {profile.weight} kg</span>
             )}
             {profile?.height && (
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>📏 {profile.height}cm</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}><Ruler size={11} strokeWidth={1.8} /> {profile.height} cm</span>
             )}
             {remaining > 0 && (
               <span style={{
@@ -192,7 +192,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
                 background: 'var(--green-glow)', color: 'var(--green)',
                 border: '1px solid var(--border-active)', fontWeight: 600,
               }}>
-                🔥 {remaining} kcal übrig
+                {remaining} kcal übrig
               </span>
             )}
           </div>
@@ -349,14 +349,14 @@ function buildWelcomeMessage(name, profile, calorieGoal, dailyLog) {
 
   // Dynamische Begrüssung basierend auf Ziel + Tageszeit
   const goalGreetings = {
-    'Muskelaufbau':        `Heute ist ein neuer Tag um stärker zu werden 💪`,
-    'Gewicht verlieren':   `Jeder Tag ist eine neue Chance auf deinen Körper hinzuarbeiten 🎯`,
-    'Fit bleiben':         `Bleib konsequent — das ist der Schlüssel zum Erfolg ⚡`,
-    'Ausdauer verbessern': `Dein Körper wird sich anpassen — vertrau dem Prozess 🏃`,
+    'Muskelaufbau':        `Heute ist ein neuer Tag um stärker zu werden.`,
+    'Gewicht verlieren':   `Jeder Tag ist eine neue Chance.`,
+    'Fit bleiben':         `Bleib konsequent — das ist der Schlüssel zum Erfolg.`,
+    'Ausdauer verbessern': `Dein Körper wird sich anpassen — vertrau dem Prozess.`,
   };
-  const motivLine = goalGreetings[profile?.goal] || `Bereit für heute? Ich bin hier um dir zu helfen 🚀`;
+  const motivLine = goalGreetings[profile?.goal] || `Bereit für heute? Ich bin hier um dir zu helfen.`;
 
-  let msg = `${greeting}${firstName}! 👋\n\n${motivLine}\n\n`;
+  let msg = `${greeting}${firstName}.\n\n${motivLine}\n\n`;
 
   // Kontext-basierte Nachricht
   if (totalCal === 0) {
@@ -364,9 +364,9 @@ function buildWelcomeMessage(name, profile, calorieGoal, dailyLog) {
   } else if (remaining > 500) {
     msg += `Du hast heute ${totalCal} kcal gegessen — noch ${remaining} kcal bis zum Ziel. Was kann ich dir empfehlen?`;
   } else if (remaining > 0) {
-    msg += `Fast am Ziel! Nur noch ${remaining} kcal übrig. Du machst das großartig! 🔥`;
+    msg += `Noch ${remaining} kcal bis zum Ziel. Weiter so.`;
   } else {
-    msg += `Du hast dein Tagesziel erreicht! 🏆 Wie kann ich dir sonst helfen?`;
+    msg += `Du hast dein Tagesziel von ${calorieGoal} kcal heute erreicht.`;
   }
 
   return msg;
