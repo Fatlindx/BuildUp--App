@@ -111,10 +111,10 @@ export default function Auth({ onLogin }) {
           <div style={{
             width: 56, height: 56,
             
-            borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px', boxShadow: 'var(--shadow-green)',
           }}>
-            <img src="/logo-512.png" alt="BuildUp" style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 16, display: "block" }} />
+            <img src="/logo-512.png" alt="BuildUp" style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 'var(--radius-lg)', display: "block" }} />
           </div>
           <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-1px', marginBottom: 6 }}>
             BuildUp
@@ -144,7 +144,7 @@ export default function Auth({ onLogin }) {
               ].map(m => (
                 <button key={m.id} onClick={() => switchMode(m.id)} style={{
                   flex: 1, padding: '9px', borderRadius: 8,
-                  fontSize: 13.5, fontWeight: 600,
+                  fontSize: 14, fontWeight: 600,
                   background: mode === m.id ? 'var(--green-glow)' : 'transparent',
                   border: mode === m.id ? '1px solid var(--border-active)' : '1px solid transparent',
                   color: mode === m.id ? 'var(--green)' : 'var(--text-secondary)',
@@ -213,7 +213,7 @@ export default function Auth({ onLogin }) {
           {mode === 'login' && (
             <div style={{ textAlign: 'right', marginTop: 8 }}>
               <button onClick={() => switchMode('forgot')} style={{
-                fontSize: 12.5, color: 'var(--text-muted)',
+                fontSize: 13, color: 'var(--text-muted)',
                 background: 'none', border: 'none', cursor: 'pointer',
               }}>
                 Passwort vergessen?
@@ -224,7 +224,7 @@ export default function Auth({ onLogin }) {
           {mode === 'forgot' && (
             <div style={{ textAlign: 'center', marginTop: 8 }}>
               <button onClick={() => switchMode('login')} style={{
-                fontSize: 12.5, color: 'var(--text-muted)',
+                fontSize: 13, color: 'var(--text-muted)',
                 background: 'none', border: 'none', cursor: 'pointer',
               }}>
                 ← Zurück zum Login
@@ -238,7 +238,7 @@ export default function Auth({ onLogin }) {
               marginTop: 16, padding: '11px 14px',
               background: 'rgba(239,68,68,0.08)',
               border: '1px solid rgba(239,68,68,0.25)',
-              borderRadius: 10, fontSize: 13.5,
+              borderRadius: 10, fontSize: 14,
               color: '#f87171', lineHeight: 1.5,
               display: 'flex', alignItems: 'flex-start', gap: 8,
             }}>
@@ -253,7 +253,7 @@ export default function Auth({ onLogin }) {
               marginTop: 16, padding: '11px 14px',
               background: 'rgba(34,197,94,0.08)',
               border: '1px solid rgba(34,197,94,0.25)',
-              borderRadius: 10, fontSize: 13.5,
+              borderRadius: 10, fontSize: 14,
               color: 'var(--green)', lineHeight: 1.5,
             }}>
               {success}

@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import {
-  UtensilsCrossed, Target, Dumbbell, ClipboardList,
-  Flame, Star, Trophy, Rocket, Lock, TrendingUp,
-  Scale, Plus, ChevronDown, ChevronUp, Check, Zap,
-  AlertCircle, CheckCircle2, Activity, Minus, Award, Crown
+  UtensilsCrossed, Target, Dumbbell, ClipboardList, Flame, Star, Trophy, Rocket, Lock, TrendingUp, Scale, Plus, ChevronUp, Check, Zap, AlertCircle, CheckCircle2, Activity, Minus, Award, Crown
 } from 'lucide-react';
 
 function getLast7Days() {
@@ -214,7 +211,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '6px 14px', borderRadius: 100,
                   background: statusText.bg, border: `1px solid ${statusText.border}`,
-                  fontSize: 12.5, fontWeight: 700, color: statusText.color,
+                  fontSize: 13, fontWeight: 700, color: statusText.color,
                   animation: 'slideUpFade 0.4s ease both',
                 }}>
                   {SI && <SI size={13} strokeWidth={2} />}
@@ -231,7 +228,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '6px 14px', borderRadius: 100,
                   background: 'var(--bg-card)', border: '1px solid var(--border)',
-                  fontSize: 12.5, fontWeight: 600, color: weekTrend.color,
+                  fontSize: 13, fontWeight: 600, color: weekTrend.color,
                   animation: 'slideUpFade 0.4s 0.1s ease both',
                 }}>
                   {WI && <WI size={13} strokeWidth={2} />}
@@ -267,7 +264,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <h3 className="progress-card-title" style={{ marginBottom: 0 }}>Heutiger Kalorienfortschritt</h3>
             {/* P3: Tagesstatus Badge */}
             <span style={{
-              fontSize: 11.5, fontWeight: 700, color: statusText.color,
+              fontSize: 12, fontWeight: 700, color: statusText.color,
               background: 'var(--bg-card-2)', border: `1px solid ${statusText.color}40`,
               padding: '3px 10px', borderRadius: 100, flexShrink: 0,
             }}>
@@ -411,7 +408,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
 
                   {/* Tag Label */}
                   <div style={{
-                    fontSize: 10.5, fontWeight: d.active ? 700 : 500,
+                    fontSize: 11, fontWeight: d.active ? 700 : 500,
                     color: d.active ? 'var(--green)' : 'var(--text-muted)',
                   }}>
                     {d.day}
@@ -441,7 +438,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
               background: showWeightInput ? 'var(--green-glow)' : 'var(--bg-card-2)',
               border: `1px solid ${showWeightInput ? 'var(--border-active)' : 'var(--border)'}`,
               color: showWeightInput ? 'var(--green)' : 'var(--text-muted)',
-              cursor: 'pointer', fontSize: 12.5, fontWeight: 600, transition: 'all 0.2s ease',
+              cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'all 0.2s ease',
             }}>
               {showWeightInput ? <ChevronUp size={13} /> : <Plus size={13} />}
               {showWeightInput ? 'Schliessen' : 'Eintragen'}
@@ -478,20 +475,20 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <div style={{ display: 'grid', gridTemplateColumns: bmi ? '1fr 1fr 1fr' : '1fr 1fr', gap: 10, marginBottom: 16 }}>
               <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text)' }}>{latestWeight}</div>
-                <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 1 }}>kg aktuell</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>kg aktuell</div>
               </div>
               {weightDiff !== null && (
                 <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: parseFloat(weightDiff) < 0 ? 'var(--green)' : parseFloat(weightDiff) > 0 ? '#f97316' : 'var(--text)' }}>
                     {parseFloat(weightDiff) > 0 ? '+' : ''}{weightDiff}
                   </div>
-                  <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 1 }}>kg Veränderung</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>kg Veränderung</div>
                 </div>
               )}
               {bmi && (
                 <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
                   <div style={{ fontSize: 22, fontWeight: 800, color: bmiColor }}>{bmi}</div>
-                  <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 1 }}>BMI · {bmiCategory}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>BMI · {bmiCategory}</div>
                 </div>
               )}
             </div>
@@ -609,7 +606,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                       ? <Icon size={26} strokeWidth={1.5} color={a.color} />
                       : <Lock size={22} strokeWidth={1.5} color="var(--text-muted)" />}
                   </div>
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: a.done ? 'var(--text)' : 'var(--text-muted)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: a.done ? 'var(--text)' : 'var(--text-muted)' }}>
                     {a.title}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
@@ -651,7 +648,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                streak === 1  ? 'Erster Schritt' :
                'Bleib am Ball'}
             </div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, marginBottom: 12 }}>
+            <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
               {totalDaysLogged === 0
                 ? 'Fang heute an – jede Mahlzeit bringt dich näher ans Ziel.'
                 : streak >= 30
@@ -702,7 +699,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                     <Target size={12} strokeWidth={1.8} />
                     Nächste Milestone
                   </span>
-                  <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--green)' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>
                     {daysLeft} {daysLeft === 1 ? 'Tag' : 'Tage'} bis {next}-Tage Streak
                   </span>
                 </div>

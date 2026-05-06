@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2,
-  Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList,
-  ChevronUp, ChevronDown, Zap, TrendingUp, Star
+  Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2, Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList, ChevronUp, ChevronDown, TrendingUp, Star
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { exercises } from '../data/exercises';
@@ -208,7 +206,7 @@ export default function WorkoutTracker({ user, profile }) {
                 ].map(tab => (
                   <button key={tab.id} onClick={() => setView(tab.id)} style={{
                     display: 'flex', alignItems: 'center', gap: 7,
-                    padding: '8px 18px', borderRadius: 9, fontSize: 13.5, fontWeight: 600,
+                    padding: '8px 18px', borderRadius: 9, fontSize: 14, fontWeight: 600,
                     background: view === tab.id ? 'var(--green-glow)' : 'transparent',
                     border: view === tab.id ? '1px solid var(--border-active)' : '1px solid transparent',
                     color: view === tab.id ? 'var(--green)' : 'var(--text-secondary)',
@@ -278,7 +276,7 @@ function PlansView({ plans, loading, onEdit, onDelete, onStart, onNew, history }
             borderRadius: 'var(--radius-xl)', marginBottom: 28,
           }}>
             <div style={{
-              width: 64, height: 64, borderRadius: 18,
+              width: 64, height: 64, borderRadius: 'var(--radius-lg)',
               background: 'var(--green-glow)', border: '1px solid var(--border-active)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
             }}>
@@ -390,7 +388,7 @@ function TemplatesSection({ onUseTemplate }) {
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 14 }}>
               {tpl.days.map((d, j) => (
                 <span key={j} style={{
-                  fontSize: 10.5, padding: '2px 7px', borderRadius: 100,
+                  fontSize: 11, padding: '2px 7px', borderRadius: 100,
                   background: 'var(--bg-card-2)', color: 'var(--text-secondary)',
                   border: '1px solid var(--border)',
                 }}>
@@ -574,7 +572,7 @@ function CreateView({ editPlan, user, onSaved }) {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px' }}>
                             <div style={{ width: 3, height: 32, borderRadius: 2, background: color, flexShrink: 0 }} />
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 13.5, fontWeight: 600 }}>{exercise.name}</div>
+                              <div style={{ fontSize: 14, fontWeight: 600 }}>{exercise.name}</div>
                               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{exercise.muscleGroup}</div>
                             </div>
                             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -795,7 +793,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button className="btn btn-ghost btn-sm" onClick={onBack}><ArrowLeft size={15} /></button>
           <div>
-            <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
               {plan.name}
             </div>
             <div style={{ fontSize: 17, fontWeight: 800 }}>{currentDay?.name}</div>
@@ -827,7 +825,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
           {days.map((day, i) => (
             <button key={i} onClick={() => setCurrentDayIndex(i)} style={{
-              padding: '6px 14px', borderRadius: 100, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+              padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 600, cursor: 'pointer',
               background: currentDayIndex === i ? 'var(--green-glow)' : 'var(--bg-card)',
               border: currentDayIndex === i ? '1px solid var(--border-active)' : '1px solid var(--border)',
               color: currentDayIndex === i ? 'var(--green)' : 'var(--text-secondary)',

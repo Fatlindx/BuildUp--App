@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Search, X, Dumbbell, Target, Zap, Package, Flame, ZoomIn, Heart, Plus, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Search, X, Dumbbell, Target, Zap, Package, Flame, ZoomIn, Heart, ChevronDown, ChevronUp
+} from 'lucide-react';
 import { supabase } from '../supabase';
 import { exercises, muscleGroups, difficulties, equipmentTypes } from '../data/exercises';
 
@@ -178,11 +180,11 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
                     textAlign: 'center', border: '1px solid rgba(34,197,94,0.15)',
                   }}>
                     <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--green)' }}>{r.value}</div>
-                    <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 2 }}>{r.label}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{r.label}</div>
                   </div>
                 ))}
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
                 {rec.note}
               </div>
             </div>
@@ -247,7 +249,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
             <div className="calorie-info-box">
               <div className="calorie-info-icon"><Flame size={20} color="var(--green)" /></div>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 2 }}>Kalorienverbrauch</div>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>Kalorienverbrauch</div>
                 <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
                   ca. <strong style={{ color: 'var(--green)' }}>{exercise.caloriesPerMin} kcal/min</strong> bei mittlerer Intensität
                 </div>

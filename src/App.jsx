@@ -142,7 +142,7 @@ export default function App() {
       alignItems: 'center', justifyContent: 'center', gap: 16,
     }}>
       <div style={{
-        width: 72, height: 72, borderRadius: 20, overflow: 'hidden',
+        width: 72, height: 72, borderRadius: 'var(--radius-lg)', overflow: 'hidden',
         animation: 'loadingPulse 1.5s ease infinite',
         boxShadow: '0 0 30px rgba(34,197,94,0.25)',
       }}>

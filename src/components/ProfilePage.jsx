@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, Flame, TrendingUp, Scale } from 'lucide-react';
+import {
+  User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, TrendingUp, Scale
+} from 'lucide-react';
 
 // Goal translation — maps DB/English values to German display names
 const GOAL_LABELS = {
@@ -67,7 +69,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
       {/* Header Card */}
       <div style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: 16, padding: '32px', marginBottom: 20,
+        borderRadius: 'var(--radius-lg)', padding: '32px', marginBottom: 20,
         display: 'flex', alignItems: 'center', gap: 24, position: 'relative',
       }}>
         {/* Avatar */}
@@ -102,7 +104,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '7px 14px', borderRadius: 10,
             background: 'var(--bg-card-2)', border: '1px solid var(--border)',
-            color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12.5, fontWeight: 600,
+            color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--green)'}
@@ -134,7 +136,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
       {/* Details Card */}
       <div style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: 16, padding: '24px',
+        borderRadius: 'var(--radius-lg)', padding: '24px',
       }}>
         <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', marginTop: 0, marginBottom: 20 }}>
           Profil-Details
@@ -143,7 +145,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
           <Field label="E-Mail" icon={Mail}>
-            <span style={{ fontSize: 13.5, color: 'var(--text-muted)' }}>{user?.email}</span>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{user?.email}</span>
           </Field>
 
           <Field label="Benutzername" icon={User}>
@@ -241,7 +243,7 @@ function Field({ label, icon: Icon, children }) {
   );
 }
 
-const valueStyle = { fontSize: 13.5, color: 'var(--text)' };
+const valueStyle = { fontSize: 14, color: 'var(--text)' };
 const inputStyle = {
   width: '100%', padding: '7px 10px',
   background: 'var(--bg-card-2)', border: '1px solid var(--border)',

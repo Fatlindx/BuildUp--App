@@ -60,7 +60,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                 padding: '6px 12px', borderRadius: 9,
                 background: 'var(--bg-card-2)', border: '1px solid var(--border)',
                 color: 'var(--text-muted)', cursor: 'pointer',
-                fontSize: 12.5, fontWeight: 500, flexShrink: 0,
+                fontSize: 13, fontWeight: 500, flexShrink: 0,
                 transition: 'all 0.18s ease',
               }}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
@@ -90,7 +90,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               {user && (
                 <button onClick={() => handleNav('profile')} style={{
-                  fontSize: 12.5,
+                  fontSize: 13,
                   color: activeSection === 'profile' ? 'var(--text)' : 'var(--text-muted)',
                   display: 'flex', alignItems: 'center', gap: 6,
                   background: activeSection === 'profile' ? 'var(--bg-hover)' : 'none',
@@ -112,7 +112,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                   display: 'flex', alignItems: 'center', gap: 7,
                   padding: '7px 13px', borderRadius: 10,
                   background: 'var(--green-glow)', border: '1px solid var(--border-active)',
-                  cursor: 'pointer', color: 'var(--green)', fontWeight: 600, fontSize: 12.5,
+                  cursor: 'pointer', color: 'var(--green)', fontWeight: 600, fontSize: 13,
                   transition: 'all 0.2s ease', whiteSpace: 'nowrap', flexShrink: 0,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(34,197,94,0.2)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.6)'; }}

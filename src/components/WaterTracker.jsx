@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Minus, Droplets, Trophy } from 'lucide-react';
+import { Minus, Droplets, Trophy } from 'lucide-react';
 
 const WATER_GOAL = 8; // Gläser
 const ML_PER_GLASS = 250;
@@ -106,7 +106,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
               <div style={{ fontSize: 26, fontWeight: 900, color: waterColor, letterSpacing: '-1px', lineHeight: 1 }}>
                 {totalMl} <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }}>ml</span>
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
                 {done ? 'Tagesziel erreicht' : `${remaining * ML_PER_GLASS} ml noch übrig`}
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
 
       {/* Hydration tip */}
       <div style={{
-        fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.6,
+        fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6,
         padding: '8px 12px', background: 'rgba(96,165,250,0.05)',
         border: '1px solid rgba(96,165,250,0.1)', borderRadius: 8,
       }}>

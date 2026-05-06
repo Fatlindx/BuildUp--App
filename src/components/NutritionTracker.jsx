@@ -1,5 +1,7 @@
 ﻿import { useState, useMemo, useEffect } from "react";
-import { Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine, Clock, Star, Zap } from "lucide-react";
+import {
+  Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine, Clock, Star
+} from "lucide-react";
 import { foodDatabase, foodCategories } from "../data/foods";
 import BarcodeScanner from "./BarcodeScanner";
 import WaterTracker from "./WaterTracker";
@@ -169,7 +171,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
         {calorieGoal > 0 && (
           <div style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
-            borderRadius: 14, padding: '14px 16px', marginBottom: 20,
+            borderRadius: 'var(--radius)', padding: '14px 16px', marginBottom: 20,
           }}>
             {/* Top row: Kalorien + Badge */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, gap: 8, flexWrap: 'wrap' }}>
@@ -177,7 +179,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 {totals.calories.toLocaleString()} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ {calorieGoal.toLocaleString()} kcal</span>
               </span>
               <span style={{
-                fontSize: 11.5, fontWeight: 700, padding: '2px 10px', borderRadius: 100,
+                fontSize: 12, fontWeight: 700, padding: '2px 10px', borderRadius: 100,
                 color: pct >= 100 ? '#ef4444' : 'var(--green)',
                 background: pct >= 100 ? 'rgba(239,68,68,0.1)' : 'var(--green-glow)',
                 border: `1px solid ${pct >= 100 ? 'rgba(239,68,68,0.3)' : 'var(--border-active)'}`,
@@ -233,7 +235,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                     <div style={{ marginBottom: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                         <Clock size={12} color="var(--text-muted)" />
-                        <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                           Zuletzt gegessen
                         </span>
                       </div>
@@ -278,7 +280,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                     <div style={{ marginBottom: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                         <Star size={12} color="var(--text-muted)" />
-                        <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                           Häufig gegessen
                         </span>
                       </div>
@@ -363,7 +365,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                       placeholder="Portionen" value={qty}
                       onChange={e => setQty(e.target.value)} autoFocus />
                     {preview && (
-                      <span style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 4, display: "block" }}>
+                      <span style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, display: "block" }}>
                         = {preview.cal} kcal — P: {preview.prot}g / K: {preview.carb}g / F: {preview.fat}g
                       </span>
                     )}
@@ -399,7 +401,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 Tagesprotokoll
                 {(dailyLog || []).length > 0 && (
-                  <span style={{ marginLeft: "auto", fontSize: 12.5, color: "var(--text-muted)", fontWeight: 400 }}>
+                  <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--text-muted)", fontWeight: 400 }}>
                     {(dailyLog || []).length} {(dailyLog || []).length === 1 ? "Eintrag" : "Einträge"}
                   </span>
                 )}
@@ -465,7 +467,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                   </div>
                   <ProgressBar value={totals.calories} max={calorieGoal}
                     color={totals.calories <= calorieGoal ? "var(--green)" : "#f87171"} height={8} />
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--text-muted)", marginTop: 7 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-muted)", marginTop: 7 }}>
                     <span>0</span>
                     <span style={{ fontWeight: 600 }}>{pct}%</span>
                     <span>{calorieGoal.toLocaleString()} kcal</span>

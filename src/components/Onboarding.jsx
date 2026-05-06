@@ -126,7 +126,7 @@ export default function Onboarding({ user, onComplete }) {
           <div style={{
             width: 48, height: 48,
             background: 'linear-gradient(135deg, var(--green), var(--green-dark))',
-            borderRadius: 14, display: 'flex', alignItems: 'center',
+            borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center',
             justifyContent: 'center', margin: '0 auto 20px',
             boxShadow: 'var(--shadow-green)',
           }}>
@@ -291,7 +291,7 @@ export default function Onboarding({ user, onComplete }) {
                   }}>
                     <span style={{ fontSize: 22, flexShrink: 0 }}>{a.emoji}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: data.activityLevel === a.id ? 'var(--green)' : 'var(--text)', marginBottom: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: data.activityLevel === a.id ? 'var(--green)' : 'var(--text)', marginBottom: 1 }}>
                         {a.label}
                       </div>
                       <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{a.desc}</div>
@@ -316,7 +316,7 @@ export default function Onboarding({ user, onComplete }) {
               <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.5px', marginBottom: 4 }}>
                 Dein persönlicher Plan
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: 13.5, marginBottom: 20 }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
                 Basierend auf deinen Daten berechnet.
               </p>
 
@@ -334,7 +334,7 @@ export default function Onboarding({ user, onComplete }) {
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>kcal / Tag</div>
                 <div style={{
-                  fontSize: 11.5, color: 'var(--green)', marginTop: 8,
+                  fontSize: 12, color: 'var(--green)', marginTop: 8,
                   background: 'var(--green-glow)', border: '1px solid var(--border-active)',
                   borderRadius: 100, padding: '3px 12px', display: 'inline-block',
                 }}>
@@ -356,7 +356,7 @@ export default function Onboarding({ user, onComplete }) {
                     <div style={{ fontSize: 20, fontWeight: 800, color: m.color }}>
                       {m.value}<span style={{ fontSize: 10 }}>{m.unit}</span>
                     </div>
-                    <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 2 }}>{m.label}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{m.label}</div>
                   </div>
                 ))}
               </div>

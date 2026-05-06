@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, Sparkles, TrendingUp, Dumbbell, Droplets, Scale, Ruler } from 'lucide-react';
+import { X, Send, Bot, Sparkles, Dumbbell, Droplets, Scale, Ruler } from 'lucide-react';
 
 export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const displayName = profile?.username || profile?.full_name?.split(' ')[0] || 'du';
@@ -140,7 +140,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
         }}>
           {/* Progress Row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
               Tagesfortschritt
             </span>
             <span style={{ fontSize: 12, fontWeight: 700, color: progressColor }}>
@@ -231,12 +231,12 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
               <div style={{
                 maxWidth: '80%',
                 padding: '12px 16px',
-                borderRadius: 18,
+                borderRadius: 'var(--radius-lg)',
                 background: msg.role === 'user'
                   ? 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(34,197,94,0.08))'
                   : 'var(--bg-card)',
                 border: `1px solid ${msg.role === 'user' ? 'rgba(34,197,94,0.3)' : 'var(--border)'}`,
-                fontSize: 13.5, lineHeight: 1.65, color: 'var(--text)',
+                fontSize: 14, lineHeight: 1.65, color: 'var(--text)',
                 borderBottomRightRadius: msg.role === 'user' ? 4 : 18,
                 borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 18,
                 whiteSpace: 'pre-wrap',
@@ -258,7 +258,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
                 <Bot size={14} color="var(--green)" />
               </div>
               <div style={{
-                padding: '12px 16px', borderRadius: 18, borderBottomLeftRadius: 4,
+                padding: '12px 16px', borderRadius: 'var(--radius-lg)', borderBottomLeftRadius: 4,
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', gap: 4,
               }}>
@@ -283,7 +283,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {quickQuestions.map(q => (
                 <button key={q} onClick={() => sendMessage(q)} style={{
-                  fontSize: 11.5, padding: '6px 12px', borderRadius: 100,
+                  fontSize: 12, padding: '6px 12px', borderRadius: 100,
                   background: 'var(--bg-card)', border: '1px solid var(--border)',
                   color: 'var(--text-secondary)', cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -311,7 +311,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-            style={{ flex: 1, fontSize: 13.5 }}
+            style={{ flex: 1, fontSize: 14 }}
             autoFocus
           />
           <button

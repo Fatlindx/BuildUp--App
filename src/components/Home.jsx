@@ -1,8 +1,5 @@
-import { 
-  UtensilsCrossed, Dumbbell, BarChart2, Flame, 
-  Plus, Calculator, ChevronRight, MessageCircle,
-  Target, Zap, Activity, TrendingUp, CheckCircle2,
-  AlertCircle, Sunrise
+import {
+  UtensilsCrossed, Dumbbell, BarChart2, Flame, Plus, Calculator, ChevronRight, MessageCircle, Target, Activity, TrendingUp, CheckCircle2, Sunrise
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -194,7 +191,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                     display: 'inline-flex', alignItems: 'center', gap: 5,
                     background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)',
                     padding: '4px 10px', borderRadius: 100,
-                    fontSize: 11.5, fontWeight: 600, color: 'var(--green)',
+                    fontSize: 12, fontWeight: 600, color: 'var(--green)',
                     animation: `slideUpFade 0.35s ${i * 0.08}s ease both`,
                   }}>
                     {MIcon && <MIcon size={11} strokeWidth={2} />}
@@ -242,7 +239,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                 {/* Mahlzeiten-Zähler */}
                 {(dailyLog || []).length > 0 && (
                   <div style={{
-                    marginTop: 10, fontSize: 11.5, color: 'var(--text-muted)',
+                    marginTop: 10, fontSize: 12, color: 'var(--text-muted)',
                     display: 'flex', alignItems: 'center', gap: 4,
                   }}>
                     <UtensilsCrossed size={11} />

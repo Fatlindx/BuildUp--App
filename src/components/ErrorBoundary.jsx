@@ -25,7 +25,7 @@ export default class ErrorBoundary extends Component {
         }}>
           <img
             src="/logo-512.png" alt="BuildUp"
-            style={{ width: 64, height: 64, borderRadius: 16, opacity: 0.5 }}
+            style={{ width: 64, height: 64, borderRadius: 'var(--radius-lg)', opacity: 0.5 }}
           />
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
