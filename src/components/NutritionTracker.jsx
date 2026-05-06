@@ -1,4 +1,5 @@
 ﻿import { useState, useMemo, useEffect } from "react";
+import { useI18n } from "../i18n.jsx";
 import {
   Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine, Clock, Star
 } from "lucide-react";
@@ -50,8 +51,9 @@ function saveRecentFood(food) {
 }
 
 export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog, setDailyLog }) {
+  const { t } = useI18n();
   const [search, setSearch]               = useState("");
-  const [filterCat, setFilterCat]         = useState("Alle");
+  const [filterCat, setFilterCat]         = useState(t('nutrition.categories.all'));
   const [selectedFood, setSelectedFood]   = useState(null);
   const [qty, setQty]                     = useState("1");
   const [manualGoal, setManualGoal]       = useState("");
@@ -73,12 +75,12 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
     const q = search.trim().toLowerCase();
     return foodDatabase.filter(f => {
       const matchSearch = !q || f.name.toLowerCase().includes(q) || f.category.toLowerCase().includes(q);
-      const matchCat = filterCat === "Alle" || f.category === filterCat;
+      const matchCat = filterCat === t('nutrition.categories.all') || f.category === filterCat;
       return matchSearch && matchCat;
     }).slice(0, 12);
   }, [search, filterCat]);
 
-  const showResults = search.trim().length > 0 || filterCat !== "Alle";
+  const showResults = search.trim().length > 0 || filterCat !== t('nutrition.categories.all');
 
   const totals = useMemo(() => ({
     calories: (dailyLog || []).reduce((s, i) => s + (i.calories || 0), 0),
@@ -97,7 +99,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
     setSelectedFood(food);
     setQty("1");
     setSearch("");
-    setFilterCat("Alle");
+    setFilterCat(t('nutrition.categories.all'));
   };
 
   const q = parseFloat(qty) || 1;
@@ -141,11 +143,15 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
   const getCatColor = (cat) => {
     const map = {
-      "Frühstück": "#fb923c", "Hauptgericht": "var(--blue)",
-      "Snack": "#22c55e", "Getränk": "var(--blue-light)",
-      "Fitness Meal": "var(--purple)", "Gescannt": "#22c55e",
+      'Frühstück':    '#fb923c',
+      'Hauptgericht': 'var(--blue)',
+      'Snack':        '#22c55e',
+      'Getränk':      'var(--blue-light)',
+      'Fitness Meal': 'var(--purple)',
+      'Gescannt':     '#22c55e',
+      'Manuell':      'var(--text-muted)',
     };
-    return map[cat] || "#64748b";
+    return map[cat] || '#64748b';
   };
 
   // P5: Favoriten zuerst — häufig geloggte Mahlzeiten
@@ -163,8 +169,8 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
     <div className="page">
       <div className="tracker-container">
         <div className="tracker-header">
-          <h1>Ernährungs-Tracker</h1>
-          <p>Verfolge Kalorien und Makronährstoffe aus 205+ Lebensmitteln.</p>
+          <h1>{t('nutrition.title')}</h1>
+          <p>{t('nutrition.subtitle')}</p>
         </div>
 
         {/* P5: Tages-Status Bar — sofort sichtbar oben */}
@@ -200,9 +206,9 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
             {/* Makros row */}
             <div style={{ display: 'flex', gap: 16 }}>
               {[
-                { label: 'Protein', value: totals.protein, color: 'var(--red)' },
+                { label: t('nutrition.protein'), value: totals.protein, color: 'var(--red)' },
                 { label: 'Carbs',   value: totals.carbs,   color: 'var(--orange)' },
-                { label: 'Fette',   value: totals.fat,     color: 'var(--yellow)' },
+                { label: t('nutrition.fat'),   value: totals.fat,     color: 'var(--yellow)' },
               ].map(m => (
                 <div key={m.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: m.color }}>{m.value}g</span>
@@ -318,13 +324,13 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                     <Search size={15} />
                   </span>
                   <input className="form-input" type="text"
-                    placeholder="Lebensmittel suchen..."
+                    placeholder={t('nutrition.search_food')}
                     value={search} style={{ paddingLeft: 36 }}
                     onChange={e => { setSearch(e.target.value); setSelectedFood(null); }}
                   />
-                  {(search || filterCat !== "Alle") && (
+                  {(search || filterCat !== t('nutrition.categories.all')) && (
                     <button className="btn btn-ghost btn-sm" style={{ padding: "10px 12px" }}
-                      onClick={() => { setSearch(""); setFilterCat("Alle"); setSelectedFood(null); }}>
+                      onClick={() => { setSearch(""); setFilterCat(t('nutrition.categories.all')); setSelectedFood(null); }}>
                       <X size={14} />
                     </button>
                   )}
@@ -382,9 +388,9 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               )}
 
               {/* Schnellzugriff */}
-              {!selectedFood && !search && filterCat === "Alle" && recentFoods.length === 0 && (
+              {!selectedFood && !search && filterCat === t('nutrition.categories.all') && recentFoods.length === 0 && (
                 <div className="quick-add-section">
-                  <div className="quick-add-label">Schnellzugriff:</div>
+                  <div className="quick-add-label">{t('nutrition.quick_access')}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {[0, 5, 35, 55, 147, 171].map(i => foodDatabase[i]).filter(Boolean).map(f => (
                       <button key={f.id} className="chip" onClick={() => selectFood(f)}>
@@ -409,8 +415,8 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               {(dailyLog || []).length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-icon"><Leaf size={38} strokeWidth={1.2} color="var(--text-muted)" /></div>
-                  <p>Noch keine Mahlzeiten eingetragen.</p>
-                  <p className="empty-hint">Nutze die Schnellzugriff-Buttons oder suche oben.</p>
+                  <p>{t('nutrition.no_meals')}</p>
+                  <p className="empty-hint">{t('nutrition.no_meals_sub')}</p>
                 </div>
               ) : (
                 <>
@@ -453,7 +459,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
           {/* Right Column */}
           <div>
             <div className="tracker-card">
-              <h3>Kalorienübersicht</h3>
+              <h3>{t('nutrition.calorie_overview')}</h3>
               {calorieGoal > 0 ? (
                 <>
                   <div className="calories-ring">
@@ -485,7 +491,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
               {!showGoalInput ? (
                 <button className="btn btn-secondary btn-sm" style={{ width: "100%", justifyContent: "center" }}
                   onClick={() => setShowGoalInput(true)}>
-                  {calorieGoal > 0 ? "Ziel anpassen" : "+ Ziel manuell setzen"}
+                  {calorieGoal > 0 ? t('nutrition.adjust_goal') : "+ Ziel manuell setzen"}
                 </button>
               ) : (
                 <div style={{ display: "flex", gap: 7 }}>
@@ -499,7 +505,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
             </div>
 
             <div className="tracker-card">
-              <h3>Makronährstoffe</h3>
+              <h3>{t('nutrition.macros')}</h3>
               <div className="macro-bars">
                 <MacroRow label="Protein"       value={totals.protein} goal={goalProtein} unit="g" color="var(--red)" />
                 <MacroRow label="Kohlenhydrate" value={totals.carbs}   goal={goalCarbs}   unit="g" color="var(--orange)" />

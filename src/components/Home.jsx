@@ -44,14 +44,12 @@ function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour) {
 }
 
 // ── Motivations-Chips ──
-const motivationQuotes = [
-  'Disziplin schlägt Motivation jeden Tag.',
-  'Kein Schmerz, kein Wachstum.',
+const motivationQuotes = (t) => [
+  t('home.progress_motivation'),
   'Consistency is the key to results.',
-  'Kleine Schritte, große Veränderungen.',
-  'Du bist stärker als deine Ausreden.',
-  'Heute ist der Tag. Nicht morgen.',
-  'Fortschritt, nicht Perfektion.',
+  'Small steps, big changes.',
+  'Discipline beats motivation every time.',
+  t('home.streak_great'),
 ];
 
 // ── Mahlzeit-Feedback Toast ──
@@ -82,7 +80,8 @@ function FeedbackToast({ message, show }) {
 
 export default function Home({ setActiveSection, calorieGoal, totalCalories, dailyLog, logHistory, username }) {
   const hour = new Date().getHours();
-  const greeting     = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greeting = hour < 5 ? t('home.greeting_night') : hour < 12 ? t('home.greeting_morning') : hour < 18 ? t('home.greeting_day') : t('home.greeting_evening');
+  const { t, lang } = useI18n();
   const greetingIcon = null; // Icons werden inline gerendert
 
   // ── P7: Retention Logic ──
@@ -138,12 +137,13 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   const totalFat     = (dailyLog || []).reduce((s, i) => s + (i.fat || 0), 0);
 
   const macros = [
-    { label: 'Protein',       value: totalProtein, unit: 'g', color: 'var(--red)' },
-    { label: 'Kohlenhydrate', value: totalCarbs,   unit: 'g', color: 'var(--orange)' },
-    { label: 'Fette',         value: totalFat,     unit: 'g', color: 'var(--yellow)' },
+    { label: t('home.protein'),       value: totalProtein, unit: 'g', color: 'var(--red)' },
+    { label: t('home.carbs'), value: totalCarbs,   unit: 'g', color: 'var(--orange)' },
+    { label: t('home.fat'),         value: totalFat,     unit: 'g', color: 'var(--yellow)' },
   ];
 
-  const quote = motivationQuotes[new Date().getDate() % motivationQuotes.length];
+  const quotes = motivationQuotes(t);
+  const quote = quotes[new Date().getDate() % quotes.length];
   const status = getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour);
 
   const circumference = 2 * Math.PI * 54;
@@ -204,7 +204,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             {/* Dynamischer Status-Titel */}
             <h1 className="home-title" style={{ color: status.color !== 'var(--text)' ? 'var(--text)' : 'var(--text)' }}>
               {status.title.includes('Bereit') ? (
-                <>Bereit für dein <span style={{ color: 'var(--green)' }}>Training?</span></>
+                <>{t('home.status_start')}</>
               ) : (
                 <span>{status.title}</span>
               )}
@@ -273,7 +273,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                   {streak} Tage Streak
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                  {streak >= 7 ? 'Aussergewöhnliche Konstanz.' : `Noch ${7 - streak} Tage bis zum 7-Tage-Streak.`}
+                  {streak >= 7 ? t('home.streak_great') : t('home.streak_next').replace('{n}', 7 - streak)}
                 </div>
               </div>
             </div>
@@ -301,10 +301,10 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             <Clock size={15} color="var(--text-muted)" strokeWidth={2} style={{ flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                Gestern pausiert — heute wieder starten?
+                {t('home.nudge_title')}
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                Kleine Schritte zählen auch. Jetzt tracken.
+                {t('home.nudge_sub')}
               </div>
             </div>
             <ChevronRight size={14} color="var(--text-muted)" />
@@ -325,9 +325,9 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               {[
-                { label: 'Tage aktiv',  value: `${daysTrackedThisWeek}/7`, color: 'var(--green)' },
-                { label: 'Streak',      value: `${streak} Tage`,          color: 'var(--orange)' },
-                { label: 'Ziel-Tage',   value: calorieGoal > 0 ? `${weekDays.filter(d => {
+                { label: t('home.days_active'),  value: `${daysTrackedThisWeek}/7`, color: 'var(--green)' },
+                { label: t('home.streak'),      value: `${streak} Tage`,          color: 'var(--orange)' },
+                { label: t('home.goal_days'),   value: calorieGoal > 0 ? `${weekDays.filter(d => {
                     const log = d === TODAY ? dailyLog : (history[d] || []);
                     const kcal = (log || []).reduce((s,i) => s + (i.calories||0), 0);
                     return kcal >= calorieGoal * 0.85;
@@ -355,7 +355,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
           }}>
             <div className="stat-card-content">
               <div>
-                <div className="stat-label">Heute gegessen</div>
+                <div className="stat-label">{t('home.today_eaten')}</div>
                 <div className="stat-value" style={{
                   color: pct >= 100 ? 'var(--green)' : pct >= 85 ? 'var(--green-bright)' : 'var(--green)',
                   transition: 'color 0.3s ease',
@@ -366,7 +366,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                 <div className="stat-remaining" style={{ marginTop: 8 }}>
                   {remaining > 0
                     ? <span style={{ color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <Flame size={13} /> {remaining.toLocaleString()} kcal übrig
+                        <Flame size={13} /> {t('home.remaining').replace('{n}', remaining.toLocaleString())}
                       </span>
                     : <span style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700 }}>
                         <CheckCircle2 size={13} /> Tagesziel erreicht!
@@ -424,7 +424,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             <div className="mini-stat-card" onClick={() => setActiveSection('nutrition')}>
               <div className="mini-stat-icon"><UtensilsCrossed size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
               <div className="mini-stat-value">{(dailyLog || []).length}</div>
-              <div className="mini-stat-label">Mahlzeiten heute</div>
+              <div className="mini-stat-label">{t('home.meals_today')}</div>
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('exercises')}>
               <div className="mini-stat-icon"><Dumbbell size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
@@ -446,14 +446,14 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
 
         {/* Quick Actions */}
         <div className="home-section">
-          <h2 className="home-section-title">Schnellaktionen</h2>
+          <h2 className="home-section-title">{t('home.quick_actions')}</h2>
           <div className="quick-actions-grid">
             <button className="quick-action-card" onClick={() => setActiveSection('nutrition')}>
               <div className="qa-icon" style={{ background: 'rgba(34,197,94,0.15)' }}>
                 <Plus size={22} color="var(--green)" />
               </div>
               <div className="qa-label">Mahlzeit hinzufügen</div>
-              <div className="qa-sub">Kalorien tracken</div>
+              <div className="qa-sub">{t('home.add_meal_sub')}</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('exercises')}>
               <div className="qa-icon" style={{ background: 'rgba(59,130,246,0.15)' }}>
@@ -510,7 +510,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
 
         {/* Muscle Groups Quick Nav */}
         <div className="home-section">
-          <h2 className="home-section-title">Training nach Muskelgruppe</h2>
+          <h2 className="home-section-title">{t('home.training_by_muscle')}</h2>
           <div className="muscle-quick-grid">
             {muscleGroups.map(m => (
               <button

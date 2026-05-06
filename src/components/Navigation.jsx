@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react';
+import { useI18n } from '../i18n.jsx';
 import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User, ChevronLeft } from 'lucide-react';
 
 const navItems = [
-  { id: 'home',       label: 'Home',        icon: Home },
-  { id: 'nutrition',  label: 'Ernährung',   icon: UtensilsCrossed },
-  { id: 'exercises',  label: 'Übungen',     icon: Dumbbell },
-  { id: 'workout',    label: 'Training',    icon: ClipboardList },
-  { id: 'progress',   label: 'Fortschritt', icon: BarChart2 },
-  { id: 'calculator', label: 'Rechner',     icon: Flame },
+  { id: 'home',       label: t('nav.home'),        icon: Home },
+  { id: 'nutrition',  label: t('nav.nutrition'),   icon: UtensilsCrossed },
+  { id: 'exercises',  label: t('nav.exercises'),     icon: Dumbbell },
+  { id: 'workout',    label: t('nav.training'),    icon: ClipboardList },
+  { id: 'progress',   label: t('nav.progress'), icon: BarChart2 },
+  { id: 'calculator', label: t('nav.calculator'),     icon: Flame },
 ];
 
 const allNavItems = [
-  { id: 'home',       label: 'Home',        icon: Home },
-  { id: 'nutrition',  label: 'Ernährung',   icon: UtensilsCrossed },
-  { id: 'calculator', label: 'Rechner',     icon: Flame },
-  { id: 'exercises',  label: 'Übungen',     icon: Dumbbell },
-  { id: 'workout',    label: 'Training',    icon: ClipboardList },
-  { id: 'progress',   label: 'Fortschritt', icon: BarChart2 },
+  { id: 'home',       label: t('nav.home'),        icon: Home },
+  { id: 'nutrition',  label: t('nav.nutrition'),   icon: UtensilsCrossed },
+  { id: 'calculator', label: t('nav.calculator'),     icon: Flame },
+  { id: 'exercises',  label: t('nav.exercises'),     icon: Dumbbell },
+  { id: 'workout',    label: t('nav.training'),    icon: ClipboardList },
+  { id: 'progress',   label: t('nav.progress'), icon: BarChart2 },
 ];
 
 export default function Navigation({ activeSection, setActiveSection, canGoBack, onGoBack, user, profile, onLogout, onOpenCoach }) {
+  const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -67,7 +69,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
               >
                 <ChevronLeft size={15} />
-                <span>Zurück</span>
+                <span>{t('nav.back')}</span>
               </button>
             )}
 
@@ -119,7 +121,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--green-glow)'; e.currentTarget.style.borderColor = 'var(--border-active)'; }}
                 title="KI Coach öffnen">
                   <Bot size={15} strokeWidth={2} />
-                  <span>KI Coach</span>
+                  <span>{t('nav.coach')}</span>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', opacity: 0.8, animation: 'pulse 2s infinite' }} />
                 </button>
               )}
@@ -128,7 +130,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                   style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)' }}
                   title="Ausloggen">
                   <LogOut size={15} />
-                  <span style={{ fontSize: 13 }}>Logout</span>
+                  <span style={{ fontSize: 13 }}>{t('nav.logout')}</span>
                 </button>
               )}
             </div>
@@ -184,7 +186,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                 whiteSpace: 'nowrap', flexShrink: 0,
               }}>
                 <Bot size={13} strokeWidth={2} />
-                <span>Coach</span>
+                <span>{t('nav.coach')}</span>
                 <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green)', animation: 'pulse 2s infinite', flexShrink: 0 }} />
               </button>
               <button onClick={() => handleNav('profile')} style={{

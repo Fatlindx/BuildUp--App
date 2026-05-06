@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useI18n } from '../i18n.jsx';
 import { Minus, Droplets, Trophy } from 'lucide-react';
 
 const WATER_GOAL = 8; // Gläser
 const ML_PER_GLASS = 250;
 
 export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
+  const { t } = useI18n();
   const [animating, setAnimating] = useState(false);
   const [lastAction, setLastAction] = useState(null);
 
@@ -107,7 +109,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
                 {totalMl} <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }}>ml</span>
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
-                {done ? 'Tagesziel erreicht' : `${remaining * ML_PER_GLASS} ml noch übrig`}
+                {done ? t('water.goal_reached') : `${remaining * ML_PER_GLASS} ml noch übrig`}
               </div>
             </div>
             {done && (
@@ -189,7 +191,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
           }}
         >
           <Droplets size={13} color={done ? '#22c55e' : waterColor} />
-          {done ? 'Tagesziel erreicht' : `+ Glas hinzufügen (${waterGlasses}/${WATER_GOAL})`}
+          {done ? t('water.goal_reached') : `+ Glas hinzufügen (${waterGlasses}/${WATER_GOAL})`}
         </button>
       </div>
 
@@ -200,9 +202,9 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
         border: '1px solid rgba(96,165,250,0.1)', borderRadius: 8,
       }}>
         {waterGlasses === 0
-          ? 'Starte deinen Tag mit einem Glas Wasser!'
+          ? t('water.nudge_start')
           : done
-          ? 'Perfekt! Ausreichend Wasser fördert Konzentration und Stoffwechsel.'
+          ? t('water.nudge_done')
           : `Noch ${remaining} Glas${remaining !== 1 ? 'er' : ''} bis zum Tagesziel. Gut gemacht!`}
       </div>
     </div>

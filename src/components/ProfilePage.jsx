@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useI18n, translateGoal, LANG_LABELS } from '../i18n.jsx';
 import {
   User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, TrendingUp, Scale
 } from 'lucide-react';
@@ -14,9 +15,10 @@ const GOAL_LABELS = {
   endurance:        'Ausdauer verbessern',
   'Ausdauer verbessern': 'Ausdauer verbessern',
 };
-const translateGoal = (g) => GOAL_LABELS[g] || g || '—';
+// translateGoal from i18n.jsx
 
 export default function ProfilePage({ user, profile, onUpdateProfile }) {
+  const { t, lang, setLang } = useI18n();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     username:  profile?.username  || '',
@@ -118,9 +120,9 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
       {/* P7: Stats Row — mit Profil-Daten gefüllt */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
         {[
-          { icon: Dumbbell,   label: 'Gewicht',    value: profile?.weight ? `${profile.weight} kg` : '—' },
-          { icon: Scale,      label: 'Grösse',     value: profile?.height ? `${profile.height} cm` : '—' },
-          { icon: TrendingUp, label: 'Ziel',        value: profile?.goal ? translateGoal(profile.goal).split(' ')[0] : '—' },
+          { icon: Dumbbell,   label: t('profile.weight'),    value: profile?.weight ? `${profile.weight} kg` : '—' },
+          { icon: Scale,      label: t('profile.height'),     value: profile?.height ? `${profile.height} cm` : '—' },
+          { icon: TrendingUp, label: t('profile.goal_label'),        value: profile?.goal ? translateGoal(profile?.goal, lang) : '—' },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -178,7 +180,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
                 {goals.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             ) : (
-              <span style={{ ...valueStyle, color: 'var(--green)' }}>{translateGoal(form.goal) || '—'}</span>
+              <span style={{ ...valueStyle, color: 'var(--green)' }}>{translateGoal(form.goal, lang) || '—'}</span>
             )}
           </Field>
 

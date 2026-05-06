@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18n } from '../i18n.jsx';
 import { supabase } from '../supabase';
 import { Mail, Lock, User, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
@@ -40,6 +41,7 @@ function validate(mode, email, password, username) {
 }
 
 export default function Auth({ onLogin }) {
+  const { t } = useI18n();
   const [mode, setMode]         = useState('login');
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -122,7 +124,7 @@ export default function Auth({ onLogin }) {
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
             {mode === 'login'    ? 'Willkommen zurück!' :
              mode === 'register' ? 'Erstelle dein kostenloses Konto' :
-                                   'Passwort zurücksetzen'}
+                                   t('auth.reset_password')}
           </p>
         </div>
 
@@ -139,8 +141,8 @@ export default function Auth({ onLogin }) {
               padding: 4, marginBottom: 28,
             }}>
               {[
-                { id: 'login',    label: 'Einloggen' },
-                { id: 'register', label: 'Registrieren' },
+                { id: 'login',    label: t('auth.login') },
+                { id: 'register', label: t('auth.register') },
               ].map(m => (
                 <button key={m.id} onClick={() => switchMode(m.id)} style={{
                   flex: 1, padding: '9px', borderRadius: 8,
@@ -192,7 +194,7 @@ export default function Auth({ onLogin }) {
                 <input
                   className="form-input"
                   type={showPw ? 'text' : 'password'}
-                  placeholder={mode === 'register' ? 'Passwort (min. 6 Zeichen)' : 'Passwort'}
+                  placeholder={mode === 'register' ? 'Passwort (min. 6 Zeichen)' : t('auth.password')}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   style={{ paddingLeft: 38, paddingRight: 42 }}
@@ -268,7 +270,7 @@ export default function Auth({ onLogin }) {
             style={{ width: '100%', justifyContent: 'center', marginTop: 20, padding: 13, fontSize: 15 }}
           >
             {loading ? 'Bitte warten...' :
-             mode === 'login'    ? 'Einloggen' :
+             mode === 'login'    ? t('auth.login') :
              mode === 'register' ? 'Konto erstellen' :
                                    'Reset-E-Mail senden'}
           </button>

@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
+import { useI18n, translateGoal } from '../i18n.jsx';
 import { X, Send, Bot, Sparkles, Dumbbell, Droplets, Scale, Ruler } from 'lucide-react';
 
 export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
+  const { t, lang } = useI18n();
   const displayName = profile?.username || profile?.full_name?.split(' ')[0] || 'du';
 
   const [messages, setMessages] = useState([
@@ -124,7 +126,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
                   Persönlicher Coach von {displayName}
                 </p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                  {profile?.goal ? `Ziel: ${{ muscle: 'Muskelaufbau', lose_weight: 'Gewicht verlieren', fit: 'Fit bleiben', endurance: 'Ausdauer verbessern' }[profile.goal] || profile.goal}` : 'Dein Fitness-Experte'}
+                  {profile?.goal ? `${t('coach.goal_label').replace('{goal}', translateGoal(profile.goal, lang))}` : t('coach.expert')}
                 </p>
               </div>
             </div>
@@ -428,25 +430,25 @@ function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt) {
     questions.push('Wie erstelle ich ein Kaloriendefizit?');
     questions.push('Welches Training verbrennt am meisten Kalorien?');
   } else {
-    questions.push('Gib mir einen Trainingsplan');
-    questions.push('Was sind die besten Übungen für Bauch?');
+    questions.push(t('coach.q1'));
+    questions.push(t('coach.q2'));
   }
 
   if (totalCal === 0) {
-    questions.push('Was soll ich heute essen?');
+    questions.push(t('coach.q3'));
   } else if (remaining > 200) {
     questions.push(`Noch ${remaining} kcal übrig — was empfiehlst du?`);
   }
 
-  if (totalProt < 50) questions.push('Wie bekomme ich mehr Protein?');
+  if (totalProt < 50) questions.push(t('coach.q4'));
 
   if (profile?.weight && profile?.height) {
-    questions.push('Wie ist mein BMI zu bewerten?');
+    questions.push(t('coach.q5'));
   } else {
     questions.push('Wie viel Wasser sollte ich täglich trinken?');
   }
 
-  questions.push('Wie ist mein heutiger Fortschritt?');
+  questions.push(t('coach.q6'));
 
   return questions.slice(0, 6);
 }

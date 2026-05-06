@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useI18n } from '../i18n.jsx';
 import {
   Search, X, Dumbbell, Target, Zap, Package, ZoomIn, Heart, ChevronDown, ChevronUp, TrendingUp, Flame
 } from 'lucide-react';
@@ -53,7 +54,7 @@ function Lightbox({ src, alt, onClose }) {
 }
 
 // ─── Exercise Modal ────────────────────────────────────────────────────────────
-function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGoal }) {
+function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGoal, t }) {
   const [lightboxSrc, setLightboxSrc] = useState(null);
   if (!exercise) return null;
   const color = muscleColors[exercise.muscleGroup] || '#22c55e';
@@ -61,7 +62,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
   // Sets/Reps basierend auf User-Ziel
   const goalKey = userGoal === 'Gewicht verlieren' ? 'Gewicht verlieren'
     : userGoal === 'Muskelaufbau' ? 'Muskelaufbau'
-    : 'Standard';
+    : t('exercises.sort_default');
   const rec = setsRepsMap[goalKey] || setsRepsMap.Standard;
 
   return (
@@ -167,13 +168,13 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
               padding: '16px 18px', marginBottom: 20,
             }}>
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--green)', marginBottom: 12 }}>
-                Empfehlung für dein Ziel — {goalKey}
+                {t('exercises.recommendation')} — {goalKey}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 {[
-                  { label: 'Sätze', value: rec.sets },
-                  { label: 'Wiederholungen', value: rec.reps },
-                  { label: 'Pause', value: rec.rest },
+                  { label: t('exercises.sets'), value: rec.sets },
+                  { label: t('exercises.reps'), value: rec.reps },
+                  { label: t('exercises.rest'), value: rec.rest },
                 ].map(r => (
                   <div key={r.label} style={{
                     background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: '10px',
@@ -195,7 +196,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
                 }}>
                   <TrendingUp size={13} color="var(--green)" style={{ flexShrink: 0, marginTop: 1 }} />
                   <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                    <strong style={{ color: 'var(--text)', fontWeight: 600 }}>Progression: </strong>
+                    <strong style={{ color: 'var(--text)', fontWeight: 600 }}>{t('exercises.progression')}: </strong>
                     {rec.progress}
                   </span>
                 </div>
@@ -204,14 +205,14 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
 
             {/* Über diese Übung */}
             <div className="modal-section">
-              <h4>Über diese Übung</h4>
+              <h4>{t('exercises.about')}</h4>
               <p>{exercise.description}</p>
             </div>
             <div className="modal-divider" />
 
             {/* Trainierte Muskeln */}
             <div className="modal-section">
-              <h4><Target size={12} />Trainierte Muskeln</h4>
+              <h4><Target size={12} />{t('exercises.muscles')}</h4>
               <div className="muscle-tags">
                 {exercise.targetMuscles.map(m => (
                   <span key={m} className="tag" style={{ borderColor: `${color}40`, color }}>{m}</span>
@@ -222,7 +223,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
 
             {/* Equipment */}
             <div className="modal-section">
-              <h4><Package size={12} />Equipment</h4>
+              <h4><Package size={12} />{t('exercises.equipment')}</h4>
               <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{exercise.equipment}</p>
             </div>
             <div className="modal-divider" />
@@ -385,7 +386,7 @@ function ExerciseCard({ exercise, onClick, index, isFavorite, onToggleFavorite }
 }
 
 // ─── Filter Panel (Mobile collapsible) ────────────────────────────────────────
-function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff, filterEquip, setFilterEquip, hasFilters, resetFilters, filteredCount, counts, isMobile, sortBy, setSortBy }) {
+function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff, filterEquip, setFilterEquip, hasFilters, resetFilters, filteredCount, counts, isMobile, sortBy, setSortBy, t }) {
   const [open, setOpen] = useState(!isMobile);
 
   return (
@@ -454,9 +455,9 @@ function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff,
             <label><TrendingUp size={12} /> Sortierung</label>
             <div className="filter-chips">
               {[
-                { value: 'default',    label: 'Standard' },
-                { value: 'name',       label: 'A – Z' },
-                { value: 'difficulty', label: 'Schwierigkeit' },
+                { value: 'default',    label: t('exercises.sort_default') },
+                { value: 'name',       label: t('exercises.sort_az') },
+                { value: 'difficulty', label: t('exercises.sort_diff') },
               ].map(s => (
                 <button key={s.value} className={`chip ${sortBy === s.value ? 'active' : ''}`}
                   onClick={() => setSortBy(s.value)}>
@@ -467,7 +468,7 @@ function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff,
           </div>
 
           <div className="filter-count">
-            <strong>{filteredCount}</strong> Übung{filteredCount !== 1 ? 'en' : ''} gefunden
+            {filteredCount !== 1 ? t('exercises.results_plural').replace('{n}', filteredCount) : t('exercises.results').replace('{n}', filteredCount)}
           </div>
         </>
       )}
@@ -477,6 +478,7 @@ function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff,
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function ExerciseLibrary({ user, profile }) {
+  const { t } = useI18n();
   const [search,        setSearch]        = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterMuscle,  setFilterMuscle]  = useState('Alle');
@@ -587,20 +589,20 @@ export default function ExerciseLibrary({ user, profile }) {
   const counts = {};
   exercises.forEach(e => { counts[e.muscleGroup] = (counts[e.muscleGroup] || 0) + 1; });
 
-  const userGoal = profile?.goal || 'Standard';
+  const userGoal = profile?.goal || t('exercises.sort_default');
 
   return (
     <div className="page">
       <div className="library-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1>Übungsbibliothek</h1>
+            <h1>{t('exercises.title')}</h1>
             <p>{exercises.length} professionell dokumentierte Übungen — von Einsteiger bis Elite.</p>
           </div>
           {/* Tabs: Alle / Favoriten */}
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg-card-2)', borderRadius: 10, padding: 4 }}>
             {[
-              { id: 'all',       label: 'Alle Übungen' },
+              { id: 'all',       label: t('exercises.all') },
               { id: 'favorites', label: `Favoriten${favorites.size > 0 ? ` (${favorites.size})` : ''}` },
             ].map(t => (
               <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
@@ -626,6 +628,7 @@ export default function ExerciseLibrary({ user, profile }) {
           filteredCount={displayedExercises.length}
           counts={counts} isMobile={isMobile}
           sortBy={sortBy} setSortBy={setSortBy}
+          t={t}
         />
 
         <div>
@@ -666,7 +669,7 @@ export default function ExerciseLibrary({ user, profile }) {
             <Search size={16} className="search-icon" />
             <input
               type="text"
-              placeholder="Übung oder Muskelgruppe suchen…"
+              placeholder={t('exercises.search_placeholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               autoComplete="off"
@@ -706,8 +709,8 @@ export default function ExerciseLibrary({ user, profile }) {
           ) : activeTab !== 'favorites' && (
             <div className="no-results">
               <div className="no-results-icon"><Search size={38} strokeWidth={1.2} /></div>
-              <p style={{ marginBottom: 16 }}>Keine Übungen gefunden.</p>
-              <button className="btn btn-secondary btn-sm" onClick={resetFilters}>Filter zurücksetzen</button>
+              <p style={{ marginBottom: 16 }}>{t('exercises.no_results')}</p>
+              <button className="btn btn-secondary btn-sm" onClick={resetFilters}>{t('exercises.reset_filters')}</button>
             </div>
           )}
         </div>
@@ -720,6 +723,7 @@ export default function ExerciseLibrary({ user, profile }) {
           isFavorite={favorites.has(selected.id)}
           onToggleFavorite={toggleFavorite}
           userGoal={userGoal}
+          t={t}
         />
       )}
     </div>

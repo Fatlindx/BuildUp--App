@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useI18n } from '../i18n.jsx';
 import {
   Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2, Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList, ChevronUp, ChevronDown, TrendingUp, Star
 } from 'lucide-react';
@@ -115,6 +116,7 @@ function PauseTimer({ duration, onDone }) {
 
 // ── Hauptkomponente ────────────────────────────────────────────────────────
 export default function WorkoutTracker({ user, profile }) {
+  const { t } = useI18n();
   const [view, setView]           = useState('plans');
   const [plans, setPlans]         = useState([]);
   const [history, setHistory]     = useState([]);
@@ -150,7 +152,7 @@ export default function WorkoutTracker({ user, profile }) {
   };
 
   const deletePlan = async (id) => {
-    if (!confirm('Trainingsplan löschen?')) return;
+    if (!confirm(t('training.delete_confirm'))) return;
     try {
       await supabase.from('workout_plans').delete().eq('id', id);
       setPlans(p => p.filter(x => x.id !== id));
@@ -201,7 +203,7 @@ export default function WorkoutTracker({ user, profile }) {
             {view !== 'create' && (
               <div style={{ display: 'flex', gap: 4, marginTop: 24, background: 'var(--bg-card-2)', padding: 4, borderRadius: 12, width: 'fit-content' }}>
                 {[
-                  { id: 'plans', label: 'Meine Pläne', icon: <ClipboardList size={14}/> },
+                  { id: 'plans', label: t('training.my_plans'), icon: <ClipboardList size={14}/> },
                   { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}`, icon: <BarChart2 size={14}/> },
                 ].map(tab => (
                   <button key={tab.id} onClick={() => setView(tab.id)} style={{
@@ -758,7 +760,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
         <p style={{ color: 'var(--text-secondary)', marginBottom: 32 }}>{currentDay.name} · {plan.name}</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
           {[
-            { label: 'Dauer', value: `${durationMin} min`, icon: <Clock size={22}/> },
+            { label: t('training.duration'), value: `${durationMin} min`, icon: <Clock size={22}/> },
             { label: 'Sets', value: `${completedSets}/${totalSets}`, icon: <Check size={22}/> },
             { label: 'Volumen', value: `${totalVolume} kg`, icon: <Trophy size={22}/> },
           ].map(s => (

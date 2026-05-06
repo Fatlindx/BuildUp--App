@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useI18n } from '../i18n.jsx';
 import { supabase } from '../supabase';
 import {
   UtensilsCrossed, Target, Dumbbell, ClipboardList, Flame, Star, Trophy, Rocket, Lock, TrendingUp, Scale, Plus, ChevronUp, Check, Zap, AlertCircle, CheckCircle2, Activity, Minus, Award, Crown
@@ -79,6 +80,7 @@ function GradientProgressBar({ value, max, height = 10 }) {
 }
 
 export default function Progress({ calorieGoal, dailyLog, logHistory, user, profile }) {
+  const { t } = useI18n();
   const [weightLog, setWeightLog]             = useState([]);
   const [weightInput, setWeightInput]         = useState('');
   const [showWeightInput, setShowWeightInput] = useState(false);
@@ -154,7 +156,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   const oldestWeight = weightLog[weightLog.length - 1]?.weight;
   const weightDiff = latestWeight && oldestWeight && weightLog.length > 1 ? (latestWeight - oldestWeight).toFixed(1) : null;
   const bmi = latestWeight && profile?.height ? (latestWeight / ((profile.height / 100) ** 2)).toFixed(1) : null;
-  const bmiCategory = bmi ? bmi < 18.5 ? 'Untergewicht' : bmi < 25 ? 'Normalgewicht' : bmi < 30 ? 'Übergewicht' : 'Adipositas' : null;
+  const bmiCategory = bmi ? bmi < 18.5 ? t('progress.bmi_under') : bmi < 25 ? t('progress.bmi_normal') : bmi < 30 ? t('progress.bmi_over') : 'Adipositas' : null;
   const bmiColor = bmi ? bmi < 18.5 ? 'var(--blue-light)' : bmi < 25 ? 'var(--green)' : bmi < 30 ? 'var(--orange)' : 'var(--red)' : 'var(--green)';
 
   const stats = [
@@ -180,7 +182,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
     : pct >= 85 ? { text: 'Fast am Ziel',   color: 'var(--green-bright)',          iconName: 'TrendingUp',   bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
     : pct >= 50 ? { text: 'On Track',        color: 'var(--green)',     iconName: 'CheckCircle2', bg: 'var(--green-glow)',     border: 'var(--border-active)'  }
     : pct > 0   ? { text: 'Gestartet',       color: 'var(--blue-light)',          iconName: 'Activity',     bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
-    : { text: 'Noch nichts',   color: 'var(--text-muted)',   iconName: 'Minus',        bg: 'var(--bg-card-2)',     border: 'var(--border)'         };
+    : { text: t('progress.nothing_yet'),   color: 'var(--text-muted)',   iconName: 'Minus',        bg: 'var(--bg-card-2)',     border: 'var(--border)'         };
 
   // P6: Wochentrend — Vergleich dieser Woche
   const daysWithData   = weekData.filter(d => d.kcal > 0).length;
@@ -198,8 +200,8 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
         {/* P6: Status Header mit Live-Badges */}
         <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ marginBottom: 6 }}>Mein Fortschritt</h1>
-            <p>Behalte deine Ziele im Blick und bleibe motiviert.</p>
+            <h1 style={{ marginBottom: 6 }}>{t('progress.title')}</h1>
+            <p>{t('progress.subtitle')}</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {/* P6: Tagesstatus Badge — Lucide Icons */}
@@ -261,7 +263,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           transition: 'border-color 0.4s ease',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-            <h3 className="progress-card-title" style={{ marginBottom: 0 }}>Heutiger Kalorienfortschritt</h3>
+            <h3 className="progress-card-title" style={{ marginBottom: 0 }}>{t('progress.calorie_progress')}</h3>
             {/* P3: Tagesstatus Badge */}
             <span style={{
               fontSize: 12, fontWeight: 700, color: statusText.color,
@@ -297,8 +299,8 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           {/* P3: Makro Progress Bars */}
           <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              { label: 'Protein', value: totalProt, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.30) / 4) : 0, unit: 'g', color: 'var(--red)' },
-              { label: 'Kohlenhydrate', value: totalCarb, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.45) / 4) : 0, unit: 'g', color: 'var(--orange)' },
+              { label: t('progress.protein'), value: totalProt, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.30) / 4) : 0, unit: 'g', color: 'var(--red)' },
+              { label: t('progress.carbs'), value: totalCarb, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.45) / 4) : 0, unit: 'g', color: 'var(--orange)' },
               { label: 'Fette', value: totalFat, goal: calorieGoal > 0 ? Math.round((calorieGoal * 0.25) / 9) : 0, unit: 'g', color: 'var(--yellow)' },
             ].map(m => {
               const mPct = m.goal > 0 ? Math.min((m.value / m.goal) * 100, 100) : 0;
@@ -331,7 +333,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
         {/* ── P3: Wochenverlauf — Premium Balkendiagramm ── */}
         <div className="progress-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h3 className="progress-card-title" style={{ marginBottom: 0 }}>Wochenverlauf</h3>
+            <h3 className="progress-card-title" style={{ marginBottom: 0 }}>{t('progress.week_view')}</h3>
             {streak > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {/* P8: Streak Milestone Badge — Lucide Icons */}
@@ -542,7 +544,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
               {weightLoaded && weightLog.length === 0 ? (
                 <><Scale size={32} strokeWidth={1.2} color="var(--text-muted)" style={{ marginBottom: 10, display: 'block', margin: '0 auto 10px' }} />
                 Noch kein Gewicht eingetragen.<br /><span style={{ fontSize: 12 }}>Trag täglich dein Gewicht ein um deinen Verlauf zu sehen.</span></>
-              ) : weightLog.length === 1 ? 'Trag morgen wieder dein Gewicht ein um den Verlauf zu sehen.' : 'Lädt...'}
+              ) : weightLog.length === 1 ? t('progress.log_tomorrow') : 'Lädt...'}
             </div>
           )}
 
@@ -646,7 +648,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                streak >= 7  ? 'Aussergewöhnlich' :
                streak >= 3  ? 'Starke Konstanz' :
                streak === 1  ? 'Erster Schritt' :
-               'Bleib am Ball'}
+               t('progress.stay_on_track')}
             </div>
             <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
               {totalDaysLogged === 0

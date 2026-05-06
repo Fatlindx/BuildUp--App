@@ -1,24 +1,13 @@
 import { useState } from 'react';
+import { useI18n } from '../i18n.jsx';
 import { supabase } from '../supabase';
 import { Zap, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 
 // ── Schritt-Definitionen ──
 const STEPS = ['ziel', 'geschlecht', 'koerper', 'aktivitaet', 'zusammenfassung'];
 
-const goals = [
-  { id: 'Muskelaufbau',        label: 'Muskelaufbau',        desc: 'Muskelmasse aufbauen & stärker werden' },
-  { id: 'Gewicht verlieren',   label: 'Gewicht verlieren',   desc: 'Körperfett reduzieren & schlanker werden' },
-  { id: 'Fit bleiben',         label: 'Fit bleiben',         desc: 'Gesund & aktiv im Alltag' },
-  { id: 'Ausdauer verbessern', label: 'Ausdauer verbessern', desc: 'Cardio & Durchhaltevermögen steigern' },
-];
-
-const activityLevels = [
-  { id: 1.2,  label: 'Kaum Bewegung',       desc: 'Bürojob, kein Sport' },
-  { id: 1.375,label: 'Leicht aktiv',         desc: '1–3x Sport pro Woche' },
-  { id: 1.55, label: 'Mässig aktiv',         desc: '3–5x Sport pro Woche' },
-  { id: 1.725,label: 'Sehr aktiv',           desc: '6–7x intensives Training' },
-  { id: 1.9,  label: 'Extrem aktiv',         desc: 'Tägliches Training + körperl. Job' },
-];
+// Goals and activity levels are defined inside component to support i18n
+// (see getGoals(t) and getActivityLevels(t) below)
 
 // ── Kalorienberechnung (Mifflin-St Jeor) ──
 function calculateNutrition(data) {
@@ -53,6 +42,7 @@ function calculateNutrition(data) {
 }
 
 export default function Onboarding({ user, onComplete }) {
+  const { t, lang } = useI18n();
   const [step, setStep]     = useState(0);
   const [loading, setLoading] = useState(false);
   const [data, setData]     = useState({
@@ -206,8 +196,8 @@ export default function Onboarding({ user, onComplete }) {
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {[
-                  { id: 'männlich', label: 'Männlich' },
-                  { id: 'weiblich', label: 'Weiblich' },
+                  { id: 'männlich', label: t('onboarding.male') },
+                  { id: 'weiblich', label: t('onboarding.female') },
                 ].map(g => (
                   <button key={g.id} onClick={() => set('gender', g.id)} style={{
                     padding: '24px 16px', borderRadius: 'var(--radius)',
@@ -237,7 +227,7 @@ export default function Onboarding({ user, onComplete }) {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {[
-                  { key: 'age',    label: 'Alter',       unit: 'Jahre', placeholder: 'z.B. 25', min: 13, max: 100 },
+                  { key: 'age',    label: t('onboarding.age'),       unit: 'Jahre', placeholder: 'z.B. 25', min: 13, max: 100 },
                   { key: 'height', label: 'Grösse',      unit: 'cm',    placeholder: 'z.B. 178', min: 100, max: 250 },
                   { key: 'weight', label: 'Körpergewicht', unit: 'kg',  placeholder: 'z.B. 75',  min: 30,  max: 300 },
                 ].map(f => (
@@ -370,7 +360,7 @@ export default function Onboarding({ user, onComplete }) {
                   {[
                     { label: 'Ziel',        value: data.goal },
                     { label: 'Geschlecht',  value: data.gender },
-                    { label: 'Alter',       value: `${data.age} Jahre` },
+                    { label: t('onboarding.age'),       value: `${data.age} Jahre` },
                     { label: 'Grösse',      value: `${data.height} cm` },
                     { label: 'Gewicht',     value: `${data.weight} kg` },
                     { label: 'BMI',         value: nutrition.bmi },
@@ -418,7 +408,7 @@ export default function Onboarding({ user, onComplete }) {
               className="btn btn-primary"
               style={{ flex: 1, justifyContent: 'center', padding: 14, fontSize: 15 }}
             >
-              {loading ? 'Wird gespeichert...' : 'Loslegen'}
+              {loading ? 'Wird gespeichert...' : t('onboarding.start')}
             </button>
           )}
         </div>
