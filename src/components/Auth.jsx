@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
 // ── Fehlermeldungen auf Deutsch ──
 function translateError(message) {

@@ -1,4 +1,4 @@
-import { Trophy, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2,
   Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList,
