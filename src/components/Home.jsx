@@ -81,8 +81,8 @@ function FeedbackToast({ message, show }) {
 
 export default function Home({ setActiveSection, calorieGoal, totalCalories, dailyLog, logHistory, username }) {
   const hour = new Date().getHours();
-  const greeting = hour < 5 ? t('home.greeting_night') : hour < 12 ? t('home.greeting_morning') : hour < 18 ? t('home.greeting_day') : t('home.greeting_evening');
   const { t, lang } = useI18n();
+  const greeting = hour < 5 ? t('home.greeting_night') : hour < 12 ? t('home.greeting_morning') : hour < 18 ? t('home.greeting_day') : t('home.greeting_evening');
   const greetingIcon = null; // Icons werden inline gerendert
 
   // ── P7: Retention Logic ──
