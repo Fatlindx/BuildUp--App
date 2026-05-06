@@ -29,7 +29,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const pct       = calorieGoal > 0 ? Math.min(100, Math.round((totalCal / calorieGoal) * 100)) : 0;
 
   const systemPrompt   = buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog });
-  const quickQuestions = buildQuickQuestions(profile, totalCal, calorieGoal, totalProt);
+  const quickQuestions = buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t);
 
   const sendMessage = async (text) => {
     const msgText = text || input.trim();
@@ -419,7 +419,7 @@ DEIN FACHWISSEN: Makros, Kalorien, Muskelaufbau, Gewichtsabnahme, Krafttraining,
 }
 
 // ── Quick Questions — Personalisiert ──
-function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt) {
+function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t) {
   const questions = [];
   const remaining = calorieGoal - totalCal;
 
