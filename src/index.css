@@ -190,7 +190,7 @@ img { max-width: 100%; }
 
 /* ─── Modal ─── */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; z-index: 200; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 24px; animation: fadeIn 0.18s ease; box-sizing: border-box; }
-.modal { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.modal { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); width: 100%; max-width: 680px; max-height: min(90vh, 90vh); overflow-y: auto; animation: slideUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .modal::-webkit-scrollbar { width: 3px; }
 .modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 .modal-header-inner { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
@@ -468,11 +468,15 @@ img { max-width: 100%; }
 
 /* ─── Responsive Mobile (< 768px) ─── */
 @media (max-width: 767px) {
-  * { max-width: 100%; }
-  img, video, canvas, svg { max-width: 100%; }
-  /* Critical Fix: position:fixed overlays must never inherit max-width constraints */
-  *[style*="position: fixed"] { max-width: none !important; max-height: none !important; width: 100vw !important; height: 100vh !important; }
-  .modal-overlay { max-width: none !important; max-height: none !important; width: 100vw !important; height: 100vh !important; }
+  /* Safe global max-width — explicit exceptions for overlays */
+  img, video, canvas { max-width: 100%; }
+
+  /* Modal overlay — full screen, no constraints */
+  .modal-overlay { max-width: none !important; max-height: none !important; width: 100vw !important; height: 100vh !important; height: 100dvh !important; box-sizing: border-box !important; }
+
+  /* Mobile scroll fix — prevent horizontal overflow */
+  body { overflow-x: hidden; }
+  .page { overflow-x: hidden; }
   .home-container, .tracker-container, .calc-container, .progress-container, .library-header, .library-layout { padding-top: 24px; padding-bottom: calc(var(--mobile-bottom) + 24px); }
   body { padding-bottom: var(--mobile-bottom); }
   .home-stats-row { grid-template-columns: 1fr; gap: 12px; }
@@ -833,3 +837,83 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 .stat-card-goal-reached {
   animation: goalReached 1.2s ease forwards;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE EXCELLENCE — iOS/Android Premium UX
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── iOS Safe Areas ── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Touch Targets — minimum 44px ── */
+@media (max-width: 767px) {
+  button, [role="button"] {
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Exception: icon-only small buttons */
+  .log-delete, .modal-close {
+    min-height: 32px;
+  }
+
+  /* ── Mobile Card Spacing ── */
+  .tracker-card, .progress-card {
+    padding: 16px !important;
+    border-radius: 14px !important;
+  }
+
+  /* ── Mobile Typography ── */
+  .home-title { font-size: 26px !important; }
+  .home-greeting { font-size: 14px !important; }
+  .page-header h1 { font-size: 24px !important; }
+
+  /* ── Mobile Scroll Smoothness ── */
+  .page {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Prevent zoom on input focus (iOS) ── */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* ── Mobile Nav Bottom ── */
+  nav[style*="bottom: 0"] {
+    padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* ── No hover effects on touch ── */
+  @media (hover: none) {
+    .quick-action-card:hover { transform: none !important; }
+    .mini-stat-card:hover { transform: none !important; }
+    .food-result-item:hover { transform: none !important; }
+    .btn:hover { filter: none !important; box-shadow: none !important; }
+  }
+
+  /* ── Mobile Modal — zentriert wie Desktop, konsistent ── */
+  .modal {
+    max-height: 90vh !important;
+    border-radius: 16px !important;
+    margin: 16px;
+  }
+  .modal-overlay {
+    align-items: center !important;
+    padding: 16px !important;
+  }
+
+  /* ── Performance: disable heavy animations on mobile ── */
+  .stat-card-main:hover { box-shadow: none !important; }
+}
+
+/* ── DVH already included in .modal-overlay directly ── */
