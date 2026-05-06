@@ -113,7 +113,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                   padding: '7px 13px', borderRadius: 10,
                   background: 'var(--green-glow)', border: '1px solid var(--border-active)',
                   cursor: 'pointer', color: 'var(--green)', fontWeight: 600, fontSize: 12.5,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.2s ease', whiteSpace: 'nowrap', flexShrink: 0,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(34,197,94,0.2)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.6)'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'var(--green-glow)'; e.currentTarget.style.borderColor = 'var(--border-active)'; }}
@@ -181,6 +181,7 @@ export default function Navigation({ activeSection, setActiveSection, canGoBack,
                 padding: '6px 11px', borderRadius: 9,
                 background: 'var(--green-glow)', border: '1px solid var(--border-active)',
                 cursor: 'pointer', color: 'var(--green)', fontWeight: 600, fontSize: 12,
+                whiteSpace: 'nowrap', flexShrink: 0,
               }}>
                 <Bot size={13} strokeWidth={2} />
                 <span>Coach</span>

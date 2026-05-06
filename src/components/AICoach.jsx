@@ -124,7 +124,7 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
                   Persönlicher Coach von {displayName}
                 </p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                  {profile?.goal ? `Ziel: ${profile.goal}` : 'Dein Fitness-Experte'}
+                  {profile?.goal ? `Ziel: ${{ muscle: 'Muskelaufbau', lose_weight: 'Gewicht verlieren', fit: 'Fit bleiben', endurance: 'Ausdauer verbessern' }[profile.goal] || profile.goal}` : 'Dein Fitness-Experte'}
                 </p>
               </div>
             </div>

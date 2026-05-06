@@ -169,41 +169,42 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
         {calorieGoal > 0 && (
           <div style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
-            borderRadius: 14, padding: '14px 20px', marginBottom: 20,
-            display: 'flex', alignItems: 'center', gap: 16,
+            borderRadius: 14, padding: '14px 16px', marginBottom: 20,
           }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                  {totals.calories.toLocaleString()} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ {calorieGoal.toLocaleString()} kcal</span>
-                </span>
-                <span style={{
-                  fontSize: 11.5, fontWeight: 700, padding: '2px 10px', borderRadius: 100,
-                  color: pct >= 100 ? '#ef4444' : 'var(--green)',
-                  background: pct >= 100 ? 'rgba(239,68,68,0.1)' : 'var(--green-glow)',
-                  border: `1px solid ${pct >= 100 ? 'rgba(239,68,68,0.3)' : 'var(--border-active)'}`,
-                }}>
-                  {pct}% · {remaining !== null && remaining > 0 ? `${remaining} kcal übrig` : 'Tagesziel erreicht'}
-                </span>
-              </div>
-              <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%', width: `${pct}%`, borderRadius: 100,
-                  background: pct >= 100 ? '#ef4444' : 'linear-gradient(90deg, var(--green-dark), var(--green))',
-                  transition: 'width 0.6s ease',
-                  boxShadow: pct > 0 ? '0 0 8px rgba(34,197,94,0.4)' : 'none',
-                }} />
-              </div>
+            {/* Top row: Kalorien + Badge */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap' }}>
+                {totals.calories.toLocaleString()} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ {calorieGoal.toLocaleString()} kcal</span>
+              </span>
+              <span style={{
+                fontSize: 11.5, fontWeight: 700, padding: '2px 10px', borderRadius: 100,
+                color: pct >= 100 ? '#ef4444' : 'var(--green)',
+                background: pct >= 100 ? 'rgba(239,68,68,0.1)' : 'var(--green-glow)',
+                border: `1px solid ${pct >= 100 ? 'rgba(239,68,68,0.3)' : 'var(--border-active)'}`,
+                whiteSpace: 'nowrap', flexShrink: 0,
+              }}>
+                {pct}% · {remaining !== null && remaining > 0 ? `${remaining} kcal übrig` : 'Tagesziel erreicht'}
+              </span>
             </div>
-            <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
+            {/* Progress bar */}
+            <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 100, overflow: 'hidden', marginBottom: 10 }}>
+              <div style={{
+                height: '100%', width: `${pct}%`, borderRadius: 100,
+                background: pct >= 100 ? '#ef4444' : 'linear-gradient(90deg, var(--green-dark), var(--green))',
+                transition: 'width 0.6s ease',
+                boxShadow: pct > 0 ? '0 0 8px rgba(34,197,94,0.4)' : 'none',
+              }} />
+            </div>
+            {/* Makros row */}
+            <div style={{ display: 'flex', gap: 16 }}>
               {[
-                { label: 'P', value: totals.protein, color: '#ef4444' },
-                { label: 'K', value: totals.carbs,   color: '#f97316' },
-                { label: 'F', value: totals.fat,     color: '#eab308' },
+                { label: 'Protein', value: totals.protein, color: '#ef4444' },
+                { label: 'Carbs',   value: totals.carbs,   color: '#f97316' },
+                { label: 'Fette',   value: totals.fat,     color: '#eab308' },
               ].map(m => (
-                <div key={m.label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: m.color }}>{m.value}g</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{m.label}</div>
+                <div key={m.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: m.color }}>{m.value}g</span>
+                  <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{m.label}</span>
                 </div>
               ))}
             </div>

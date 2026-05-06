@@ -105,7 +105,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
         {[
           { icon: Dumbbell,   label: 'Gewicht',    value: profile?.weight ? `${profile.weight} kg` : '—' },
           { icon: Scale,      label: 'Grösse',     value: profile?.height ? `${profile.height} cm` : '—' },
-          { icon: TrendingUp, label: 'Ziel',        value: profile?.goal ? profile.goal.split(' ')[0] : '—' },
+          { icon: TrendingUp, label: 'Ziel',        value: profile?.goal ? translateGoal(profile.goal).split(' ')[0] : '—' },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -163,7 +163,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
                 {goals.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             ) : (
-              <span style={{ ...valueStyle, color: 'var(--green)' }}>{form.goal || '—'}</span>
+              <span style={{ ...valueStyle, color: 'var(--green)' }}>{translateGoal(form.goal) || '—'}</span>
             )}
           </Field>
 
