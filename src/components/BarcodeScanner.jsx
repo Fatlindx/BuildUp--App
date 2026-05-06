@@ -112,10 +112,10 @@ async function fetchOFF(barcode) {
     // Validierung: kein HTML, muss JSON sein
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('json')) {
-      return { status: 'api_error', message: t('scanner.api_unavailable') };
+      return { status: 'api_error', msgKey: 'scanner.api_unavailable' };
     }
     if (res.status === 429) {
-      return { status: 'rate_limit', message: t('scanner.rate_limit') };
+      return { status: 'rate_limit', msgKey: 'scanner.rate_limit' };
     }
     if (!res.ok) {
       return { status: 'api_error', message: 'Serverfehler. Bitte nochmals versuchen.' };
@@ -149,9 +149,9 @@ async function fetchOFF(barcode) {
   } catch (err) {
     clearTimeout(timeout);
     if (err.name === 'AbortError') {
-      return { status: 'timeout', message: t('scanner.timeout') };
+      return { status: 'timeout', msgKey: 'scanner.timeout' };
     }
-    return { status: 'api_error', message: t('scanner.network_error') };
+    return { status: 'api_error', msgKey: 'scanner.network_error' };
   }
 }
 
@@ -206,7 +206,7 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
             setPhase('notfound');
           } else {
             // api_error | rate_limit | timeout
-            setErrorMsg(result.message || 'Produkt konnte nicht geladen werden.');
+            setErrorMsg(result.msgKey ? t(result.msgKey) : (result.message || t('scanner.api_unavailable')));
             setPhase('error');
           }
         },

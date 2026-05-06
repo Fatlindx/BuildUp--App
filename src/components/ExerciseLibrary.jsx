@@ -62,7 +62,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
   // Sets/Reps basierend auf User-Ziel
   const goalKey = userGoal === 'Gewicht verlieren' ? 'Gewicht verlieren'
     : userGoal === 'Muskelaufbau' ? 'Muskelaufbau'
-    : t('exercises.sort_default');
+    : 'Standard';
   const rec = setsRepsMap[goalKey] || setsRepsMap.Standard;
 
   return (

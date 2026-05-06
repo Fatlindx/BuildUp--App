@@ -2,26 +2,26 @@ import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
 import { Home, UtensilsCrossed, Flame, Dumbbell, BarChart2, LogOut, Bot, ClipboardList, User, ChevronLeft } from 'lucide-react';
 
-const navItems = [
-  { id: 'home',       label: t('nav.home'),        icon: Home },
-  { id: 'nutrition',  label: t('nav.nutrition'),   icon: UtensilsCrossed },
-  { id: 'exercises',  label: t('nav.exercises'),     icon: Dumbbell },
-  { id: 'workout',    label: t('nav.training'),    icon: ClipboardList },
-  { id: 'progress',   label: t('nav.progress'), icon: BarChart2 },
-  { id: 'calculator', label: t('nav.calculator'),     icon: Flame },
-];
-
-const allNavItems = [
-  { id: 'home',       label: t('nav.home'),        icon: Home },
-  { id: 'nutrition',  label: t('nav.nutrition'),   icon: UtensilsCrossed },
-  { id: 'calculator', label: t('nav.calculator'),     icon: Flame },
-  { id: 'exercises',  label: t('nav.exercises'),     icon: Dumbbell },
-  { id: 'workout',    label: t('nav.training'),    icon: ClipboardList },
-  { id: 'progress',   label: t('nav.progress'), icon: BarChart2 },
-];
+// navItems defined inside component (needs t() from hook)
 
 export default function Navigation({ activeSection, setActiveSection, canGoBack, onGoBack, user, profile, onLogout, onOpenCoach }) {
   const { t } = useI18n();
+  const navItems = [
+    { id: 'home',       label: t('nav.home'),       icon: Home },
+    { id: 'nutrition',  label: t('nav.nutrition'),  icon: UtensilsCrossed },
+    { id: 'exercises',  label: t('nav.exercises'),  icon: Dumbbell },
+    { id: 'workout',    label: t('nav.training'),   icon: ClipboardList },
+    { id: 'progress',   label: t('nav.progress'),   icon: BarChart2 },
+    { id: 'calculator', label: t('nav.calculator'), icon: Flame },
+  ];
+  const allNavItems = [
+    { id: 'home',       label: t('nav.home'),       icon: Home },
+    { id: 'nutrition',  label: t('nav.nutrition'),  icon: UtensilsCrossed },
+    { id: 'calculator', label: t('nav.calculator'), icon: Flame },
+    { id: 'exercises',  label: t('nav.exercises'),  icon: Dumbbell },
+    { id: 'workout',    label: t('nav.training'),   icon: ClipboardList },
+    { id: 'progress',   label: t('nav.progress'),   icon: BarChart2 },
+  ];
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
