@@ -100,12 +100,12 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
         )}
       </div>
 
-      {/* Stats Row */}
+      {/* P7: Stats Row — mit Profil-Daten gefüllt */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
         {[
-          { icon: Dumbbell,   label: 'Trainings',  value: '—' },
-          { icon: Flame,      label: 'Ø Kalorien', value: '—' },
-          { icon: TrendingUp, label: 'Streak',      value: '—' },
+          { icon: Dumbbell,   label: 'Gewicht',    value: profile?.weight ? `${profile.weight} kg` : '—' },
+          { icon: Scale,      label: 'Grösse',     value: profile?.height ? `${profile.height} cm` : '—' },
+          { icon: TrendingUp, label: 'Ziel',        value: profile?.goal ? profile.goal.split(' ')[0] : '—' },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',

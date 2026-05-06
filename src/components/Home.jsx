@@ -89,7 +89,8 @@ function FeedbackToast({ message, show }) {
 
 export default function Home({ setActiveSection, calorieGoal, totalCalories, dailyLog, username }) {
   const hour = new Date().getHours();
-  const greeting = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greeting     = hour < 5 ? 'Gute Nacht' : hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '☀️' : hour < 18 ? '⚡' : '🌆';
 
   const pct = calorieGoal > 0 ? Math.min((totalCalories / calorieGoal) * 100, 100) : 0;
   const remaining = Math.max(calorieGoal - totalCalories, 0);
@@ -109,6 +110,13 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
 
   const circumference = 2 * Math.PI * 54;
   const dash = circumference - (pct / 100) * circumference;
+
+  // ── P8: Kleine Erfolge — Tages-Meilensteine ──
+  const miniMilestones = [];
+  if (dailyLog.length >= 3) miniMilestones.push({ icon: '🍽️', text: '3 Mahlzeiten heute' });
+  if (totalProtein >= 100)  miniMilestones.push({ icon: '💪', text: '100g Protein erreicht' });
+  if (pct >= 100)           miniMilestones.push({ icon: '🎯', text: 'Tagesziel erreicht!' });
+  if (pct >= 50 && pct < 100) miniMilestones.push({ icon: '⚡', text: 'Halbzeit geschafft' });
 
   // ── Toast Feedback ──
   const [toast, setToast] = useState({ show: false, message: '' });
@@ -152,7 +160,8 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
         <div className="home-hero">
           <div>
             <div className="home-greeting" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {greeting}{showName ? `, ${username}` : ''}! 👋
+              <span style={{ fontSize: 18 }}>{greetingIcon}</span>
+              {greeting}{showName ? `, ${username}` : ''}!
             </div>
 
             {/* Dynamischer Status-Titel */}
@@ -167,20 +176,33 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
               {status.subtitle}
             </p>
 
-            {/* Kontext-Reaktion Badge */}
-            {reaction && pct > 0 && (
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                marginTop: 12,
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                padding: '5px 12px', borderRadius: 100,
-                fontSize: 12, fontWeight: 600, color: reaction.color,
-                animation: 'slideUpFade 0.4s ease both',
-              }}>
-                <TrendingUp size={12} />
-                {reaction.text}
-              </div>
-            )}
+            {/* P6: Kontext-Reaktion Badges */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginTop: 12 }}>
+              {reaction && pct > 0 && (
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: 'var(--bg-card)', border: '1px solid var(--border)',
+                  padding: '5px 12px', borderRadius: 100,
+                  fontSize: 12, fontWeight: 600, color: reaction.color,
+                  animation: 'slideUpFade 0.4s ease both',
+                }}>
+                  <TrendingUp size={12} />
+                  {reaction.text}
+                </div>
+              )}
+              {/* P8: Mini-Erfolge als Chips */}
+              {miniMilestones.map((m, i) => (
+                <div key={i} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)',
+                  padding: '4px 10px', borderRadius: 100,
+                  fontSize: 11.5, fontWeight: 600, color: 'var(--green)',
+                  animation: `slideUpFade 0.35s ${i * 0.08}s ease both`,
+                }}>
+                  {m.icon} {m.text}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="home-quote-chip">

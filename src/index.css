@@ -564,3 +564,272 @@ html body div[style*="z-index:200"],
   max-width: 100vw !important;
   max-height: 100vh !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   P7 — FEINSCHLIFF: Konsistente Abstände, Premium Animationen
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Interaktive Elemente — Hover States ── */
+.quick-action-card {
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.18s ease,
+              box-shadow 0.18s ease !important;
+}
+.quick-action-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--border-active) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important;
+}
+.quick-action-card:active {
+  transform: translateY(0px) scale(0.98) !important;
+}
+
+/* ── Mini Stat Cards ── */
+.mini-stat-card {
+  transition: transform 0.15s ease, border-color 0.15s ease !important;
+  cursor: pointer;
+}
+.mini-stat-card:hover {
+  transform: translateY(-1px) !important;
+  border-color: var(--border-active) !important;
+}
+.mini-stat-card:active {
+  transform: scale(0.97) !important;
+}
+
+/* ── Food Result Items ── */
+.food-result-item {
+  transition: background 0.15s ease, transform 0.12s ease !important;
+}
+.food-result-item:hover {
+  transform: translateX(2px) !important;
+}
+
+/* ── Nav Links — aktiver Zustand ── */
+.nav-link {
+  transition: color 0.15s ease, background 0.15s ease !important;
+}
+
+/* ── Progress Stat Cards ── */
+.progress-stat-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+}
+.progress-stat-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important;
+}
+
+/* ── Muscle Quick Chips ── */
+.muscle-quick-chip {
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease !important;
+}
+.muscle-quick-chip:hover {
+  transform: scale(1.04) !important;
+  border-color: var(--mcolor, var(--green)) !important;
+  background: color-mix(in srgb, var(--mcolor, var(--green)) 12%, transparent) !important;
+}
+
+/* ── Achievement Cards ── */
+.achievement-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.achievement-card.done:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* ── Category Chips ── */
+.category-chip {
+  transition: all 0.15s ease !important;
+}
+.category-chip:not(.active):hover {
+  border-color: var(--border-active) !important;
+  color: var(--text) !important;
+}
+
+/* ── Tracker Cards ── */
+.tracker-card {
+  transition: border-color 0.2s ease !important;
+}
+.tracker-card:focus-within {
+  border-color: rgba(34,197,94,0.25) !important;
+}
+
+/* ── Buttons ── */
+.btn {
+  transition: all 0.15s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.96) !important;
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08) !important;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.3) !important;
+}
+
+/* ── Konsistente Seitenanimationen ── */
+.page > * {
+  animation: pageIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Log Items Stagger ── */
+.log-item:nth-child(1) { animation: slideUpFade 0.22s 0.00s ease both; }
+.log-item:nth-child(2) { animation: slideUpFade 0.22s 0.04s ease both; }
+.log-item:nth-child(3) { animation: slideUpFade 0.22s 0.08s ease both; }
+.log-item:nth-child(4) { animation: slideUpFade 0.22s 0.12s ease both; }
+.log-item:nth-child(5) { animation: slideUpFade 0.22s 0.16s ease both; }
+
+/* ── Scrollbar Premium ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Focus Ring ── */
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid rgba(34,197,94,0.5) !important;
+  outline-offset: 2px !important;
+}
+
+/* ── Konsistente Card Hover Tint ── */
+.progress-card {
+  transition: border-color 0.25s ease !important;
+}
+.progress-card:hover {
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+/* ── Home Quote Chip Animation ── */
+.home-quote-chip {
+  animation: slideUpFade 0.5s 0.2s ease both;
+}
+
+/* ── Stat Card Main Glow on hover ── */
+.stat-card-main {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+.stat-card-main:hover {
+  box-shadow: 0 0 30px rgba(34,197,94,0.06) !important;
+}
+
+/* ── Input Focus Glow ── */
+.form-input:focus {
+  border-color: rgba(34,197,94,0.4) !important;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.08) !important;
+}
+
+/* ── Weekly Bar Animation ── */
+@keyframes barGrow {
+  from { transform: scaleY(0); transform-origin: bottom; }
+  to   { transform: scaleY(1); transform-origin: bottom; }
+}
+
+/* ── Chip Buttons ── */
+.chip {
+  transition: all 0.15s ease !important;
+}
+.chip:hover {
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  background: var(--green-glow) !important;
+}
+
+/* ── Recent Meal Row Hover ── */
+.recent-meal-row {
+  transition: background 0.15s ease !important;
+  border-radius: 8px;
+  padding: 4px 6px;
+  margin: 0 -6px;
+}
+.recent-meal-row:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   P8 — EMOTIONALE BINDUNG: Streak System, kleine Erfolge
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Streak Milestone Glow ── */
+@keyframes streakPulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  50%       { box-shadow: 0 0 12px 2px currentColor; opacity: 0.85; }
+}
+
+@keyframes achievementPop {
+  0%   { transform: scale(0.8) translateY(10px); opacity: 0; }
+  60%  { transform: scale(1.05) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes milestoneGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(34,197,94,0.2); }
+  50%       { box-shadow: 0 0 20px rgba(34,197,94,0.5), 0 0 40px rgba(34,197,94,0.15); }
+}
+
+@keyframes streakFire {
+  0%   { transform: scale(1) rotate(-3deg); }
+  25%  { transform: scale(1.1) rotate(3deg); }
+  50%  { transform: scale(1) rotate(-2deg); }
+  75%  { transform: scale(1.05) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes confettiPop {
+  0%   { transform: scale(0); opacity: 0; }
+  50%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Achievement Cards Premium Glow ── */
+.achievement-card.done {
+  animation: achievementPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+/* ── Milestone erreicht — Pulsierender Ring ── */
+.streak-milestone-badge {
+  animation: streakPulse 2.5s ease infinite;
+}
+
+/* ── Progress stat value Highlight bei 100% ── */
+.stat-card-main[data-complete="true"] {
+  animation: milestoneGlow 2s ease infinite;
+  border-color: rgba(34,197,94,0.4) !important;
+}
+
+/* ── Mini Achievement Chips ── */
+.mini-achievement-chip {
+  animation: confettiPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.15s ease !important;
+}
+.mini-achievement-chip:hover {
+  transform: scale(1.05) !important;
+}
+
+/* ── Streak Number — Spezielle Farben je Level ── */
+.streak-1  { color: #f97316 !important; } /* Bronze   */
+.streak-7  { color: #22c55e !important; } /* Grün     */
+.streak-14 { color: #a855f7 !important; } /* Lila     */
+.streak-30 { color: #eab308 !important; } /* Gold     */
+
+/* ── Motivation Banner animiert bei hohem Streak ── */
+.motivation-banner {
+  transition: border-color 0.4s ease, background 0.4s ease !important;
+}
+
+/* ── Log Item Success Flash ── */
+@keyframes logItemAdd {
+  0%   { background: rgba(34,197,94,0.15); transform: translateX(-4px); }
+  100% { background: transparent; transform: translateX(0); }
+}
+.log-item-new {
+  animation: logItemAdd 0.6s ease both;
+}
+
+/* ── Ziel erreicht — Special State ── */
+@keyframes goalReached {
+  0%   { border-color: var(--border); }
+  30%  { border-color: rgba(34,197,94,0.6); box-shadow: 0 0 20px rgba(34,197,94,0.2); }
+  100% { border-color: rgba(34,197,94,0.35); }
+}
+.stat-card-goal-reached {
+  animation: goalReached 1.2s ease forwards;
+}
