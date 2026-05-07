@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
-import { useToast, Toast } from '../useToast.jsx';
+import { useToast, Toast } from './useToast.jsx';
 import {
   Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2, Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList, ChevronUp, ChevronDown, TrendingUp, Star,
   Award,

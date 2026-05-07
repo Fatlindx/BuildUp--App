@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n, translateGoal, LANG_LABELS } from '../i18n.jsx';
-import { useToast, Toast } from '../useToast.jsx';
+import { useToast, Toast } from './useToast.jsx';
 import {
   User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, TrendingUp, Scale
 } from 'lucide-react';

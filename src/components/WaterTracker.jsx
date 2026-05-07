@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useToast, Toast } from '../useToast.jsx';
+import { useToast, Toast } from './useToast.jsx';
 import { useI18n } from '../i18n.jsx';
 import { Minus, Droplets, Trophy } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
-import { useToast, Toast } from '../useToast.jsx';
+import { useToast, Toast } from './useToast.jsx';
 import { supabase } from '../supabase';
 import {
   UtensilsCrossed, Target, Dumbbell, ClipboardList, Flame, Star, Trophy, Rocket, Lock, TrendingUp, Scale, Plus, ChevronUp, Check, Zap, AlertCircle, CheckCircle2, Activity, Minus, Award, Crown
