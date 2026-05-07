@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from './supabase';
 import Navigation from './components/Navigation';
-import Home from './components/Home';
-import ExerciseLibrary from './components/ExerciseLibrary';
-import CalorieCalculator from './components/CalorieCalculator';
-import NutritionTracker from './components/NutritionTracker';
-import Progress from './components/Progress';
 import Auth from './components/Auth';
 import Onboarding from './components/Onboarding';
-import AICoach from './components/AICoach';
-import WorkoutTracker from './components/WorkoutTracker';
-import ProfilePage from './components/ProfilePage';
 import SplashScreen from './components/SplashScreen';
+
+// Lazy-loaded routes — only downloaded when first visited
+const Home             = lazy(() => import('./components/Home'));
+const NutritionTracker = lazy(() => import('./components/NutritionTracker'));
+const ExerciseLibrary  = lazy(() => import('./components/ExerciseLibrary'));
+const CalorieCalculator= lazy(() => import('./components/CalorieCalculator'));
+const WorkoutTracker   = lazy(() => import('./components/WorkoutTracker'));
+const Progress         = lazy(() => import('./components/Progress'));
+const ProfilePage      = lazy(() => import('./components/ProfilePage'));
+const AICoach          = lazy(() => import('./components/AICoach'));
 
 const TODAY = new Date().toDateString();
 const SPLASH_KEY = 'buildup_splash_shown';
@@ -181,6 +183,11 @@ export default function App() {
         onOpenCoach={() => setShowCoach(true)}
       />
 
+      <Suspense fallback={
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
+          <div style={{ width: 28, height: 28, border: "2px solid rgba(34,197,94,0.2)", borderTop: "2px solid var(--green)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        </div>
+      }>
       <div key={activeSection} style={{ animation: 'pageIn 0.25s ease both' }}>
         {activeSection === 'home' && (
           <Home
@@ -215,13 +222,17 @@ export default function App() {
         )}
       </div>
 
+      </Suspense>
+
       {showCoach && (
-        <AICoach
-          onClose={() => setShowCoach(false)}
-          dailyLog={dailyLog}
-          calorieGoal={calorieGoal}
-          profile={profile}
-        />
+        <Suspense fallback={null}>
+          <AICoach
+            onClose={() => setShowCoach(false)}
+            dailyLog={dailyLog}
+            calorieGoal={calorieGoal}
+            profile={profile}
+          />
+        </Suspense>
       )}
     </>
   );

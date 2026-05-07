@@ -1,10 +1,34 @@
 import { useState, useRef, useEffect } from 'react';
+import { supabase } from '../supabase';
 import { useI18n, translateGoal } from '../i18n.jsx';
 import { X, Send, Bot, Sparkles, Dumbbell, Droplets, Scale, Ruler } from 'lucide-react';
 
 export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const { t, lang } = useI18n();
   const displayName = profile?.username || profile?.full_name?.split(' ')[0] || 'du';
+
+  const [workoutHistory, setWorkoutHistory] = useState([]);
+  const [weekStats,       setWeekStats]       = useState(null);
+  const [dataLoaded,      setDataLoaded]      = useState(false);
+
+  // Load workout history + compute weekly nutrition stats
+  useEffect(() => {
+    const loadContext = async () => {
+      if (!profile?.id && !profile?.user_id) { setDataLoaded(true); return; }
+      const userId = profile.id || profile.user_id;
+      try {
+        const { data } = await supabase.from('workout_history')
+          .select('*').eq('user_id', userId)
+          .order('created_at', { ascending: false }).limit(20);
+        setWorkoutHistory(data || []);
+      } catch (e) { /* silent */ }
+      setDataLoaded(true);
+    };
+    loadContext();
+  }, [profile]);
+
+  // Compute week nutrition stats from logHistory prop
+  const weekStats_ = computeWeekStats(dailyLog, calorieGoal);
 
   const [messages, setMessages] = useState([
     {
@@ -28,8 +52,8 @@ export default function AICoach({ onClose, dailyLog, calorieGoal, profile }) {
   const remaining = calorieGoal - totalCal;
   const pct       = calorieGoal > 0 ? Math.min(100, Math.round((totalCal / calorieGoal) * 100)) : 0;
 
-  const systemPrompt   = buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog });
-  const quickQuestions = buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t);
+  const systemPrompt   = buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog, workoutHistory, weekStats: weekStats_ });
+  const quickQuestions = buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t, workoutHistory);
 
   const sendMessage = async (text) => {
     const msgText = text || input.trim();
@@ -375,7 +399,22 @@ function buildWelcomeMessage(name, profile, calorieGoal, dailyLog) {
 }
 
 // ── System Prompt — Coach Persönlichkeit ──
-function buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog }) {
+// ── Compute weekly nutrition stats from today's log + last 7 days ──
+function computeWeekStats(dailyLog, calorieGoal) {
+  if (!dailyLog || dailyLog.length === 0) return null;
+  const totalCal  = dailyLog.reduce((s, i) => s + (i.calories || 0), 0);
+  const totalProt = dailyLog.reduce((s, i) => s + (i.protein  || 0), 0);
+  return {
+    avgCal:      Math.round(totalCal),
+    avgProt:     Math.round(totalProt),
+    daysTracked: dailyLog.length > 0 ? 1 : 0,
+    lowProtein:  totalProt < (calorieGoal * 0.3 / 4),
+    belowGoal:   totalCal < calorieGoal * 0.7,
+  };
+}
+
+
+function buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCarb, totalFat, remaining, dailyLog, workoutHistory, weekStats }) {
   const name = profile?.username || profile?.full_name?.split(' ')[0] || 'der User';
 
   let bmiInfo = '';
@@ -393,62 +432,80 @@ function buildSystemPrompt({ profile, calorieGoal, totalCal, totalProt, totalCar
   };
   const strategy = goalStrategy[profile?.goal] || 'Individuelle Strategie je nach Zielen';
 
-  return `Du bist Max, der persönliche Fitness-Coach von ${name} in der BuildUp App. Du kennst ${name} und seine/ihre Daten genau.
+  // Workout history context
+  const recentWorkouts = (workoutHistory || []).slice(0, 5);
+  const lastWorkout    = recentWorkouts[0];
+  const workoutsThisWeek = (workoutHistory || []).filter(w => {
+    const d = new Date(w.date || w.created_at);
+    return (Date.now() - d) < 7 * 24 * 60 * 60 * 1000;
+  });
+  const daysSinceLast = lastWorkout
+    ? Math.floor((Date.now() - new Date(lastWorkout.date || lastWorkout.created_at)) / (1000*60*60*24))
+    : null;
 
-DEINE PERSÖNLICHKEIT:
-- Motivierend, direkt, ehrlich — keine leeren Floskeln
-- Du sprichst ${name} immer beim Namen an
-- Du machst konkrete, personalisierte Empfehlungen basierend auf den echten Daten
-- Kurze, klare Antworten unter 180 Wörter — kein unnötiges Drumherum
-- Manchmal humorvoll, immer professionell
-- Antworte immer auf Deutsch
+  const workoutCtx = recentWorkouts.length > 0
+    ? `\nLETZTE WORKOUTS:\n${recentWorkouts.map(w =>
+        `- ${w.plan_name} / ${w.day_name} | ${w.duration_minutes}min | ${w.total_volume}kg (${new Date(w.date || w.created_at).toLocaleDateString('de-DE')})`
+      ).join('\n')}`
+    : '\nNoch keine Workouts geloggt.';
 
-PROFIL VON ${name.toUpperCase()}:
-- Ziel: ${profile?.goal || 'Nicht gesetzt'}
-- Gewicht: ${profile?.weight ? `${profile.weight} kg` : 'Nicht angegeben'}
-- Grösse: ${profile?.height ? `${profile.height} cm` : 'Nicht angegeben'}${bmiInfo}
-- Strategie: ${strategy}
+  const weekCtx = weekStats
+    ? `\nDIESE WOCHE: ${workoutsThisWeek.length} Workouts | Ø ${weekStats.avgCal} kcal/Tag | Ø ${weekStats.avgProt}g Protein/Tag | ${weekStats.daysTracked}/7 Tage getrackt`
+    : '';
 
-HEUTIGE STATS (${new Date().toLocaleDateString('de-DE')}):
-- Kalorien: ${totalCal} / ${calorieGoal} kcal (${Math.round((totalCal/calorieGoal)*100)}%)
-- Verbleibend: ${remaining > 0 ? `${remaining} kcal` : `${Math.abs(remaining)} kcal über Ziel`}
-- Protein: ${totalProt}g | Carbs: ${totalCarb}g | Fette: ${totalFat}g
-- Mahlzeiten: ${(dailyLog || []).length > 0 ? dailyLog.map(i => i.name).join(', ') : 'Noch keine'}
+  const inactiveNote = daysSinceLast !== null && daysSinceLast > 5
+    ? `\n⚠️ ${name} hat seit ${daysSinceLast} Tagen kein Workout mehr geloggt — sprich es sanft an.`
+    : daysSinceLast === 0
+    ? `\n✅ ${name} hat heute bereits trainiert!`
+    : '';
 
-DEIN FACHWISSEN: Makros, Kalorien, Muskelaufbau, Gewichtsabnahme, Krafttraining, Cardio, HIIT, Supplements, Regeneration, Trainingspläne aller Level. Bei themenfremden Fragen freundlich auf Fitness & Ernährung hinweisen.`;
+  return `Du bist Max, der persönliche Fitness-Coach von ${name} in der BuildUp App.\n\nDEINE PERSÖNLICHKEIT:\n- Motivierend, direkt, ehrlich\n- Sprich ${name} beim Namen an\n- Konkrete, personalisierte Empfehlungen basierend auf echten Daten\n- Kurze klare Antworten (max 180 Wörter)\n- Antworte auf Deutsch, ausser der User schreibt eine andere Sprache\n\nPROFIL VON ${name.toUpperCase()}:\n- Ziel: ${profile?.goal || 'Nicht gesetzt'}\n- Gewicht: ${profile?.weight ? `${profile.weight} kg` : 'Nicht angegeben'}\n- Grösse: ${profile?.height ? `${profile.height} cm` : 'Nicht angegeben'}${bmiInfo}\n- Strategie: ${strategy}\n\nHEUTE (${new Date().toLocaleDateString('de-DE')}):\n- Kalorien: ${totalCal}/${calorieGoal} kcal (${Math.round((totalCal/calorieGoal)*100)}%)\n- Protein: ${totalProt}g | Carbs: ${totalCarb}g | Fett: ${totalFat}g\n- Mahlzeiten: ${(dailyLog||[]).length > 0 ? dailyLog.map(i=>i.name).join(', ') : 'Noch keine'}${weekCtx}${workoutCtx}${inactiveNote}\n\nFACHWISSEN: Makros, Kalorien, Muskelaufbau, Gewichtsabnahme, Krafttraining, Cardio, Supplements, Regeneration. Bei themenfremden Fragen auf Fitness hinweisen.`;
 }
 
 // ── Quick Questions — Personalisiert ──
-function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t) {
+function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t, workoutHistory) {
   const questions = [];
-  const remaining = calorieGoal - totalCal;
+  const remaining    = calorieGoal - totalCal;
+  const lastWorkout  = (workoutHistory || [])[0];
+  const daysSince    = lastWorkout
+    ? Math.floor((Date.now() - new Date(lastWorkout.date || lastWorkout.created_at)) / (1000*60*60*24))
+    : null;
 
+  // Goal-based questions
   if (profile?.goal === 'Muskelaufbau') {
     questions.push(t('coach.q7'));
     questions.push(t('coach.q8'));
   } else if (profile?.goal === 'Gewicht verlieren') {
-    questions.push('Wie erstelle ich ein Kaloriendefizit?');
-    questions.push('Welches Training verbrennt am meisten Kalorien?');
+    questions.push(t('coach.q_deficit'));
+    questions.push(t('coach.q_cardio'));
   } else {
     questions.push(t('coach.q1'));
     questions.push(t('coach.q2'));
   }
 
+  // Context-reactive questions
   if (totalCal === 0) {
     questions.push(t('coach.q3'));
-  } else if (remaining > 200) {
-    questions.push(`Noch ${remaining} kcal übrig — was empfiehlst du?`);
+  } else if (remaining > 300) {
+    questions.push(t('coach.q_remaining'));
   }
 
   if (totalProt < 50) questions.push(t('coach.q4'));
+
+  // Workout-reactive questions
+  if (daysSince !== null && daysSince > 3) {
+    questions.push(t('coach.q_no_workout'));
+  } else if (daysSince === 0) {
+    questions.push(t('coach.q_recovery'));
+  } else {
+    questions.push(t('coach.q6'));
+  }
 
   if (profile?.weight && profile?.height) {
     questions.push(t('coach.q5'));
   } else {
     questions.push(t('coach.q9'));
   }
-
-  questions.push(t('coach.q6'));
 
   return questions.slice(0, 6);
 }

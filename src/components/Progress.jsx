@@ -148,22 +148,45 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
     }
   };
 
-  const weightChart = weightLog.slice(0, 7).reverse();
-  const weightMin = weightChart.length > 0 ? Math.min(...weightChart.map(w => w.weight)) - 2 : 0;
-  const weightMax = weightChart.length > 0 ? Math.max(...weightChart.map(w => w.weight)) + 2 : 100;
+  const weightChart = weightLog.slice(0, 10).reverse();
+  const weightMin = weightChart.length > 0 ? Math.min(...weightChart.map(w => w.weight)) - 1.5 : 0;
+  const weightMax = weightChart.length > 0 ? Math.max(...weightChart.map(w => w.weight)) + 1.5 : 100;
   const weightRange = weightMax - weightMin || 1;
   const latestWeight = weightLog[0]?.weight;
   const oldestWeight = weightLog[weightLog.length - 1]?.weight;
   const weightDiff = latestWeight && oldestWeight && weightLog.length > 1 ? (latestWeight - oldestWeight).toFixed(1) : null;
+
+  // Weight trend: linear regression over last 7 entries
+  const weightTrend = (() => {
+    if (weightChart.length < 3) return null;
+    const n = weightChart.length;
+    const xs = weightChart.map((_, i) => i);
+    const ys = weightChart.map(w => w.weight);
+    const xMean = xs.reduce((a, b) => a + b, 0) / n;
+    const yMean = ys.reduce((a, b) => a + b, 0) / n;
+    const slope = xs.reduce((s, x, i) => s + (x - xMean) * (ys[i] - yMean), 0) /
+                  xs.reduce((s, x) => s + (x - xMean) ** 2, 0);
+    if (Math.abs(slope) < 0.05) return 'stable';
+    return slope > 0 ? 'up' : 'down';
+  })();
+
+  // Protein weekly data
+  const proteinWeekData = getLast7Days().map(({ key, label }) => {
+    const log  = (logHistory || {})[key] || [];
+    const prot = Math.round(log.reduce((s, i) => s + (i.protein || 0), 0));
+    return { day: label, prot };
+  });
+  const proteinGoal = profile?.weight ? Math.round(profile.weight * 1.8) : 120;
+  const maxProt     = Math.max(...proteinWeekData.map(d => d.prot), proteinGoal);
   const bmi = latestWeight && profile?.height ? (latestWeight / ((profile.height / 100) ** 2)).toFixed(1) : null;
   const bmiCategory = bmi ? bmi < 18.5 ? t('progress.bmi_under') : bmi < 25 ? t('progress.bmi_normal') : bmi < 30 ? t('progress.bmi_over') : 'Adipositas' : null;
   const bmiColor = bmi ? bmi < 18.5 ? 'var(--blue-light)' : bmi < 25 ? 'var(--green)' : bmi < 30 ? 'var(--orange)' : 'var(--red)' : 'var(--green)';
 
   const stats = [
-    { label: 'Heute gegessen', value: `${totalCal} kcal`,    icon: UtensilsCrossed },
-    { label: 'Tagesziel',      value: `${calorieGoal} kcal`, icon: Target },
-    { label: 'Protein heute',  value: `${totalProt}g`,       icon: Dumbbell },
-    { label: 'Mahlzeiten',     value: dailyLog.length,       icon: ClipboardList },
+    { label: t('home.today_eaten'),   value: `${totalCal} kcal`,    icon: UtensilsCrossed },
+    { label: t('home.kcal_goal'),     value: `${calorieGoal} kcal`, icon: Target },
+    { label: t('nutrition.protein'),  value: `${totalProt}g`,       icon: Dumbbell },
+    { label: t('home.meals_today'),   value: dailyLog.length,       icon: ClipboardList },
   ];
 
   const achievements = [
@@ -178,10 +201,10 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   ];
 
   // P6: Tagesstatus mit Icon
-  const statusText = pct >= 100 ? { text: 'Über Ziel',     color: 'var(--red)',          iconName: 'AlertCircle',  bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)'   }
-    : pct >= 85 ? { text: 'Fast am Ziel',   color: 'var(--green-bright)',          iconName: 'TrendingUp',   bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
-    : pct >= 50 ? { text: 'On Track',        color: 'var(--green)',     iconName: 'CheckCircle2', bg: 'var(--green-glow)',     border: 'var(--border-active)'  }
-    : pct > 0   ? { text: 'Gestartet',       color: 'var(--blue-light)',          iconName: 'Activity',     bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
+  const statusText = pct >= 100 ? { text: t('progress.over_goal'),     color: 'var(--red)',          iconName: 'AlertCircle',  bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)'   }
+    : pct >= 85 ? { text: t('home.status_great'),   color: 'var(--green-bright)',          iconName: 'TrendingUp',   bg: 'rgba(74,222,128,0.1)',  border: 'rgba(74,222,128,0.3)'  }
+    : pct >= 50 ? { text: t('home.status_halfway'),        color: 'var(--green)',     iconName: 'CheckCircle2', bg: 'var(--green-glow)',     border: 'var(--border-active)'  }
+    : pct > 0   ? { text: t('home.status_low'),       color: 'var(--blue-light)',          iconName: 'Activity',     bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.3)'  }
     : { text: t('progress.nothing_yet'),   color: 'var(--text-muted)',   iconName: 'Minus',        bg: 'var(--bg-card-2)',     border: 'var(--border)'         };
 
   // P6: Wochentrend — Vergleich dieser Woche
@@ -189,10 +212,10 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
   const avgKcal        = daysWithData > 0 ? Math.round(weekData.reduce((s,d) => s + d.kcal, 0) / daysWithData) : 0;
   const daysOnTrack    = (calorieGoal > 0) ? weekData.filter(d => d.kcal >= calorieGoal * 0.8 && d.kcal <= calorieGoal * 1.1).length : 0;
   const weekScore      = daysWithData > 0 ? Math.round((daysOnTrack / daysWithData) * 100) : 0;
-  const weekTrend      = weekScore >= 80 ? { text: 'Ausgezeichnete Woche', color: 'var(--green)', iconName: 'Trophy' }
-    : weekScore >= 50 ? { text: 'Gute Woche',          color: 'var(--green-bright)',        iconName: 'TrendingUp' }
-    : weekScore >  0  ? { text: 'Woche im Aufbau',     color: 'var(--orange)',        iconName: 'Activity' }
-    : { text: 'Diese Woche starten', color: 'var(--text-muted)', iconName: 'Target' };
+  const weekTrend      = weekScore >= 80 ? { text: t('progress.week_great'), color: 'var(--green)', iconName: 'Trophy' }
+    : weekScore >= 50 ? { text: t('home.status_halfway'),          color: 'var(--green-bright)',        iconName: 'TrendingUp' }
+    : weekScore >  0  ? { text: t('progress.week_building'),     color: 'var(--orange)',        iconName: 'Activity' }
+    : { text: t('progress.week_start'), color: 'var(--text-muted)', iconName: 'Target' };
 
   return (
     <div className="page">
@@ -432,7 +455,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h3 className="progress-card-title" style={{ marginBottom: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Scale size={18} color="var(--text-secondary)" strokeWidth={1.5} />
-              Gewichtsverlauf
+              {t('progress.weight_history')}
             </h3>
             <button onClick={() => setShowWeightInput(v => !v)} style={{
               display: 'flex', alignItems: 'center', gap: 5,
@@ -477,7 +500,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <div style={{ display: 'grid', gridTemplateColumns: bmi ? '1fr 1fr 1fr' : '1fr 1fr', gap: 10, marginBottom: 16 }}>
               <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text)' }}>{latestWeight}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>kg aktuell</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{t('progress.kg_current')}</div>
               </div>
               {weightDiff !== null && (
                 <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, textAlign: 'center' }}>
@@ -493,6 +516,28 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>BMI · {bmiCategory}</div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Weight trend indicator */}
+          {weightTrend && weightChart.length >= 3 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 4,
+              padding: '8px 12px', borderRadius: 9,
+              background: weightTrend === 'down' ? 'rgba(34,197,94,0.06)'
+                : weightTrend === 'up' ? 'rgba(239,68,68,0.06)'
+                : 'rgba(107,114,128,0.06)',
+              border: `1px solid ${weightTrend === 'down' ? 'rgba(34,197,94,0.15)' : weightTrend === 'up' ? 'rgba(239,68,68,0.15)' : 'var(--border)'}`,
+            }}>
+              <TrendingUp size={13}
+                color={weightTrend === 'down' ? 'var(--green)' : weightTrend === 'up' ? 'var(--red)' : 'var(--text-muted)'}
+                style={{ transform: weightTrend === 'down' ? 'rotate(180deg)' : weightTrend === 'stable' ? 'rotate(0deg)' : 'none' }}
+              />
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                {weightTrend === 'down' ? t('progress.trend_down')
+                  : weightTrend === 'up' ? t('progress.trend_up')
+                  : t('progress.trend_stable')}
+              </span>
             </div>
           )}
 
@@ -551,7 +596,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           {weightLog.length > 0 && (
             <div style={{ marginTop: 12 }}>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
-                Letzte Einträge
+                {t('progress.recent_entries')}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {weightLog.slice(0, 5).map(w => (
@@ -571,11 +616,66 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           )}
         </div>
 
+
+        {/* ── Protein-Konsistenz Chart ── */}
+        <div className="progress-card">
+          <div style={{ marginBottom: 16 }}>
+            <h3 className="progress-card-title" style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Dumbbell size={16} color="var(--text-secondary)" strokeWidth={1.5} />
+              {t('progress.protein_consistency')}
+            </h3>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              {t('progress.protein_goal_label')}: {proteinGoal}g {t('common.per_day')}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 80 }}>
+            {proteinWeekData.map((d, i) => {
+              const pct   = maxProt > 0 ? d.prot / maxProt : 0;
+              const hit   = d.prot >= proteinGoal;
+              const today = i === proteinWeekData.length - 1;
+              return (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                  {d.prot > 0 && (
+                    <div style={{ fontSize: 8, color: hit ? 'var(--green)' : 'var(--text-muted)' }}>
+                      {d.prot}g
+                    </div>
+                  )}
+                  <div style={{
+                    width: '100%', borderRadius: 4,
+                    background: d.prot === 0 ? 'var(--bg-card-2)'
+                      : hit ? (today ? 'var(--green)' : 'rgba(34,197,94,0.45)')
+                      : (today ? 'var(--blue)' : 'rgba(59,130,246,0.35)'),
+                    height: `${Math.max(pct * 60, d.prot > 0 ? 4 : 3)}px`,
+                    transition: 'height 0.4s ease',
+                    boxShadow: today && d.prot > 0 ? `0 0 8px ${hit ? 'rgba(34,197,94,0.3)' : 'rgba(59,130,246,0.3)'}` : 'none',
+                  }} />
+                  <div style={{ fontSize: 9, color: today ? 'var(--text)' : 'var(--text-muted)', fontWeight: today ? 600 : 400 }}>
+                    {d.day}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Goal line indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12, fontSize: 11, color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 10, height: 3, borderRadius: 2, background: 'var(--green)' }} />
+              {t('progress.goal_reached')}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 10, height: 3, borderRadius: 2, background: 'var(--blue)' }} />
+              {t('progress.below_goal')}
+            </div>
+          </div>
+        </div>
+
         {/* ── P3: Achievements — mit Glow für aktive ── */}
         <div className="progress-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
             <h3 className="progress-card-title" style={{ marginBottom: 0 }}>
-              Errungenschaften
+              {t('progress.achievements')}
             </h3>
             <span style={{
               fontSize: 12, fontWeight: 700,

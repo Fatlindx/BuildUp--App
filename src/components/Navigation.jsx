@@ -512,24 +512,6 @@ export default function Navigation({
           })}
         </nav>
       )}
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes slideInLeft {
-          from { transform: translateX(-100%); }
-          to   { transform: translateX(0); }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50%       { opacity: 1; transform: scale(1.3); }
-        }
-        @media (max-width: 767px) {
-          body { padding-bottom: 80px; }
-        }
-      `}</style>
     </>
   );
 }

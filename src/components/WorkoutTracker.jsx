@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
 import {
-  Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2, Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList, ChevronUp, ChevronDown, TrendingUp, Star
+  Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2, Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList, ChevronUp, ChevronDown, TrendingUp, Star,
+  Award,
+  Activity,
+  ArrowUp,
+  Layers,
+  AlertCircle
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { exercises } from '../data/exercises';
@@ -203,8 +208,9 @@ export default function WorkoutTracker({ user, profile }) {
             {view !== 'create' && (
               <div style={{ display: 'flex', gap: 4, marginTop: 24, background: 'var(--bg-card-2)', padding: 4, borderRadius: 12, width: 'fit-content' }}>
                 {[
-                  { id: 'plans', label: t('training.my_plans'), icon: <ClipboardList size={14}/> },
-                  { id: 'history', label: `History${history.length > 0 ? ` (${history.length})` : ''}`, icon: <BarChart2 size={14}/> },
+                  { id: 'plans',    label: t('training.my_plans'),  icon: <ClipboardList size={14}/> },
+                  { id: 'insights', label: t('training.insights'),    icon: <TrendingUp size={14}/> },
+                  { id: 'history',  label: t('training.history_tab'), icon: <BarChart2 size={14}/> },
                 ].map(tab => (
                   <button key={tab.id} onClick={() => setView(tab.id)} style={{
                     display: 'flex', alignItems: 'center', gap: 7,
@@ -225,6 +231,7 @@ export default function WorkoutTracker({ user, profile }) {
         {view === 'plans'   && <PlansView plans={plans} loading={loading} onEdit={openEdit} onDelete={deletePlan} onStart={startWorkout} onNew={() => openEdit()} history={history} />}
         {view === 'create'  && <CreateView editPlan={editPlan} user={user} onSaved={() => { loadPlans(); setView('plans'); setEditPlan(null); }} />}
         {view === 'workout' && <WorkoutView plan={activePlan} user={user} onDone={() => { loadHistory(); setView('history'); }} onBack={() => setView('plans')} />}
+        {view === 'insights' && <InsightsView history={history} plans={plans} />}
         {view === 'history' && <HistoryView history={history} />}
       </div>
     </div>
@@ -809,7 +816,7 @@ function WorkoutView({ plan, user, onDone, onBack }) {
             <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--green)', letterSpacing: '-0.5px' }}>
               {formatDuration(elapsed)}
             </div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Dauer</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('training.duration')}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: completedSets === totalSets && totalSets > 0 ? 'var(--green)' : 'var(--text)' }}>
@@ -971,8 +978,303 @@ function WorkoutView({ plan, user, onDone, onBack }) {
   );
 }
 
+// ── INSIGHTS VIEW ────────────────────────────────────────────────────────────
+function InsightsView({ history, plans }) {
+  const { t } = useI18n();
+
+  // ── Compute Personal Records ─────────────────────────────────
+  const prByExercise = {};   // exerciseId → { maxWeight, maxVolume, count }
+  const muscleHits   = {};   // muscleGroup → count
+  const weeklyData   = {};   // ISO week → sessionCount
+
+  history.forEach(session => {
+    const sets   = session.exercises_done?.sets   || {};
+    const values = session.exercises_done?.values || {};
+
+    // Weekly frequency
+    const d    = new Date(session.date || session.created_at);
+    const week = `${d.getFullYear()}-W${String(Math.ceil((d.getDate() + new Date(d.getFullYear(), d.getMonth(), 1).getDay()) / 7)).padStart(2,'0')}`;
+    weeklyData[week] = (weeklyData[week] || 0) + 1;
+
+    // PR + exercise frequency
+    Object.keys(sets).forEach(key => {
+      const [exIdxStr] = key.split('-');
+      const exIdx = Number(exIdxStr);
+      const exId  = session.exercises_done?.exIds?.[exIdx] || `ex_${exIdx}`;
+      const exName = session.exercises_done?.exNames?.[exIdx] || `Exercise ${exIdx + 1}`;
+
+      if (!prByExercise[exId]) {
+        prByExercise[exId] = { name: exName, maxWeight: 0, maxVolume: 0, count: 0, sessions: 0 };
+      }
+
+      const setIdx = Number(key.split('-')[1]);
+      const weight = Number(values[`${exIdx}-${setIdx}-weight`]) || 0;
+      const reps   = Number(values[`${exIdx}-${setIdx}-reps`])   || 0;
+      const vol    = weight * reps;
+
+      if (sets[key]) { // set completed
+        prByExercise[exId].count++;
+        if (weight > prByExercise[exId].maxWeight) prByExercise[exId].maxWeight = weight;
+        if (vol    > prByExercise[exId].maxVolume)  prByExercise[exId].maxVolume = vol;
+      }
+    });
+
+    // Muscle groups from plans
+    plans.forEach(plan => {
+      plan.days?.forEach(day => {
+        const key = `${session.plan_id}-${session.day_name}`;
+        const sessKey = `${plan.id}-${day.name}`;
+        if (key === sessKey) {
+          day.exercises?.forEach(ex => {
+            const ex_data = window.__buildupExercises?.find?.(e => e.id === ex.exerciseId);
+            const muscle  = ex_data?.muscleGroup || ex.muscleGroup || 'Other';
+            muscleHits[muscle] = (muscleHits[muscle] || 0) + 1;
+          });
+        }
+      });
+    });
+  });
+
+  // Top PRs by max weight
+  const topPRs = Object.entries(prByExercise)
+    .filter(([, v]) => v.maxWeight > 0)
+    .sort(([, a], [, b]) => b.maxWeight - a.maxWeight)
+    .slice(0, 6);
+
+  // Muscle balance
+  const muscleEntries = Object.entries(muscleHits).sort(([,a],[,b]) => b - a);
+  const maxMuscleHits = Math.max(...muscleEntries.map(([,v]) => v), 1);
+
+  // Last 8 weeks frequency
+  const now = new Date();
+  const last8Weeks = Array.from({ length: 8 }, (_, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - (7 * (7 - i)));
+    const week = `${d.getFullYear()}-W${String(Math.ceil((d.getDate() + new Date(d.getFullYear(), d.getMonth(), 1).getDay()) / 7)).padStart(2,'0')}`;
+    return { week, count: weeklyData[week] || 0, label: `W${8 - i}` };
+  });
+  const maxWeekCount = Math.max(...last8Weeks.map(w => w.count), 1);
+
+  // Total stats
+  const totalSessions  = history.length;
+  const totalVolume    = history.reduce((s, h) => s + (h.total_volume || 0), 0);
+  const avgDuration    = totalSessions > 0
+    ? Math.round(history.reduce((s, h) => s + (h.duration_minutes || 0), 0) / totalSessions) : 0;
+  const longestSession = Math.max(...history.map(h => h.duration_minutes || 0), 0);
+  const weeksActive    = Object.keys(weeklyData).length;
+
+  if (totalSessions === 0) return (
+    <div style={{ textAlign: 'center', padding: '64px 24px',
+      background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
+      <TrendingUp size={48} color="var(--green)" strokeWidth={1.3} style={{ marginBottom: 16 }} />
+      <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{t('training.no_insights_yet')}</h3>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>{t('training.no_insights_sub')}</p>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      {/* ── Overview Stats ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+        {[
+          { icon: <Trophy size={16} color="var(--yellow)" />,    label: t('training.total_sessions'),  value: totalSessions,                bg: 'rgba(234,179,8,0.08)',   border: 'rgba(234,179,8,0.2)' },
+          { icon: <Clock size={16} color="var(--blue)" />,       label: t('training.avg_duration'),    value: `${avgDuration} min`,          bg: 'rgba(59,130,246,0.08)',  border: 'rgba(59,130,246,0.2)' },
+          { icon: <Layers size={16} color="var(--green)" />,     label: t('training.total_volume'),    value: `${(totalVolume/1000).toFixed(1)}t`, bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.2)' },
+          { icon: <Calendar size={16} color="var(--purple)" />,  label: t('training.weeks_active'),    value: weeksActive,                   bg: 'rgba(168,85,247,0.08)', border: 'rgba(168,85,247,0.2)' },
+        ].map(s => (
+          <div key={s.label} style={{
+            background: s.bg, border: `1px solid ${s.border}`,
+            borderRadius: 'var(--radius)', padding: '16px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              {s.icon}
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>
+                {s.label}
+              </span>
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)' }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Weekly Frequency ── */}
+      {totalSessions > 1 && (
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-lg)', padding: '20px 20px 16px',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Activity size={14} color="var(--green)" />
+            {t('training.weekly_frequency')}
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 72 }}>
+            {last8Weeks.map((w, i) => {
+              const pct = maxWeekCount > 0 ? w.count / maxWeekCount : 0;
+              const isRecent = i >= 6;
+              return (
+                <div key={w.week} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{ fontSize: 9, color: w.count > 0 ? 'var(--text-muted)' : 'transparent' }}>{w.count}</div>
+                  <div style={{
+                    width: '100%', borderRadius: 4,
+                    background: w.count === 0 ? 'var(--bg-card-2)' : isRecent ? 'var(--green)' : 'rgba(34,197,94,0.35)',
+                    height: `${Math.max(pct * 50, w.count > 0 ? 6 : 4)}px`,
+                    transition: 'height 0.4s ease',
+                    boxShadow: isRecent && w.count > 0 ? '0 0 8px rgba(34,197,94,0.3)' : 'none',
+                  }} />
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>{w.label}</div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)' }}>
+            {t('training.last_8_weeks')}
+          </div>
+        </div>
+      )}
+
+      {/* ── Personal Records ── */}
+      {topPRs.length > 0 && (
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-lg)', padding: '20px',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Award size={14} color="var(--yellow)" />
+            {t('training.personal_records')}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {topPRs.map(([exId, pr], idx) => (
+              <div key={exId} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '10px 14px', borderRadius: 10,
+                background: idx === 0 ? 'rgba(234,179,8,0.06)' : 'var(--bg-card-2)',
+                border: `1px solid ${idx === 0 ? 'rgba(234,179,8,0.2)' : 'var(--border)'}`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: idx === 0 ? 'rgba(234,179,8,0.12)' : 'var(--bg-card)',
+                    border: `1px solid ${idx === 0 ? 'rgba(234,179,8,0.25)' : 'var(--border)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, fontWeight: 700, color: idx === 0 ? 'var(--yellow)' : 'var(--text-muted)',
+                  }}>
+                    {idx === 0 ? '🥇' : idx + 1}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{pr.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                      {pr.count} {t('training.sets_done')}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: idx === 0 ? 'var(--yellow)' : 'var(--text)' }}>
+                    {pr.maxWeight} kg
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('training.max_weight')}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Muscle Balance ── */}
+      {muscleEntries.length > 0 && (
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-lg)', padding: '20px',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Target size={14} color="var(--blue)" />
+            {t('training.muscle_balance')}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+            {t('training.muscle_balance_sub')}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {muscleEntries.slice(0, 6).map(([muscle, count]) => {
+              const pct = count / maxMuscleHits;
+              const colors = {
+                Brust: 'var(--red)', Rücken: 'var(--blue)', Schultern: 'var(--purple)',
+                Beine: 'var(--orange)', Bizeps: 'var(--green)', Trizeps: '#06b6d4',
+                Core: 'var(--yellow)', Chest: 'var(--red)', Back: 'var(--blue)',
+                Shoulders: 'var(--purple)', Legs: 'var(--orange)', Biceps: 'var(--green)',
+              };
+              const color = colors[muscle] || 'var(--text-muted)';
+              return (
+                <div key={muscle}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500 }}>{muscle}</span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{count}×</span>
+                  </div>
+                  <div style={{ height: 5, background: 'var(--bg-card-2)', borderRadius: 3 }}>
+                    <div style={{
+                      height: '100%', borderRadius: 3,
+                      background: color,
+                      width: `${pct * 100}%`,
+                      transition: 'width 0.6s cubic-bezier(0.4,0,0.2,1)',
+                      opacity: 0.8,
+                    }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {muscleEntries.length > 0 && (() => {
+            const trained   = new Set(muscleEntries.map(([m]) => m));
+            const allMuscles = ['Brust','Rücken','Schultern','Beine','Bizeps','Trizeps','Core'];
+            const neglected  = allMuscles.filter(m => !trained.has(m));
+            return neglected.length > 0 ? (
+              <div style={{
+                marginTop: 14, padding: '10px 12px', borderRadius: 9,
+                background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.15)',
+                display: 'flex', alignItems: 'flex-start', gap: 8,
+              }}>
+                <AlertCircle size={13} color="var(--yellow)" style={{ marginTop: 1, flexShrink: 0 }} />
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  <strong style={{ color: 'var(--text)' }}>{t('training.neglected')}: </strong>
+                  {neglected.join(', ')}
+                </div>
+              </div>
+            ) : null;
+          })()}
+        </div>
+      )}
+
+      {/* ── Longest Session ── */}
+      {longestSession > 0 && (
+        <div style={{
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)', padding: '16px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+              background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Timer size={16} color="var(--purple)" />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{t('training.longest_session')}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{t('training.personal_best')}</div>
+            </div>
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--purple)' }}>{longestSession} min</div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+
 // ── HISTORY VIEW ───────────────────────────────────────────────────────────
 function HistoryView({ history }) {
+  const { t } = useI18n();
   // Volumen Chart — letzte 10 Workouts
   const chartData = history.slice(0, 10).reverse();
   const maxVolume = Math.max(...chartData.map(h => h.total_volume || 0), 1);
@@ -984,8 +1286,8 @@ function HistoryView({ history }) {
       borderRadius: 'var(--radius-xl)',
     }}>
       <div style={{ marginBottom: 16 }}><Dumbbell size={48} color="var(--green)" strokeWidth={1.3} /></div>
-      <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Noch kein Workout abgeschlossen</h3>
-      <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Starte deinen ersten Plan!</p>
+      <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{t('training.no_history')}</h3>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>{t('training.no_history_sub')}</p>
     </div>
   );
 
@@ -1000,10 +1302,10 @@ function HistoryView({ history }) {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
-          { label: 'Workouts', value: totalWorkouts, color: 'var(--green)' },
-          { label: 'Gesamt Volumen', value: `${totalVolume.toLocaleString()}kg`, color: 'var(--blue)' },
-          { label: 'Ø Dauer', value: `${avgDuration} min`, color: 'var(--purple)' },
-          { label: 'Bestes Volumen', value: `${bestVolume.toLocaleString()}kg`, color: 'var(--orange)' },
+          { label: t('training.total_sessions'), value: totalWorkouts, color: 'var(--green)' },
+          { label: t('training.total_volume'), value: `${totalVolume.toLocaleString()}kg`, color: 'var(--blue)' },
+          { label: t('training.avg_duration'), value: `${avgDuration} min`, color: 'var(--purple)' },
+          { label: t('training.best_volume'), value: `${bestVolume.toLocaleString()}kg`, color: 'var(--orange)' },
         ].map(s => (
           <div key={s.label} style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -1022,7 +1324,7 @@ function HistoryView({ history }) {
           borderRadius: 'var(--radius-lg)', padding: '20px 24px', marginBottom: 24,
         }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: 'var(--text)' }}>
-            Volumen-Verlauf (letzte {chartData.length} Workouts)
+            {t('training.volume_trend')} ({chartData.length})
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 100 }}>
             {chartData.map((h, i) => {
@@ -1054,7 +1356,6 @@ function HistoryView({ history }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {history.map((h, i) => (
           <div key={h.id} style={{
-            display: 'flex', alignItems: 'center', gap: 16,
             background: 'var(--bg-card)', border: '1px solid var(--border)',
             borderRadius: 'var(--radius-lg)', padding: '16px 20px',
             transition: 'var(--transition)',
@@ -1062,31 +1363,48 @@ function HistoryView({ history }) {
           onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
           onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
           >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                background: i === 0 ? 'var(--green-glow)' : 'var(--bg-card-2)',
+                border: `1px solid ${i === 0 ? 'var(--border-active)' : 'var(--border)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {i === 0 ? <Trophy size={15} color="var(--yellow)" /> : <Dumbbell size={15} color="var(--text-muted)" />}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {h.plan_name}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>
+                  {h.day_name} · {formatDate(h.date || h.created_at)}
+                </div>
+              </div>
+              {i === 0 && (
+                <span style={{
+                  fontSize: 10, fontWeight: 700, color: 'var(--green)',
+                  background: 'var(--green-glow)', border: '1px solid var(--border-active)',
+                  padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap', flexShrink: 0,
+                }}>
+                  {t('training.latest')}
+                </span>
+              )}
+            </div>
             <div style={{
-              width: 40, height: 40, borderRadius: 11, flexShrink: 0,
-              background: i === 0 ? 'var(--green-glow)' : 'var(--bg-card-2)',
-              border: `1px solid ${i === 0 ? 'var(--border-active)' : 'var(--border)'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 18,
+              display: 'flex', gap: 16, marginTop: 12, paddingTop: 12,
+              borderTop: '1px solid var(--border)',
             }}>
-              {i === 0 ? <Trophy size={14} color='var(--yellow)' /> : <Dumbbell size={14} color='var(--green)' />}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>
-                {h.plan_name} — {h.day_name}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Clock size={12} color="var(--text-muted)" />
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>
+                  {h.duration_minutes || '—'} min
+                </span>
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                {formatDate(h.date)}
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 20 }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--green)' }}>{h.duration_minutes} min</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Dauer</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--blue)' }}>{h.total_volume?.toLocaleString()} kg</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Volumen</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Layers size={12} color="var(--text-muted)" />
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--blue)' }}>
+                  {h.total_volume ? `${h.total_volume.toLocaleString()}kg` : '—'}
+                </span>
               </div>
             </div>
           </div>

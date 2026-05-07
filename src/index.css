@@ -1033,3 +1033,13 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   90%  { opacity: 0.7; }
   100% { top: 8%;  opacity: 0;   }
 }
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes splashDot {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
