@@ -1,6 +1,5 @@
 ﻿import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "../i18n.jsx";
-import { useToast, Toast } from "./useToast.jsx";
 import {
   Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine, Clock, Star
 } from "lucide-react";
@@ -53,7 +52,6 @@ function saveRecentFood(food) {
 
 export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog, setDailyLog }) {
   const { t } = useI18n();
-  const { toast, show: showToast } = useToast();
   const [search, setSearch]               = useState("");
   const [filterCat, setFilterCat]         = useState(t('nutrition.categories.all'));
   const [selectedFood, setSelectedFood]   = useState(null);
@@ -124,7 +122,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
       fat:      Math.round(food.fat      * (foodOverride ? 1 : q)),
     };
     setDailyLog(log => [...log, entry]);
-    showToast(t('toast.meal_added'), 'success');
+   
 
     // P5: Update recent foods
     saveRecentFood(food);
@@ -137,7 +135,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
     if (!foodOverride) { setSelectedFood(null); setQty("1"); }
   };
 
-  const removeEntry = (id) => { setDailyLog(log => log.filter(i => i.id !== id)); showToast(t('toast.meal_removed'), 'info'); };
+  const removeEntry = (id) => { setDailyLog(log => log.filter(i => i.id !== id)); };
 
   const saveManualGoal = () => {
     const g = parseInt(manualGoal);
@@ -531,11 +529,10 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
       {showScanner && (
         <BarcodeScanner
-          onAddFood={(food) => { setDailyLog(log => [...log, food]); setShowScanner(false); showToast(t('toast.meal_added'), 'success'); }}
+          onAddFood={(food) => { setDailyLog(log => [...log, food]); setShowScanner(false); }}
           onClose={() => setShowScanner(false)}
         />
       )}
-      <Toast toast={toast} />
     </div>
   );
 }
