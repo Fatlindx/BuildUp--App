@@ -83,7 +83,7 @@ export default function Auth({ onLogin }) {
             username: username.trim(),
           });
         }
-        setSuccess('Bestätigungsmail gesendet! Prüfe dein Postfach und klicke auf den Bestätigungslink.');
+        setSuccess(t('auth.confirm_sent'));
         setMode('login');
 
       } else if (mode === 'forgot') {

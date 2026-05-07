@@ -743,11 +743,11 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           <div style={{ flex: 1 }}>
             {/* P8: Streak Milestone Messages */}
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
-              {streak >= 30 ? 'Legendärer Status' :
-               streak >= 14 ? 'Elite-Level erreicht' :
-               streak >= 7  ? 'Aussergewöhnlich' :
-               streak >= 3  ? 'Starke Konstanz' :
-               streak === 1  ? 'Erster Schritt' :
+              {streak >= 30 ? t('progress.streak_legendary') :
+               streak >= 14 ? t('progress.streak_elite') :
+               streak >= 7  ? t('home.streak_great') :
+               streak >= 3  ? t('progress.streak_consistent') :
+               streak === 1  ? t('progress.streak_first') :
                t('progress.stay_on_track')}
             </div>
             <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
