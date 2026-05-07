@@ -513,6 +513,15 @@ export const es = {
     err_username_short: 'El nombre de usuario debe tener al menos 3 caracteres.',
   },
 
+  toast: {
+    meal_added: '✓ Comida añadida',
+    meal_removed: 'Eliminado',
+    water_added: '💧 Agua registrada',
+    weight_saved: '✓ Peso guardado',
+    workout_saved: '✓ Entrenamiento guardado',
+    goal_saved: '✓ Objetivo actualizado',
+    profile_saved: '✓ Perfil guardado',
+  },
   common: {
     loading:   'Cargando…',
     save:      'Guardar',

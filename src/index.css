@@ -335,8 +335,36 @@ img { max-width: 100%; }
 .log-delete { color: var(--text-muted); padding: 4px; border-radius: 6px; transition: all var(--dur-base) var(--ease); font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .log-delete:hover { background: rgba(239,68,68,0.1); color: #f87171; }
 .log-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--green-glow); border-radius: 10px; border: 1px solid var(--border-active); font-weight: 700; margin-top: 4px; font-size: 14px; }
-.empty-state { text-align: center; padding: 36px 20px; color: var(--text-muted); }
-.empty-state .empty-icon { font-size: 38px; margin-bottom: 12px; }
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+  animation: fadeIn 0.4s ease both;
+}
+.empty-state h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+.empty-state p, .empty-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 220px;
+  margin: 0 auto;
+}
+.empty-state .empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: var(--bg-card-2);
+  border: 1px solid var(--border);
+  margin: 0 auto 16px;
+}
 .empty-state p { font-size: 14px; line-height: 1.6; }
 .empty-state .empty-hint { font-size: 12.5px; margin-top: 6px; }
 .water-tracker { display: flex; flex-direction: column; gap: 14px; }
@@ -1042,4 +1070,190 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 @keyframes splashDot {
   0%, 100% { opacity: 0.3; transform: scale(0.8); }
   50%       { opacity: 1;   transform: scale(1.2); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM POLISH — Mikrointeraktionen & Success States
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Success Toast ───────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 9000;
+  background: var(--bg-elevated, #1a1a1a);
+  border: 1px solid var(--border-active);
+  border-radius: 100px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(34,197,94,0.1);
+  animation: toastIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
+  pointer-events: none;
+}
+
+.toast.toast-success { border-color: var(--border-active); color: var(--green); }
+.toast.toast-error   { border-color: rgba(239,68,68,0.3); color: var(--red); }
+.toast.toast-info    { border-color: rgba(59,130,246,0.3); color: var(--blue); }
+.toast.toast-hide    { animation: toastOut 0.25s ease both; }
+
+.toast-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: currentColor;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); }
+  to   { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+}
+
+/* Desktop toast positioning */
+@media (min-width: 768px) {
+  .toast {
+    bottom: 32px;
+  }
+}
+
+/* ── Card Tap Scale (Mobile) ─────────────────────────────────── */
+.quick-action-card:active,
+.progress-card-clickable:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
+/* ── Button Active States ────────────────────────────────────── */
+.btn:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease !important;
+}
+
+.btn-ghost:active {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+/* ── Input Focus Premium ─────────────────────────────────────── */
+.form-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ── Modal Premium Entrance ──────────────────────────────────── */
+.modal-overlay {
+  animation: modalOverlayIn 0.2s ease both;
+}
+.modal-content, [class*="modal"] > div {
+  animation: modalContentIn 0.25s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes modalOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modalContentIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Skeleton Improvements ───────────────────────────────────── */
+.skeleton-line {
+  height: 14px;
+  border-radius: 7px;
+  margin-bottom: 8px;
+}
+.skeleton-line-sm  { height: 10px; border-radius: 5px; width: 60%; }
+.skeleton-line-lg  { height: 20px; border-radius: 10px; }
+.skeleton-circle   { border-radius: 50%; }
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+/* ── Tab Switch Animation ────────────────────────────────────── */
+.tab-content-enter {
+  animation: tabFadeIn 0.2s ease both;
+}
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Progress Bar Animation ──────────────────────────────────── */
+.progress-fill {
+  transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ── Nav Bottom Active Indicator ────────────────────────────── */
+.nav-item-active-dot {
+  transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ── Chart Bar Animation ─────────────────────────────────────── */
+.chart-bar {
+  transform-origin: bottom;
+  animation: barGrow 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+.chart-bar:nth-child(1) { animation-delay: 0.05s; }
+.chart-bar:nth-child(2) { animation-delay: 0.10s; }
+.chart-bar:nth-child(3) { animation-delay: 0.15s; }
+.chart-bar:nth-child(4) { animation-delay: 0.20s; }
+.chart-bar:nth-child(5) { animation-delay: 0.25s; }
+.chart-bar:nth-child(6) { animation-delay: 0.30s; }
+.chart-bar:nth-child(7) { animation-delay: 0.35s; }
+
+/* ── Scroll Feel ─────────────────────────────────────────────── */
+.page, [class*="section"], main {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Success Pulse ───────────────────────────────────────────── */
+@keyframes successPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+  70%  { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+.success-pulse {
+  animation: successPulse 0.6s ease both;
+}
+
+/* ── Hover Lift Effect on Cards ─────────────────────────────── */
+@media (hover: hover) {
+  .quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s ease;
+  }
+
+  .progress-card:hover {
+    border-color: var(--border-hover);
+    transition: border-color 0.2s ease;
+  }
+}
+
+/* ── Water Tracker Button Ripple ─────────────────────────────── */
+.water-btn:active {
+  transform: scale(0.93);
+  transition: transform 0.1s ease;
 }

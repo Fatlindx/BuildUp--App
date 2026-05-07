@@ -529,6 +529,15 @@ export const de = {
     err_username_short: 'Der Benutzername muss mindestens 3 Zeichen lang sein.',
   },
 
+  toast: {
+    meal_added: '✓ Mahlzeit hinzugefügt',
+    meal_removed: 'Entfernt',
+    water_added: '💧 Wasser gespeichert',
+    weight_saved: '✓ Gewicht gespeichert',
+    workout_saved: '✓ Workout gespeichert',
+    goal_saved: '✓ Ziel aktualisiert',
+    profile_saved: '✓ Profil gespeichert',
+  },
   common: {
     loading:   'Lädt…',
     save:      'Speichern',
