@@ -279,7 +279,13 @@ export default function Navigation({
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.06)'}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                <LogOut size={16} color="var(--red)" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+                <div style={{
+                  width: 32, height: 32, borderRadius: 9, flexShrink: 0,
+                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <LogOut size={14} color="var(--red)" strokeWidth={1.8} />
+                </div>
                 <span style={{ fontSize: 14, color: 'var(--red)', fontWeight: 500 }}>
                   {t('nav.logout')}
                 </span>
