@@ -36,7 +36,7 @@ const TEMPLATES = [
   },
   {
     name: 'Upper / Lower',
-    description: t('training.template_split_desc'),
+    description: 'training.template_split_desc',
     days: [
       { id: 'u1', name: 'Upper A', exercises: [
         { exerciseId: 'bench-press', sets: 4, reps: 8, weight: 60 },
@@ -52,7 +52,7 @@ const TEMPLATES = [
   },
   {
     name: 'Ganzkörper',
-    description: t('training.template_fullbody_desc'),
+    description: 'training.template_fullbody_desc',
     days: [
       { id: 'g1', name: 'Ganzkörper A', exercises: [
         { exerciseId: 'squat', sets: 3, reps: 10, weight: 50 },
@@ -314,7 +314,7 @@ function PlansView({ plans, loading, onEdit, onDelete, onStart, onNew, history }
                   <div style={{ marginBottom: 14 }}>
                     <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 4, letterSpacing: '-0.3px' }}>{plan.name}</h3>
                     {plan.description && (
-                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{plan.description}</p>
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{plan.description?.startsWith('training.') ? t(plan.description) : plan.description}</p>
                     )}
                   </div>
 
@@ -386,7 +386,7 @@ function TemplatesSection({ onUseTemplate }) {
           onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
           >
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{tpl.name}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{tpl.description}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{t(tpl.description)}</div>
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 14 }}>
               {tpl.days.map((d, j) => (
                 <span key={j} style={{
