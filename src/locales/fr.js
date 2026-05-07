@@ -11,6 +11,9 @@ export const fr = {
     logout:     'Déconnexion',
     coach:      'Coach',
     profile:    'Profil',
+    help:     'Aide',
+    privacy:     'Confidentialité',
+    settings:     'Paramètres',
   },
 
   home: {

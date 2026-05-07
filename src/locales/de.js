@@ -12,6 +12,9 @@ export const de = {
     logout:     'Logout',
     coach:      'Coach',
     profile:    'Profil',
+    help:     'Hilfe',
+    privacy:     'Datenschutz',
+    settings:     'Einstellungen',
   },
 
   // Home

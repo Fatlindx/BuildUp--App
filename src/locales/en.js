@@ -11,6 +11,9 @@ export const en = {
     logout:     'Logout',
     coach:      'Coach',
     profile:    'Profile',
+    help:     'Help',
+    privacy:     'Privacy',
+    settings:     'Settings',
   },
 
   home: {
