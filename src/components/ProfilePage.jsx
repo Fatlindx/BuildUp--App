@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useI18n, translateGoal, LANG_LABELS } from '../i18n.jsx';
-import { useToast, Toast } from './useToast.jsx';
 import {
   User, Mail, Calendar, Target, Edit3, Save, X, Dumbbell, TrendingUp, Scale
 } from 'lucide-react';
@@ -9,7 +8,6 @@ import {
 
 export default function ProfilePage({ user, profile, onUpdateProfile }) {
   const { t, lang, setLang } = useI18n();
-  const { toast, show: showToast } = useToast();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     username:  profile?.username  || '',
@@ -35,7 +33,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
   const handleSave = async () => {
     if (onUpdateProfile) await onUpdateProfile(form);
     setEditing(false);
-    showToast(t('toast.profile_saved'), 'success');
+   
    
   };
 
@@ -234,7 +232,6 @@ function Field({ label, icon: Icon, children }) {
         </span>
       </div>
       {children}
-      <Toast toast={toast} />
     </div>
   );
 }

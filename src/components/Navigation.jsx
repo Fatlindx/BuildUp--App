@@ -14,7 +14,6 @@ export default function Navigation({
   onOpenCoach, onLogout,
 }) {
   const { t, lang, setLang } = useI18n();
-  const { toast, show: showToast } = useToast();
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isMobile,     setIsMobile]     = useState(window.innerWidth < 768);
@@ -70,7 +69,7 @@ export default function Navigation({
 
   const handleLangChange = (newLang) => {
     setLang(newLang);
-    showToast(t('toast.lang_changed'), 'info', 1600);
+   
   };
 
   const displayName = profile?.username || profile?.full_name?.split(' ')[0] || 'User';
@@ -514,7 +513,6 @@ export default function Navigation({
           })}
         </nav>
       )}
-      <Toast toast={toast} />
     </>
   );
 }

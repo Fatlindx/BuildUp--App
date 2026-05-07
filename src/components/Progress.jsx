@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
-import { useToast, Toast } from './useToast.jsx';
 import { supabase } from '../supabase';
 import {
   UtensilsCrossed, Target, Dumbbell, ClipboardList, Flame, Star, Trophy, Rocket, Lock, TrendingUp, Scale, Plus, ChevronUp, Check, Zap, AlertCircle, CheckCircle2, Activity, Minus, Award, Crown
@@ -82,7 +81,6 @@ function GradientProgressBar({ value, max, height = 10 }) {
 
 export default function Progress({ calorieGoal, dailyLog, logHistory, user, profile }) {
   const { t } = useI18n();
-  const { toast, show: showToast } = useToast();
   const [weightLog, setWeightLog]             = useState([]);
   const [weightInput, setWeightInput]         = useState('');
   const [showWeightInput, setShowWeightInput] = useState(false);
@@ -138,14 +136,14 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
         { user_id: user.id, date: today, weight: val }, { onConflict: 'user_id,date' }
       ).select().single();
       if (!error && data) {
-        showToast(t('toast.weight_saved'), 'success');
+       
       setWeightLog(prev => {
           const filtered = prev.filter(w => w.date !== today);
           return [data, ...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
         });
       }
     } catch (err) {
-      showToast(t('toast.save_error'), 'error');
+     
       console.error('Save weight error:', err);
     } finally {
       setWeightInput(''); setShowWeightInput(false); setSavingWeight(false);
@@ -821,7 +819,6 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
           100% { transform: translateX(200%); }
         }
       `}</style>
-      <Toast toast={toast} />
     </div>
   );
 }

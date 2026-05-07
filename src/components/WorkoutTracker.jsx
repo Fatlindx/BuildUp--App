@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
-import { useToast, Toast } from './useToast.jsx';
 import {
   Plus, Trash2, Play, Check, Clock, Dumbbell, BarChart2, Edit2, X, Search, Trophy, ArrowLeft, Timer, ClipboardList, ChevronUp, ChevronDown, TrendingUp, Star,
   Award,
@@ -702,7 +701,6 @@ function CreateView({ editPlan, user, onSaved }) {
 // ── WORKOUT VIEW ───────────────────────────────────────────────────────────
 function WorkoutView({ plan, user, onDone, onBack }) {
   const { t } = useI18n();
-  const { toast, show: showToast } = useToast();
   const days = plan?.plan_data?.days || [];
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [setsDone, setSetsDone]   = useState({});
@@ -977,7 +975,6 @@ function WorkoutView({ plan, user, onDone, onBack }) {
       {pauseTimer && (
         <PauseTimer key={pauseTimer} duration={pauseDuration} onDone={() => setPauseTimer(null)} />
       )}
-      <Toast toast={toast} />
     </div>
   );
 }

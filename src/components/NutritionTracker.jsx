@@ -1,6 +1,5 @@
 ﻿import { useState, useMemo, useEffect } from "react";
 import { useI18n } from "../i18n.jsx";
-import { useToast, Toast } from "./useToast.jsx";
 import {
   Search, X, Plus, Trash2, Droplets, Lightbulb, Target, Leaf, ScanLine, Clock, Star
 } from "lucide-react";
@@ -53,7 +52,6 @@ function saveRecentFood(food) {
 
 export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog, setDailyLog }) {
   const { t } = useI18n();
-  const { toast, show: showToast } = useToast();
   const [search, setSearch]               = useState("");
   const [filterCat, setFilterCat]         = useState(t('nutrition.categories.all'));
   const [selectedFood, setSelectedFood]   = useState(null);
@@ -531,11 +529,10 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
       {showScanner && (
         <BarcodeScanner
-          onAddFood={(food) => { setDailyLog(log => [...log, food]); setShowScanner(false); showToast(t('toast.meal_added'), 'success'); }}
+          onAddFood={(food) => { setDailyLog(log => [...log, food]); setShowScanner(false); }}
           onClose={() => setShowScanner(false)}
         />
       )}
-      <Toast toast={toast} />
     </div>
   );
 }
