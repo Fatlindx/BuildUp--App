@@ -967,17 +967,40 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
 
   useEffect(() => {
     isMounted.current = true;
-    // FIX 2: Lock body scroll while scanner is open
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
+    // FIX 2: Robust scroll lock — targets html (actual scroll container)
+    const scrollY = window.scrollY;
+    const html    = document.documentElement;
+    const body    = document.body;
+
+    // Save original styles
+    const origHtmlOverflow   = html.style.overflow;
+    const origHtmlHeight     = html.style.height;
+    const origBodyOverflow   = body.style.overflow;
+    const origBodyPosition   = body.style.position;
+    const origBodyTop        = body.style.top;
+    const origBodyWidth      = body.style.width;
+
+    // Lock html + body (covers all browsers incl. iOS Safari)
+    html.style.overflow  = 'hidden';
+    html.style.height    = '100%';
+    body.style.overflow  = 'hidden';
+    body.style.position  = 'fixed';
+    body.style.top       = `-${scrollY}px`;
+    body.style.width     = '100%';
 
     startScanner();
 
     return () => {
       isMounted.current = false;
-      // FIX 2: Restore scroll on unmount
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
+      // FIX 2: Restore scroll state precisely
+      html.style.overflow  = origHtmlOverflow;
+      html.style.height    = origHtmlHeight;
+      body.style.overflow  = origBodyOverflow;
+      body.style.position  = origBodyPosition;
+      body.style.top       = origBodyTop;
+      body.style.width     = origBodyWidth;
+      // Restore scroll position (iOS fix)
+      window.scrollTo(0, scrollY);
       // FIX 1: Clean stop on unmount — only if still running
       const sc = scannerRef.current;
       if (sc) {
@@ -1086,7 +1109,7 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} onTouchMove={e => e.preventDefault()} style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       <div className="modal" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
 
         {/* Header */}
