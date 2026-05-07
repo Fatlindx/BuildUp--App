@@ -270,7 +270,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                                   cursor: 'pointer', color: 'var(--green)',
                                   transition: 'all 0.15s ease',
                                 }}
-                                title="Direkt hinzufügen"
+                                {...{title: t("common.add")}}
                               >
                                 <Plus size={14} />
                               </button>
@@ -408,7 +408,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 Tagesprotokoll
                 {(dailyLog || []).length > 0 && (
                   <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--text-muted)", fontWeight: 400 }}>
-                    {(dailyLog || []).length} {(dailyLog || []).length === 1 ? "Eintrag" : "Einträge"}
+                    {(dailyLog || []).length} {t('nutrition.daily_log')}
                   </span>
                 )}
               </h3>
@@ -520,7 +520,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
 
             <div className="tip-box" style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
               <Lightbulb size={16} color="var(--green)" style={{ flexShrink: 0, marginTop: 2 }} />
-              <span>Trinke täglich 2–3 Liter Wasser für optimale Leistung und Fettstoffwechsel.</span>
+              <span>{t('water.tip')}</span>
             </div>
           </div>
         </div>

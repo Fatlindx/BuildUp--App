@@ -5,40 +5,40 @@ import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
 
 // ── Dynamische Motivations-Texte ──
-function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour) {
+function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour, t) {
   if (pct >= 100) return {
-    title: 'Tagesziel erreicht.',
-    subtitle: 'Starke Leistung heute. Bleib auf Kurs.',
+    title: t('home.status_goal_reached'),
+    subtitle: t('home.status_sub_goal_reached'),
     color: '#22c55e',
     iconName: 'CheckCircle2',
   };
   if (pct >= 85) return {
-    title: 'Fast am Ziel.',
-    subtitle: `Noch ${(calorieGoal - totalCalories).toLocaleString()} kcal verbleibend.`,
+    title: t('home.status_great'),
+    subtitle: t('home.status_sub_great'),
     color: 'var(--green-bright)',
     iconName: 'TrendingUp',
   };
   if (pct >= 50) return {
-    title: 'Auf Kurs.',
-    subtitle: 'Du machst heute gute Fortschritte.',
+    title: t('home.status_halfway'),
+    subtitle: t('home.status_sub_halfway'),
     color: 'var(--blue-light)',
     iconName: 'Activity',
   };
   if (hour < 10 && (dailyLog || []).length === 0) return {
-    title: 'Guten Morgen.',
-    subtitle: 'Starte deinen Tag mit einer guten Mahlzeit.',
+    title: t('home.greeting_morning') + '.',
+    subtitle: t('home.status_sub_nothing'),
     color: 'var(--orange)',
     iconName: 'Sunrise',
   };
   if (hour >= 18 && pct < 30) return {
-    title: 'Heute noch nachholen.',
-    subtitle: 'Du hast heute wenig gegessen.',
+    title: t('home.status_start'),
+    subtitle: t('home.status_sub_start'),
     color: 'var(--orange)',
     iconName: 'Clock',
   };
   return {
-    title: 'Bereit für heute?',
-    subtitle: 'Verfolge deine Ernährung und erreiche deine Ziele.',
+    title: t('home.status_nothing_yet'),
+    subtitle: t('home.status_sub_nothing'),
     color: 'var(--text)',
     iconName: null,
   };
@@ -145,7 +145,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
 
   const quotes = motivationQuotes(t);
   const quote = quotes[new Date().getDate() % quotes.length];
-  const status = getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour);
+  const status = getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour, t);
 
   const circumference = 2 * Math.PI * 54;
   const dash = circumference - (pct / 100) * circumference;
@@ -430,17 +430,17 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             <div className="mini-stat-card" onClick={() => setActiveSection('exercises')}>
               <div className="mini-stat-icon"><Dumbbell size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
               <div className="mini-stat-value">71</div>
-              <div className="mini-stat-label">Übungen verfügbar</div>
+              <div className="mini-stat-label">{t('home.exercises_available')}</div>
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('progress')}>
               <div className="mini-stat-icon"><BarChart2 size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
               <div className="mini-stat-value">{calorieGoal > 0 ? <CheckCircle2 size={16} color="var(--green)" strokeWidth={2} /> : <span style={{color:"var(--text-muted)"}}>—</span>}</div>
-              <div className="mini-stat-label">Ziel gesetzt</div>
+              <div className="mini-stat-label">{t('home.goal_set')}</div>
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('calculator')}>
               <div className="mini-stat-icon"><Flame size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
               <div className="mini-stat-value">{calorieGoal.toLocaleString()}</div>
-              <div className="mini-stat-label">kcal Tagesziel</div>
+              <div className="mini-stat-label">{t('home.kcal_goal')}</div>
             </div>
           </div>
         </div>
@@ -453,28 +453,28 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
               <div className="qa-icon" style={{ background: 'rgba(34,197,94,0.15)' }}>
                 <Plus size={22} color="var(--green)" />
               </div>
-              <div className="qa-label">Mahlzeit hinzufügen</div>
+              <div className="qa-label">{t('home.add_meal')}</div>
               <div className="qa-sub">{t('home.add_meal_sub')}</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('exercises')}>
               <div className="qa-icon" style={{ background: 'rgba(59,130,246,0.15)' }}>
                 <Dumbbell size={22} color="var(--blue)" />
               </div>
-              <div className="qa-label">Übungen entdecken</div>
+              <div className="qa-label">{t('home.discover_exercises')}</div>
               <div className="qa-sub">71 Übungen</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('calculator')}>
               <div className="qa-icon" style={{ background: 'rgba(239,68,68,0.15)' }}>
                 <Calculator size={22} color="var(--red)" />
               </div>
-              <div className="qa-label">Kalorienbedarf</div>
+              <div className="qa-label">{t('home.calorie_calc')}</div>
               <div className="qa-sub">Mifflin-St Jeor</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('progress')}>
               <div className="qa-icon" style={{ background: 'rgba(234,179,8,0.15)' }}>
                 <BarChart2 size={22} color="var(--yellow)" />
               </div>
-              <div className="qa-label">Fortschritt ansehen</div>
+              <div className="qa-label">{t('home.view_progress')}</div>
               <div className="qa-sub">Statistiken & Ziele</div>
             </button>
           </div>

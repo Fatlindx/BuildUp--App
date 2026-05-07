@@ -484,7 +484,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
                   <div style={{ fontSize: 22, fontWeight: 800, color: parseFloat(weightDiff) < 0 ? 'var(--green)' : parseFloat(weightDiff) > 0 ? 'var(--orange)' : 'var(--text)' }}>
                     {parseFloat(weightDiff) > 0 ? '+' : ''}{weightDiff}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>kg Veränderung</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{t('common.kg')} {t('progress.remaining')}</div>
                 </div>
               )}
               {bmi && (

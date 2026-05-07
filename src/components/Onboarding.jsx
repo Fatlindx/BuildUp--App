@@ -45,10 +45,10 @@ export default function Onboarding({ user, onComplete }) {
   const { t, lang } = useI18n();
 
   const goals = [
-    { id: 'Muskelaufbau',        label: 'Muskelaufbau',        desc: 'Muskelmasse aufbauen & stärker werden' },
-    { id: 'Gewicht verlieren',   label: 'Gewicht verlieren',   desc: 'Körperfett reduzieren & schlanker werden' },
-    { id: 'Fit bleiben',         label: 'Fit bleiben',         desc: 'Gesund & aktiv im Alltag' },
-    { id: 'Ausdauer verbessern', label: 'Ausdauer verbessern', desc: 'Cardio & Durchhaltevermögen steigern' },
+    { id: 'Muskelaufbau',        label: t('onboarding.goal_muscle'),      desc: t('onboarding.goal_muscle_desc') },
+    { id: 'Gewicht verlieren',   label: t('onboarding.goal_lose'),        desc: t('onboarding.goal_lose_desc') },
+    { id: 'Fit bleiben',         label: t('onboarding.goal_fit'),         desc: t('onboarding.goal_fit_desc') },
+    { id: 'Ausdauer verbessern', label: t('onboarding.goal_endurance'),   desc: t('onboarding.goal_endurance_desc') },
   ];
 
   const activityLevels = [

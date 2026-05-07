@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useI18n, LANG_LABELS } from '../i18n.jsx';
+import { useI18n, LANG_LABELS, translateGoal } from '../i18n.jsx';
 import {
   Home, UtensilsCrossed, Flame, Dumbbell, BarChart2,
   ClipboardList, Bot, ChevronLeft, LogOut,
@@ -230,55 +230,14 @@ export default function Navigation({
                 ))}
               </div>
 
-              <div style={{ height: 1, background: 'var(--border)', margin: '8px 20px' }} />
-
-              {/* Personal Data Section */}
-              <div style={{ padding: '8px 20px 6px' }}>
-                <div style={{
-                  fontSize: 10, fontWeight: 700, color: 'var(--text-muted)',
-                  textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8,
-                }}>
-                  {t('profile.title')}
-                </div>
-                {[
-                  { icon: Target, label: t('profile.goal_label'), value: profile?.goal || '—' },
-                  { icon: Scale,  label: t('profile.weight'),     value: profile?.weight ? `${profile.weight} kg` : '—' },
-                  { icon: Ruler,  label: t('profile.height'),     value: profile?.height ? `${profile.height} cm` : '—' },
-                ].map(item => (
-                  <div key={item.label} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '9px 12px', borderRadius: 9, marginBottom: 4,
-                    background: 'var(--bg-card-2)', border: '1px solid var(--border)',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <item.icon size={13} color="var(--text-muted)" strokeWidth={1.8} />
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.label}</span>
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
-                      {item.value}
-                    </span>
-                  </div>
-                ))}
-                <button onClick={() => handleNav('profile')} style={{
-                  width: '100%', padding: '9px 12px', borderRadius: 9,
-                  background: 'none', border: '1px dashed var(--border)',
-                  color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer',
-                  marginTop: 2, transition: 'all 0.15s ease',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green)'; e.currentTarget.style.color = 'var(--green)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}>
-                  {t('profile.edit')} →
-                </button>
-              </div>
             </div>
           </div>
         ) : (
           /* Main Menu Items */
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '8px 0' }}>
             {[
-              { icon: User,     label: t('profile.title'),      action: () => handleNav('profile') },
-              { icon: Settings, label: t('nav.settings'),       action: () => setSettingsOpen(true), hasArrow: true },
-              { icon: Shield,   label: t('nav.privacy'),        action: () => {} },
+              { icon: Settings,   label: t('nav.settings'),     action: () => setSettingsOpen(true), hasArrow: true },
+              { icon: Shield,     label: t('nav.privacy'),      action: () => {} },
               { icon: HelpCircle, label: t('nav.help'),         action: () => {} },
             ].map((item) => (
               <button key={item.label} onClick={item.action} style={{
@@ -318,16 +277,10 @@ export default function Navigation({
                 cursor: 'pointer', textAlign: 'left',
                 transition: 'background 0.15s ease',
               }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.06)'}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 9,
-                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <LogOut size={14} color="var(--red)" strokeWidth={1.8} />
-                </div>
-                <span style={{ fontSize: 14, color: 'var(--red)', fontWeight: 400 }}>
+                <LogOut size={16} color="var(--red)" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: 14, color: 'var(--red)', fontWeight: 500 }}>
                   {t('nav.logout')}
                 </span>
               </button>

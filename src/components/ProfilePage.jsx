@@ -151,7 +151,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
             )}
           </Field>
 
-          <Field label="Vollständiger Name" icon={User}>
+          <Field label={t('profile.full_name')} icon={User}>
             {editing ? (
               <input value={form.full_name}
                 onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
@@ -183,7 +183,7 @@ export default function ProfilePage({ user, profile, onUpdateProfile }) {
             )}
           </Field>
 
-          <Field label="Größe (cm)" icon={TrendingUp}>
+          <Field label={t('profile.height')} icon={TrendingUp}>
             {editing ? (
               <input type="number" value={form.height}
                 onChange={e => setForm(f => ({ ...f, height: e.target.value }))}

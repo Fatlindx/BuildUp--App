@@ -68,14 +68,14 @@ export const LANG_LABELS = {
 // DB-Werte bleiben stabil, nur Anzeige wird übersetzt
 
 export const GOAL_KEYS = {
-  muscle:            { de: 'Muskelaufbau',      en: 'Muscle Gain',         fr: 'Prise de muscle',      es: 'Ganancia muscular' },
-  Muskelaufbau:      { de: 'Muskelaufbau',      en: 'Muscle Gain',         fr: 'Prise de muscle',      es: 'Ganancia muscular' },
-  lose_weight:       { de: 'Gewicht verlieren', en: 'Weight Loss',         fr: 'Perte de poids',       es: 'Pérdida de peso' },
-  'Gewicht verlieren':{ de: 'Gewicht verlieren',en: 'Weight Loss',         fr: 'Perte de poids',       es: 'Pérdida de peso' },
-  fit:               { de: 'Fit bleiben',       en: 'Stay Fit',            fr: 'Rester en forme',      es: 'Mantenerse en forma' },
-  'Fit bleiben':     { de: 'Fit bleiben',       en: 'Stay Fit',            fr: 'Rester en forme',      es: 'Mantenerse en forma' },
-  endurance:         { de: 'Ausdauer',          en: 'Endurance',           fr: 'Endurance',            es: 'Resistencia' },
-  'Ausdauer verbessern':{ de: 'Ausdauer',       en: 'Endurance',           fr: 'Endurance',            es: 'Resistencia' },
+  muscle:               { de: 'Muskelaufbau',      en: 'Build Muscle',   fr: 'Prise de muscle',  es: 'Ganar músculo' },
+  Muskelaufbau:         { de: 'Muskelaufbau',      en: 'Build Muscle',   fr: 'Prise de muscle',  es: 'Ganar músculo' },
+  lose_weight:          { de: 'Gewicht verlieren', en: 'Lose Weight',    fr: 'Perdre du poids',  es: 'Perder peso' },
+  'Gewicht verlieren':  { de: 'Gewicht verlieren', en: 'Lose Weight',    fr: 'Perdre du poids',  es: 'Perder peso' },
+  fit:                  { de: 'Fit bleiben',       en: 'Stay Fit',       fr: 'Rester en forme',  es: 'Mantenerse en forma' },
+  'Fit bleiben':        { de: 'Fit bleiben',       en: 'Stay Fit',       fr: 'Rester en forme',  es: 'Mantenerse en forma' },
+  endurance:            { de: 'Ausdauer',          en: 'Endurance',      fr: 'Endurance',        es: 'Resistencia' },
+  'Ausdauer verbessern':{ de: 'Ausdauer',          en: 'Endurance',      fr: 'Endurance',        es: 'Resistencia' },
 };
 
 export function translateGoal(goalKey, lang = DEFAULT_LANG) {
