@@ -465,7 +465,7 @@ export default function NutritionTracker({ calorieGoal, setCalorieGoal, dailyLog
                 <>
                   <div className="calories-ring">
                     <div className="ring-value">{totals.calories.toLocaleString()}</div>
-                    <div className="ring-label">von {calorieGoal.toLocaleString()} kcal</div>
+                    <div className="ring-label">{t('common.of')} {calorieGoal.toLocaleString()} kcal</div>
                     <div className="ring-remaining" style={{ color: remaining >= 0 ? "var(--green)" : "#f87171" }}>
                       {remaining >= 0
                         ? `${remaining.toLocaleString()} kcal übrig`

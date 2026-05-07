@@ -153,9 +153,9 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
   // ── P8: Kleine Erfolge — Tages-Meilensteine ──
   const miniMilestones = [];
   if ((dailyLog || []).length >= 3) miniMilestones.push({ iconName: 'UtensilsCrossed', text: '3 Mahlzeiten heute' });
-  if (totalProtein >= 100)  miniMilestones.push({ iconName: 'Dumbbell',        text: '100g Protein erreicht' });
-  if (pct >= 100)           miniMilestones.push({ iconName: 'Target',           text: 'Tagesziel erreicht' });
-  if (pct >= 50 && pct < 100) miniMilestones.push({ iconName: 'TrendingUp',    text: 'Halbzeit geschafft' });
+  if (totalProtein >= 100)  miniMilestones.push({ iconName: 'Dumbbell',        text: t('home.milestone_protein') });
+  if (pct >= 100)           miniMilestones.push({ iconName: 'Target',           text: t('home.milestone_goal') });
+  if (pct >= 50 && pct < 100) miniMilestones.push({ iconName: 'TrendingUp',    text: t('home.milestone_halfway') });
 
   // ── Toast Feedback ──
   const [toast, setToast] = useState({ show: false, message: '' });
@@ -283,7 +283,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>
                   {daysTrackedThisWeek}/7
                 </div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>diese Woche</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('common.this_week')}</div>
               </div>
             )}
           </div>
@@ -484,10 +484,10 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
         {(dailyLog || []).length > 0 && (
           <div className="home-section">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 className="home-section-title" style={{ marginBottom: 0 }}>Heutige Mahlzeiten</h2>
+              <h2 className="home-section-title" style={{ marginBottom: 0 }}>{t('home.todays_meals')}</h2>
               <button className="btn btn-ghost btn-sm" onClick={() => setActiveSection('nutrition')}
                 style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                Alle ansehen <ChevronRight size={14} />
+                {t('common.see_all')} <ChevronRight size={14} />
               </button>
             </div>
             <div className="recent-meals">

@@ -188,7 +188,7 @@ export default function WorkoutTracker({ user, profile }) {
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
               <div>
-                <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 6 }}>Training</h1>
+                <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 6 }}>{t('nav.training')}</h1>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
                   Erstelle Pläne, tracke deine Workouts und verfolge deinen Fortschritt.
                 </p>
