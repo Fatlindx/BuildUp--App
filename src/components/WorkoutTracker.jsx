@@ -370,6 +370,7 @@ function PlansView({ plans, loading, onEdit, onDelete, onStart, onNew, history }
 
 // ── TEMPLATES SECTION ──────────────────────────────────────────────────────
 function TemplatesSection({ onUseTemplate }) {
+  const { t } = useI18n();
   return (
     <div>
       <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -410,6 +411,7 @@ function TemplatesSection({ onUseTemplate }) {
 
 // ── CREATE VIEW ────────────────────────────────────────────────────────────
 function CreateView({ editPlan, user, onSaved }) {
+  const { t } = useI18n();
   const [name, setName]             = useState(editPlan?.name || '');
   const [desc, setDesc]             = useState(editPlan?.description || '');
   const [days, setDays]             = useState(editPlan?.days || []);
@@ -457,7 +459,7 @@ function CreateView({ editPlan, user, onSaved }) {
   };
 
   const savePlan = async () => {
-    if (!name.trim()) { alert('Bitte gib einen Namen ein.'); return; }
+    if (!name.trim()) { alert(t('training.plan_name') + ' ' + t('common.error')); return; }
     setSaving(true);
     try {
     const payload = { user_id: user.id, name: name.trim(), description: desc.trim(), plan_data: { days } };
@@ -691,6 +693,7 @@ function CreateView({ editPlan, user, onSaved }) {
 
 // ── WORKOUT VIEW ───────────────────────────────────────────────────────────
 function WorkoutView({ plan, user, onDone, onBack }) {
+  const { t } = useI18n();
   const days = plan?.plan_data?.days || [];
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [setsDone, setSetsDone]   = useState({});
