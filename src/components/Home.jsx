@@ -3,6 +3,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
+import { exercises } from '../data/exercises';
 
 // ── Dynamische Motivations-Texte ──
 function getDynamicStatus(pct, totalCalories, calorieGoal, dailyLog, hour, t) {
@@ -429,7 +430,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('exercises')}>
               <div className="mini-stat-icon"><Dumbbell size={22} strokeWidth={1.5} color="var(--text-secondary)" /></div>
-              <div className="mini-stat-value">71</div>
+              <div className="mini-stat-value">{exercises.length}</div>
               <div className="mini-stat-label">{t('home.exercises_available')}</div>
             </div>
             <div className="mini-stat-card" onClick={() => setActiveSection('progress')}>
@@ -461,7 +462,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                 <Dumbbell size={24} color="#3b82f6" strokeWidth={1.8} />
               </div>
               <div className="qa-label">{t('home.discover_exercises')}</div>
-              <div className="qa-sub">71 {t('nav.exercises')}</div>
+              <div className="qa-sub">{exercises.length} {t('nav.exercises')}</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('calculator')}>
               <div className="qa-icon" style={{ background: 'rgba(239,68,68,0.15)' }}>

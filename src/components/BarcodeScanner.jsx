@@ -957,15 +957,35 @@ async function lookupBarcode(barcode) {
 // ─── UI Komponente ──────────────────────────────────────────────────────────
 export default function BarcodeScanner({ onAddFood, onClose }) {
   const { t } = useI18n();
-  const scannerRef = useRef(null);
+  const scannerRef  = useRef(null);
+  const isMounted   = useRef(true);
   const [phase, setPhase]       = useState('scanning'); // scanning | loading | found | notfound | error | manual
   const [product, setProduct]   = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [manual, setManual]     = useState({ name: '', calories: '', protein: '', carbs: '', fat: '' });
 
   useEffect(() => {
+    isMounted.current = true;
+    // FIX 2: Lock body scroll while scanner is open
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
     startScanner();
-    return () => { scannerRef.current?.stop().catch(() => {}); };
+
+    return () => {
+      isMounted.current = false;
+      // FIX 2: Restore scroll on unmount
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      // FIX 1: Clean stop on unmount
+      const sc = scannerRef.current;
+      if (sc) {
+        sc.stop().catch(() => {}).finally(() => {
+          try { sc.clear(); } catch {}
+          scannerRef.current = null;
+        });
+      }
+    };
   }, []);
 
   function startScanner() {
@@ -976,9 +996,12 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 280, height: 160 } },
         async (code) => {
-          await scanner.stop();
+          if (!isMounted.current) return;
+          try { await scanner.stop(); } catch {}
+          if (!isMounted.current) return;
           setPhase('loading');
           const result = await lookupBarcode(code);
+          if (!isMounted.current) return;
 
           if (result.status === 'found') {
             setProduct(result.product);
@@ -995,6 +1018,7 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
       )
       .then(() => {})
       .catch(() => {
+        if (!isMounted.current) return;
         setErrorMsg(t('scanner.camera_error'));
         setPhase('error');
       });
@@ -1034,7 +1058,16 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
     setProduct(null);
     setErrorMsg('');
     setPhase('scanning');
-    setTimeout(() => startScanner(), 100);
+    const sc = scannerRef.current;
+    if (sc) {
+      sc.stop().catch(() => {}).finally(() => {
+        try { sc.clear(); } catch {}
+        scannerRef.current = null;
+        if (isMounted.current) setTimeout(() => startScanner(), 150);
+      });
+    } else {
+      setTimeout(() => startScanner(), 150);
+    }
   }
 
   const sourceLabel = {
@@ -1058,7 +1091,7 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
                 {phase === 'loading'  && t('scanner.loading')}
                 {phase === 'found'    && t('scanner.found')}
                 {phase === 'notfound' && t('scanner.not_found_title')}
-                {phase === 'error'    && 'Problem aufgetreten'}
+                {phase === 'error'    && t('scanner.error_title')}
                 {phase === 'manual'   && t('scanner.manual_title')}
               </p>
             </div>

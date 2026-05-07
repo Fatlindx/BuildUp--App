@@ -81,6 +81,7 @@ export const de = {
 
   // Ernährung
   nutrition: {
+    error_title: 'Problem aufgetreten',
     title:          'Ernährungs-Tracker',
     subtitle:       'Verfolge Kalorien und Makronährstoffe.',
     add_meal:       'Mahlzeit hinzufügen',
@@ -100,7 +101,8 @@ export const de = {
     goal_reached:   'Tagesziel erreicht',
     pct_of_goal:    '{pct}% · {n} kcal übrig',
     categories: {
-      all:          'Alle',
+      library_sub: 'professionell dokumentierte Übungen — von Einsteiger bis Elite',
+    all:          'Alle',
       breakfast:    'Frühstück',
       main:         'Hauptgericht',
       snack:        'Snack',
@@ -112,6 +114,7 @@ export const de = {
 
   // Wasser
   water: {
+    error_title: 'Problem aufgetreten',
     title:        'Wassertracker',
     ml_remaining: '{n} ml noch übrig',
     goal_reached: 'Tagesziel erreicht',
@@ -124,8 +127,10 @@ export const de = {
 
   // Übungen
   exercises: {
+    error_title: 'Problem aufgetreten',
     title:        'Übungsbibliothek',
     subtitle:     '{n} professionell dokumentierte Übungen.',
+    library_sub: 'professionell dokumentierte Übungen — von Einsteiger bis Elite',
     all:          'Alle Übungen',
     favorites:    'Favoriten',
     favorites_empty: 'Noch keine Favoriten gespeichert.',
@@ -179,6 +184,7 @@ export const de = {
 
   // Training
   training: {
+    error_title: 'Problem aufgetreten',
     title:          'Trainings-Tracker',
     my_plans:       'Meine Pläne',
     history:        'Verlauf',
@@ -244,6 +250,7 @@ export const de = {
 
   // Fortschritt
   progress: {
+    error_title: 'Problem aufgetreten',
     title:          'Mein Fortschritt',
     subtitle:       'Behalte deine Ziele im Blick.',
     today_cal:      'Heute gegessen',
@@ -349,6 +356,7 @@ export const de = {
 
   // Rechner
   calculator: {
+    error_title: 'Problem aufgetreten',
     title:      'Kalorienrechner',
     subtitle:   'Mifflin-St. Jeor Formel',
     gender:     'Geschlecht',
@@ -370,6 +378,7 @@ export const de = {
 
   // Profil
   profile: {
+    error_title: 'Problem aufgetreten',
     title:          'Profil',
     edit:           'Bearbeiten',
     save:           'Speichern',
@@ -440,6 +449,7 @@ export const de = {
 
   // KI Coach
   coach: {
+    error_title: 'Problem aufgetreten',
     title:            'BuildUp Coach',
     subtitle:         'Persönlicher Coach von {name}',
     goal_label:       'Ziel: {goal}',
@@ -473,6 +483,7 @@ export const de = {
 
   // Scanner
   scanner: {
+    error_title: 'Problem aufgetreten',
     title:          'Barcode scannen',
     aim:            'Barcode in den Rahmen halten',
     loading:        'Produkt wird geladen…',
@@ -577,6 +588,7 @@ export const de = {
     no:        'Nein',
     error:     'Fehler',
     retry:     'Nochmals versuchen',
+    library_sub: 'professionell dokumentierte Übungen — von Einsteiger bis Elite',
     all:       'Alle',
     kcal:      'kcal',
     g:         'g',

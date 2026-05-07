@@ -606,13 +606,13 @@ export default function ExerciseLibrary({ user, profile }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <h1>{t('exercises.title')}</h1>
-            <p>{exercises.length} professionell dokumentierte Übungen — von Einsteiger bis Elite.</p>
+            <p>{exercises.length} {t('exercises.library_sub')}</p>
           </div>
           {/* Tabs: Alle / Favoriten */}
           <div style={{ display: 'flex', gap: 4, background: 'var(--bg-card-2)', borderRadius: 10, padding: 4 }}>
             {[
               { id: 'all',       label: t('exercises.all') },
-              { id: 'favorites', label: `Favoriten${favorites.size > 0 ? ` (${favorites.size})` : ''}` },
+              { id: 'favorites', label: `${t('exercises.favorites')}${favorites.size > 0 ? ` (${favorites.size})` : ''}` },
             ].map(t => (
               <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
                 padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,

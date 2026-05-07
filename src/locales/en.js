@@ -76,6 +76,7 @@ export const en = {
   },
 
   nutrition: {
+    error_title: 'Something went wrong',
     title:          'Nutrition Tracker',
     subtitle:       'Track calories and macronutrients.',
     add_meal:       'Add meal',
@@ -95,7 +96,8 @@ export const en = {
     goal_reached:   'Daily goal reached',
     pct_of_goal:    '{pct}% · {n} kcal left',
     categories: {
-      all:          'All',
+      library_sub: 'professionally documented exercises — beginner to elite',
+    all:          'All',
       breakfast:    'Breakfast',
       main:         'Main course',
       snack:        'Snack',
@@ -106,6 +108,7 @@ export const en = {
   },
 
   water: {
+    error_title: 'Something went wrong',
     title:        'Water tracker',
     ml_remaining: '{n} ml remaining',
     goal_reached: 'Daily goal reached',
@@ -117,8 +120,10 @@ export const en = {
   },
 
   exercises: {
+    error_title: 'Something went wrong',
     title:        'Exercise Library',
     subtitle:     '{n} professionally documented exercises.',
+    library_sub: 'professionally documented exercises — beginner to elite',
     all:          'All exercises',
     favorites:    'Favourites',
     favorites_empty: 'No favourites saved yet.',
@@ -171,6 +176,7 @@ export const en = {
   },
 
   training: {
+    error_title: 'Something went wrong',
     title:          'Training Tracker',
     my_plans:       'My Plans',
     history:        'History',
@@ -235,6 +241,7 @@ export const en = {
   },
 
   progress: {
+    error_title: 'Something went wrong',
     title:          'My Progress',
     subtitle:       'Keep your goals in sight.',
     today_cal:      'Eaten today',
@@ -339,6 +346,7 @@ export const en = {
   },
 
   calculator: {
+    error_title: 'Something went wrong',
     title:      'Calorie Calculator',
     subtitle:   'Mifflin-St. Jeor formula',
     gender:     'Gender',
@@ -359,6 +367,7 @@ export const en = {
   },
 
   profile: {
+    error_title: 'Something went wrong',
     title:          'Profile',
     edit:           'Edit',
     save:           'Save',
@@ -427,6 +436,7 @@ export const en = {
   },
 
   coach: {
+    error_title: 'Something went wrong',
     title:            'BuildUp Coach',
     subtitle:         'Personal coach for {name}',
     goal_label:       'Goal: {goal}',
@@ -459,6 +469,7 @@ export const en = {
   },
 
   scanner: {
+    error_title: 'Something went wrong',
     title:          'Scan barcode',
     aim:            'Hold barcode within the frame',
     loading:        'Loading product…',
@@ -561,6 +572,7 @@ export const en = {
     no:        'No',
     error:     'Error',
     retry:     'Try again',
+    library_sub: 'professionally documented exercises — beginner to elite',
     all:       'All',
     kcal:      'kcal',
     g:         'g',

@@ -76,6 +76,7 @@ export const fr = {
   },
 
   nutrition: {
+    error_title: 'Problème survenu',
     title:          'Suivi nutritionnel',
     subtitle:       'Suis tes calories et macronutriments.',
     add_meal:       'Ajouter un repas',
@@ -95,7 +96,8 @@ export const fr = {
     goal_reached:   'Objectif atteint',
     pct_of_goal:    '{pct}% · {n} kcal restantes',
     categories: {
-      all:          'Tout',
+      library_sub: 'exercices documentés professionnellement — débutant à élite',
+    all:          'Tout',
       breakfast:    'Petit-déjeuner',
       main:         'Plat principal',
       snack:        'Snack',
@@ -106,6 +108,7 @@ export const fr = {
   },
 
   water: {
+    error_title: 'Problème survenu',
     title:        'Suivi hydratation',
     ml_remaining: '{n} ml restants',
     goal_reached: 'Objectif atteint',
@@ -117,8 +120,10 @@ export const fr = {
   },
 
   exercises: {
+    error_title: 'Problème survenu',
     title:        'Bibliothèque d\'exercices',
     subtitle:     '{n} exercices documentés.',
+    library_sub: 'exercices documentés professionnellement — débutant à élite',
     all:          'Tous les exercices',
     favorites:    'Favoris',
     favorites_empty: 'Aucun favori enregistré.',
@@ -171,6 +176,7 @@ export const fr = {
   },
 
   training: {
+    error_title: 'Problème survenu',
     title:          'Suivi d\'entraînement',
     my_plans:       'Mes plans',
     history:        'Historique',
@@ -235,6 +241,7 @@ export const fr = {
   },
 
   progress: {
+    error_title: 'Problème survenu',
     title:          'Mes progrès',
     subtitle:       'Garde tes objectifs en vue.',
     today_cal:      'Mangé aujourd\'hui',
@@ -339,6 +346,7 @@ export const fr = {
   },
 
   calculator: {
+    error_title: 'Problème survenu',
     title:      'Calculateur de calories',
     subtitle:   'Formule Mifflin-St. Jeor',
     gender:     'Genre',
@@ -359,6 +367,7 @@ export const fr = {
   },
 
   profile: {
+    error_title: 'Problème survenu',
     title:          'Profil',
     edit:           'Modifier',
     save:           'Enregistrer',
@@ -427,6 +436,7 @@ export const fr = {
   },
 
   coach: {
+    error_title: 'Problème survenu',
     title:            'BuildUp Coach',
     subtitle:         'Coach personnel de {name}',
     goal_label:       'Objectif : {goal}',
@@ -459,6 +469,7 @@ export const fr = {
   },
 
   scanner: {
+    error_title: 'Problème survenu',
     title:          'Scanner un code-barres',
     aim:            'Place le code-barres dans le cadre',
     loading:        'Chargement du produit…',
@@ -561,6 +572,7 @@ export const fr = {
     no:        'Non',
     error:     'Erreur',
     retry:     'Réessayer',
+    library_sub: 'exercices documentés professionnellement — débutant à élite',
     all:       'Tout',
     kcal:      'kcal',
     g:         'g',

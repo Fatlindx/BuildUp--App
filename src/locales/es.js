@@ -76,6 +76,7 @@ export const es = {
   },
 
   nutrition: {
+    error_title: 'Se produjo un problema',
     title:          'Seguimiento nutricional',
     subtitle:       'Registra calorías y macronutrientes.',
     add_meal:       'Añadir comida',
@@ -95,7 +96,8 @@ export const es = {
     goal_reached:   'Meta alcanzada',
     pct_of_goal:    '{pct}% · {n} kcal restantes',
     categories: {
-      all:          'Todo',
+      library_sub: 'ejercicios documentados profesionalmente — principiante a élite',
+    all:          'Todo',
       breakfast:    'Desayuno',
       main:         'Plato principal',
       snack:        'Snack',
@@ -106,6 +108,7 @@ export const es = {
   },
 
   water: {
+    error_title: 'Se produjo un problema',
     title:        'Seguimiento de agua',
     ml_remaining: '{n} ml restantes',
     goal_reached: 'Meta alcanzada',
@@ -117,8 +120,10 @@ export const es = {
   },
 
   exercises: {
+    error_title: 'Se produjo un problema',
     title:        'Biblioteca de ejercicios',
     subtitle:     '{n} ejercicios documentados.',
+    library_sub: 'ejercicios documentados profesionalmente — principiante a élite',
     all:          'Todos los ejercicios',
     favorites:    'Favoritos',
     favorites_empty: 'Sin favoritos guardados.',
@@ -171,6 +176,7 @@ export const es = {
   },
 
   training: {
+    error_title: 'Se produjo un problema',
     title:          'Seguimiento de entrenamiento',
     my_plans:       'Mis planes',
     history:        'Historial',
@@ -235,6 +241,7 @@ export const es = {
   },
 
   progress: {
+    error_title: 'Se produjo un problema',
     title:          'Mi progreso',
     subtitle:       'Ten tus metas a la vista.',
     today_cal:      'Comido hoy',
@@ -339,6 +346,7 @@ export const es = {
   },
 
   calculator: {
+    error_title: 'Se produjo un problema',
     title:      'Calculadora de calorías',
     subtitle:   'Fórmula Mifflin-St. Jeor',
     gender:     'Género',
@@ -359,6 +367,7 @@ export const es = {
   },
 
   profile: {
+    error_title: 'Se produjo un problema',
     title:          'Perfil',
     edit:           'Editar',
     save:           'Guardar',
@@ -427,6 +436,7 @@ export const es = {
   },
 
   coach: {
+    error_title: 'Se produjo un problema',
     title:            'BuildUp Coach',
     subtitle:         'Coach personal de {name}',
     goal_label:       'Objetivo: {goal}',
@@ -459,6 +469,7 @@ export const es = {
   },
 
   scanner: {
+    error_title: 'Se produjo un problema',
     title:          'Escanear código de barras',
     aim:            'Coloca el código en el marco',
     loading:        'Cargando producto…',
@@ -561,6 +572,7 @@ export const es = {
     no:        'No',
     error:     'Error',
     retry:     'Reintentar',
+    library_sub: 'ejercicios documentados profesionalmente — principiante a élite',
     all:       'Todo',
     kcal:      'kcal',
     g:         'g',
