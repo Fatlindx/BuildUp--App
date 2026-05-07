@@ -553,6 +553,8 @@ export const de = {
     workout_saved: '✓ Workout gespeichert',
     goal_saved: '✓ Ziel aktualisiert',
     profile_saved: '✓ Profil gespeichert',
+    lang_changed: '✓ Sprache gespeichert',
+    save_error: 'Fehler beim Speichern',
   },
   common: {
     loading:   'Lädt…',

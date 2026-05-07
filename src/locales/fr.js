@@ -537,6 +537,8 @@ export const fr = {
     workout_saved: '✓ Séance enregistrée',
     goal_saved: '✓ Objectif mis à jour',
     profile_saved: '✓ Profil enregistré',
+    lang_changed: '✓ Langue enregistrée',
+    save_error: 'Erreur lors de la sauvegarde',
   },
   common: {
     loading:   'Chargement…',

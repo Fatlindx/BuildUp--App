@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n.jsx';
+import { useToast, Toast } from './useToast.jsx';
 import { Minus, Droplets, Trophy } from 'lucide-react';
 
 const WATER_GOAL = 8; // Gläser
@@ -7,6 +8,7 @@ const ML_PER_GLASS = 250;
 
 export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
   const { t } = useI18n();
+  const { toast, show: showToast } = useToast();
   const [animating, setAnimating] = useState(false);
   const [lastAction, setLastAction] = useState(null);
 
@@ -27,7 +29,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
     if (waterGlasses >= WATER_GOAL) return;
     setLastAction('add');
     setAnimating(true);
-    setWaterGlasses(g => Math.min(g + 1, WATER_GOAL));
+    setWaterGlasses(g => Math.min(g + 1, WATER_GOAL)); showToast(t('toast.water_added'), 'success', 1400);
     setTimeout(() => setAnimating(false), 400);
   };
 
@@ -207,6 +209,7 @@ export default function WaterTracker({ waterGlasses, setWaterGlasses }) {
           ? t('water.nudge_done')
           : `Noch ${remaining} Glas${remaining !== 1 ? 'er' : ''} bis zum Tagesziel. Gut gemacht!`}
       </div>
+      <Toast toast={toast} />
     </div>
   );
 }

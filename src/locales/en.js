@@ -537,6 +537,8 @@ export const en = {
     workout_saved: '✓ Workout saved',
     goal_saved: '✓ Goal updated',
     profile_saved: '✓ Profile saved',
+    lang_changed: '✓ Language saved',
+    save_error: 'Error saving',
   },
   common: {
     loading:   'Loading…',
