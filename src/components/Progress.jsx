@@ -543,7 +543,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: 13 }}>
               {weightLoaded && weightLog.length === 0 ? (
                 <><Scale size={32} strokeWidth={1.2} color="var(--text-muted)" style={{ marginBottom: 10, display: 'block', margin: '0 auto 10px' }} />
-                Noch kein Gewicht eingetragen.<br /><span style={{ fontSize: 12 }}>Trag täglich dein Gewicht ein um deinen Verlauf zu sehen.</span></>
+                Noch kein Gewicht eingetragen.<br /><span style={{ fontSize: 12 }}>{t('progress.log_tomorrow')}</span></>
               ) : weightLog.length === 1 ? t('progress.log_tomorrow') : 'Lädt...'}
             </div>
           )}
@@ -652,7 +652,7 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             </div>
             <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
               {totalDaysLogged === 0
-                ? 'Fang heute an – jede Mahlzeit bringt dich näher ans Ziel.'
+                ? t('progress.stay_on_track_sub')
                 : streak >= 30
                   ? `${streak} Tage in Folge. Bemerkenswerte Disziplin.`
                   : streak >= 14
@@ -670,9 +670,9 @@ export default function Progress({ calorieGoal, dailyLog, logHistory, user, prof
             {daysWithData > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 {[
-                  { label: 'Tage getrackt',  value: `${daysWithData}/7`,       color: 'var(--green)' },
-                  { label: 'Ø Kalorien',     value: `${avgKcal.toLocaleString()} kcal`, color: 'var(--blue-light)' },
-                  { label: 'On Track Tage',  value: `${daysOnTrack} Tage`,     color: 'var(--green-bright)' },
+                  { label: t('progress.days_tracked'), value: `${daysWithData}/7`,       color: 'var(--green)' },
+                  { label: t('progress.avg_calories'), value: `${avgKcal.toLocaleString()} kcal`, color: 'var(--blue-light)' },
+                  { label: t('progress.on_track_days'), value: `${daysOnTrack} ${t('common.days')}`,     color: 'var(--green-bright)' },
                 ].map(s => (
                   <div key={s.label} style={{
                     background: 'var(--bg-card-2)', border: '1px solid var(--border)',

@@ -22,7 +22,9 @@ const setsRepsMap = {
 
 function DifficultyBadge({ level }) {
   const cls = { Leicht: 'badge-leicht', Mittel: 'badge-mittel', Schwer: 'badge-schwer' };
-  return <span className={`badge ${cls[level] || 'badge-gray'}`}>{level}</span>;
+  const { t } = useI18n();
+  const labels = { Leicht: t('exercises.diff_easy'), Mittel: t('exercises.diff_medium'), Schwer: t('exercises.diff_hard') };
+  return <span className={`badge ${cls[level] || 'badge-gray'}`}>{labels[level] || level}</span>;
 }
 
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
@@ -90,7 +92,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
               {/* Favoriten Button */}
               <button
                 onClick={() => onToggleFavorite(exercise.id)}
-                title={isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+                title={isFavorite ? 'Aus Favoriten entfernen' : t('exercises.add_to_fav')}
                 style={{
                   width: 36, height: 36, borderRadius: '50%',
                   background: isFavorite ? 'rgba(239,68,68,0.15)' : 'var(--bg-card-2)',
@@ -230,7 +232,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
 
             {/* Ausführung */}
             <div className="modal-section">
-              <h4>Ausführung — Schritt für Schritt</h4>
+              <h4>{t('exercises.execution')}</h4>
               <ol className="step-list">
                 {exercise.instructions.map((step, i) => (
                   <li key={i}>
@@ -253,7 +255,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
 
             {/* Fehler */}
             <div className="modal-section">
-              <h4>Häufige Fehler vermeiden</h4>
+              <h4>{t('exercises.about')}</h4>
               <ul className="tip-list mistake-list">
                 {exercise.commonMistakes.map((m, i) => <li key={i}>{m}</li>)}
               </ul>
@@ -285,7 +287,7 @@ function ExerciseModal({ exercise, onClose, isFavorite, onToggleFavorite, userGo
               }}
             >
               <Heart size={16} fill={isFavorite ? 'var(--red)' : 'none'} />
-              {isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+              {isFavorite ? 'Aus Favoriten entfernen' : t('exercises.add_to_fav')}
             </button>
           </div>
         </div>
@@ -479,6 +481,13 @@ function FilterPanel({ filterMuscle, setFilterMuscle, filterDiff, setFilterDiff,
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function ExerciseLibrary({ user, profile }) {
   const { t } = useI18n();
+  const setsRepsMap = {
+    Muskelaufbau:        { sets: '3–4', reps: '8–12',  rest: '60–90s',  note: t('exercises.note_hypertrophy'), prog: t('exercises.prog_add_weight') },
+    'Gewicht verlieren': { sets: '3',   reps: '15–20', rest: '30–45s',  note: t('exercises.note_high_volume'), prog: t('exercises.prog_increase_reps') },
+    Kraft:               { sets: '4–5', reps: '3–6',   rest: '3–5 min', note: t('exercises.note_max_strength'), prog: t('exercises.prog_add_sets') },
+    Ausdauer:            { sets: '2–3', reps: '20–25', rest: '20–30s',  note: t('exercises.note_endurance'),   prog: t('exercises.prog_biweekly') },
+    Standard:            { sets: '3',   reps: '10–15', rest: '60s',     note: t('exercises.note_general'),     prog: t('exercises.prog_biweekly') },
+  };
   const [search,        setSearch]        = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterMuscle,  setFilterMuscle]  = useState('Alle');

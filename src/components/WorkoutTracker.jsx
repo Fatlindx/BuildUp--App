@@ -36,7 +36,7 @@ const TEMPLATES = [
   },
   {
     name: 'Upper / Lower',
-    description: '4-Tage Split für Muskelaufbau',
+    description: t('training.template_split_desc'),
     days: [
       { id: 'u1', name: 'Upper A', exercises: [
         { exerciseId: 'bench-press', sets: 4, reps: 8, weight: 60 },
@@ -52,7 +52,7 @@ const TEMPLATES = [
   },
   {
     name: 'Ganzkörper',
-    description: '3x pro Woche, ideal für Einsteiger',
+    description: t('training.template_fullbody_desc'),
     days: [
       { id: 'g1', name: 'Ganzkörper A', exercises: [
         { exerciseId: 'squat', sets: 3, reps: 10, weight: 50 },
@@ -545,7 +545,7 @@ function CreateView({ editPlan, user, onSaved }) {
           {!currentDay ? (
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 48, textAlign: 'center', color: 'var(--text-muted)' }}>
               <Dumbbell size={32} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 12px' }} />
-              <p style={{ fontSize: 14 }}>Wähle einen Tag oder füge einen neuen hinzu</p>
+              <p style={{ fontSize: 14 }}>{t('training.select_day_hint')}</p>
             </div>
           ) : (
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 24 }}>

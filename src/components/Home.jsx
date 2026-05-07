@@ -363,14 +363,14 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                 }}>
                   {totalCalories.toLocaleString()}
                 </div>
-                <div className="stat-sublabel">von {calorieGoal.toLocaleString()} kcal</div>
+                <div className="stat-sublabel">{t('home.of_goal').replace('{goal}', calorieGoal.toLocaleString())}</div>
                 <div className="stat-remaining" style={{ marginTop: 8 }}>
                   {remaining > 0
                     ? <span style={{ color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 5 }}>
                         <Flame size={13} /> {t('home.remaining').replace('{n}', remaining.toLocaleString())}
                       </span>
                     : <span style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700 }}>
-                        <CheckCircle2 size={13} /> Tagesziel erreicht!
+                        <CheckCircle2 size={13} /> {t('home.goal_reached')}
                       </span>}
                 </div>
 
@@ -381,7 +381,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                     display: 'flex', alignItems: 'center', gap: 4,
                   }}>
                     <UtensilsCrossed size={11} />
-                    {(dailyLog || []).length} {(dailyLog || []).length === 1 ? 'Mahlzeit' : 'Mahlzeiten'} heute
+                    {(dailyLog || []).length} {t('home.meals_today')}
                   </div>
                 )}
               </div>
@@ -404,7 +404,7 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
                     {Math.round(pct)}%
                   </text>
                   <text x="65" y="78" textAnchor="middle" fill="var(--text-secondary)" fontSize="10">
-                    {pct >= 100 ? 'Ziel' : 'Ziel'}
+                    {t('home.goal_set')}
                   </text>
                 </svg>
               </div>

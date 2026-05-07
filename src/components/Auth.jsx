@@ -3,38 +3,37 @@ import { useI18n } from '../i18n.jsx';
 import { supabase } from '../supabase';
 import { Mail, Lock, User, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
-// ── Fehlermeldungen auf Deutsch ──
-function translateError(message) {
+// ── Fehlermeldungen via i18n ──
+function translateError(message, t) {
   const msg = message?.toLowerCase() || '';
   if (msg.includes('invalid login credentials') || msg.includes('invalid email or password'))
-    return 'E-Mail oder Passwort ist falsch.';
+    return t('auth_errors.err_invalid_credentials');
   if (msg.includes('email not confirmed'))
-    return 'Bitte bestätige zuerst deine E-Mail-Adresse.';
+    return t('auth_errors.err_email_not_confirmed');
   if (msg.includes('user already registered') || msg.includes('already been registered'))
-    return 'Diese E-Mail-Adresse ist bereits registriert.';
+    return t('auth_errors.err_already_registered');
   if (msg.includes('password should be at least'))
-    return 'Das Passwort muss mindestens 6 Zeichen lang sein.';
+    return t('auth_errors.err_password_too_short');
   if (msg.includes('unable to validate email address') || msg.includes('invalid email'))
-    return 'Bitte gib eine gültige E-Mail-Adresse ein.';
+    return t('auth_errors.err_invalid_email');
   if (msg.includes('email rate limit') || msg.includes('too many requests'))
-    return 'Zu viele Versuche. Bitte warte kurz und versuche es erneut.';
+    return t('auth_errors.err_rate_limit');
   if (msg.includes('network') || msg.includes('fetch'))
-    return 'Verbindungsfehler. Bitte prüfe deine Internetverbindung.';
+    return t('auth_errors.err_network');
   if (msg.includes('signup is disabled'))
-    return 'Registrierung ist momentan nicht verfügbar.';
-  // Fallback: original message
-  return 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';
+    return t('auth_errors.err_signup_disabled');
+  return t('auth_errors.err_generic');
 }
 
 // ── Validierung vor dem API-Call ──
-function validate(mode, email, password, username) {
-  if (!email.trim()) return 'Bitte gib deine E-Mail-Adresse ein.';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Bitte gib eine gültige E-Mail-Adresse ein.';
+function validate(mode, email, password, username, t) {
+  if (!email.trim()) return t('auth_errors.err_enter_email');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return t('auth_errors.err_invalid_email');
   if (mode === 'forgot') return null;
-  if (!password) return 'Bitte gib dein Passwort ein.';
+  if (!password) return t('auth_errors.err_enter_password');
   if (mode === 'register') {
     if (!username.trim()) return 'Bitte gib einen Benutzernamen ein.';
-    if (username.trim().length < 3) return 'Der Benutzername muss mindestens 3 Zeichen lang sein.';
+    if (username.trim().length < 3) return t('auth_errors.err_username_short');
     if (password.length < 6) return 'Das Passwort muss mindestens 6 Zeichen lang sein.';
   }
   return null;
@@ -62,7 +61,7 @@ export default function Auth({ onLogin }) {
     setSuccess('');
 
     // Client-seitige Validierung zuerst
-    const validationError = validate(mode, email, password, username);
+    const validationError = validate(mode, email, password, username, t);
     if (validationError) {
       setError(validationError);
       return;
@@ -92,7 +91,7 @@ export default function Auth({ onLogin }) {
           redirectTo: window.location.origin,
         });
         if (error) throw error;
-        setSuccess('Reset-E-Mail gesendet! Prüfe deinen Posteingang.');
+        setSuccess(t('auth.reset_sent'));
       }
     } catch (e) {
       setError(translateError(e.message));
@@ -122,7 +121,7 @@ export default function Auth({ onLogin }) {
             BuildUp
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-            {mode === 'login'    ? 'Willkommen zurück!' :
+            {mode === 'login'    ? t('auth.login_title') :
              mode === 'register' ? 'Erstelle dein kostenloses Konto' :
                                    t('auth.reset_password')}
           </p>

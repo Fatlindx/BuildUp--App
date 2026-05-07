@@ -424,8 +424,8 @@ function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t) {
   const remaining = calorieGoal - totalCal;
 
   if (profile?.goal === 'Muskelaufbau') {
-    questions.push('Wie viel Protein brauche ich täglich?');
-    questions.push('Was sind die besten Übungen für Muskelaufbau?');
+    questions.push(t('coach.q7'));
+    questions.push(t('coach.q8'));
   } else if (profile?.goal === 'Gewicht verlieren') {
     questions.push('Wie erstelle ich ein Kaloriendefizit?');
     questions.push('Welches Training verbrennt am meisten Kalorien?');
@@ -445,7 +445,7 @@ function buildQuickQuestions(profile, totalCal, calorieGoal, totalProt, t) {
   if (profile?.weight && profile?.height) {
     questions.push(t('coach.q5'));
   } else {
-    questions.push('Wie viel Wasser sollte ich täglich trinken?');
+    questions.push(t('coach.q9'));
   }
 
   questions.push(t('coach.q6'));

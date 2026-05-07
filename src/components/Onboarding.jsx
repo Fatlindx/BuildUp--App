@@ -23,13 +23,13 @@ function calculateNutrition(data) {
   let calories, strategy;
   if (goal === 'Muskelaufbau') {
     calories = tdee + 300;
-    strategy = 'Kalorienüberschuss +300 kcal';
+    strategy = 'strategy_surplus';
   } else if (goal === 'Gewicht verlieren') {
     calories = tdee - 400;
-    strategy = 'Kaloriendefizit -400 kcal';
+    strategy = 'strategy_deficit';
   } else {
     calories = tdee;
-    strategy = 'Kalorienbilanz ausgeglichen';
+    strategy = 'strategy_balanced';
   }
 
   // Makros
@@ -344,7 +344,7 @@ export default function Onboarding({ user, onComplete }) {
                   background: 'var(--green-glow)', border: '1px solid var(--border-active)',
                   borderRadius: 100, padding: '3px 12px', display: 'inline-block',
                 }}>
-                  {nutrition.strategy}
+                  {t('onboarding.' + nutrition.strategy)}
                 </div>
               </div>
 
