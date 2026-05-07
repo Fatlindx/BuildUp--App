@@ -959,6 +959,7 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
   const { t } = useI18n();
   const scannerRef  = useRef(null);
   const isMounted   = useRef(true);
+  const isRunning   = useRef(false);
   const [phase, setPhase]       = useState('scanning'); // scanning | loading | found | notfound | error | manual
   const [product, setProduct]   = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -977,10 +978,12 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
       // FIX 2: Restore scroll on unmount
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
-      // FIX 1: Clean stop on unmount
+      // FIX 1: Clean stop on unmount — only if still running
       const sc = scannerRef.current;
       if (sc) {
-        sc.stop().catch(() => {}).finally(() => {
+        const stopPromise = isRunning.current ? sc.stop().catch(() => {}) : Promise.resolve();
+        stopPromise.finally(() => {
+          isRunning.current = false;
           try { sc.clear(); } catch {}
           scannerRef.current = null;
         });
@@ -997,7 +1000,10 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
         { fps: 10, qrbox: { width: 280, height: 160 } },
         async (code) => {
           if (!isMounted.current) return;
-          try { await scanner.stop(); } catch {}
+          if (isRunning.current) {
+            try { await scanner.stop(); } catch {}
+            isRunning.current = false;
+          }
           if (!isMounted.current) return;
           setPhase('loading');
           const result = await lookupBarcode(code);
@@ -1016,8 +1022,9 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
         },
         () => {} // Kein Fehler bei jedem nicht-erkannten Frame
       )
-      .then(() => {})
+      .then(() => { isRunning.current = true; })
       .catch(() => {
+        isRunning.current = false;
         if (!isMounted.current) return;
         setErrorMsg(t('scanner.camera_error'));
         setPhase('error');
@@ -1060,7 +1067,9 @@ export default function BarcodeScanner({ onAddFood, onClose }) {
     setPhase('scanning');
     const sc = scannerRef.current;
     if (sc) {
-      sc.stop().catch(() => {}).finally(() => {
+      const stopP = isRunning.current ? sc.stop().catch(() => {}) : Promise.resolve();
+      stopP.finally(() => {
+        isRunning.current = false;
         try { sc.clear(); } catch {}
         scannerRef.current = null;
         if (isMounted.current) setTimeout(() => startScanner(), 150);
