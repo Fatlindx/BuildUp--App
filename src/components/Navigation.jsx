@@ -256,7 +256,7 @@ export default function Navigation({
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
-                    <item.icon size={14} color="var(--text-muted)" strokeWidth={1.8} />
+                    <item.icon size={16} color="var(--text-secondary, var(--text-muted))" strokeWidth={1.8} />
                   </div>
                   <span style={{ fontSize: 14, color: 'var(--text)', fontWeight: 400 }}>
                     {item.label}
@@ -275,18 +275,19 @@ export default function Navigation({
                 display: 'flex', alignItems: 'center', gap: 12,
                 padding: '12px 20px', background: 'none', border: 'none',
                 cursor: 'pointer', textAlign: 'left',
-                transition: 'background 0.15s ease',
+                transition: 'all 0.15s ease',
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.06)'}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                  background: 'rgba(239,68,68,0.10)',
+                  border: '1px solid rgba(239,68,68,0.22)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <LogOut size={14} color="var(--red)" strokeWidth={1.8} />
+                  <LogOut size={14} color="#ef4444" strokeWidth={2} />
                 </div>
-                <span style={{ fontSize: 14, color: 'var(--red)', fontWeight: 500 }}>
+                <span style={{ fontSize: 14, color: '#ef4444', fontWeight: 500 }}>
                   {t('nav.logout')}
                 </span>
               </button>

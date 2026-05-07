@@ -451,31 +451,31 @@ export default function Home({ setActiveSection, calorieGoal, totalCalories, dai
           <div className="quick-actions-grid">
             <button className="quick-action-card" onClick={() => setActiveSection('nutrition')}>
               <div className="qa-icon" style={{ background: 'rgba(34,197,94,0.15)' }}>
-                <Plus size={22} color="var(--green)" />
+                <Plus size={24} color="#22c55e" strokeWidth={1.8} />
               </div>
               <div className="qa-label">{t('home.add_meal')}</div>
               <div className="qa-sub">{t('home.add_meal_sub')}</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('exercises')}>
               <div className="qa-icon" style={{ background: 'rgba(59,130,246,0.15)' }}>
-                <Dumbbell size={22} color="var(--blue)" />
+                <Dumbbell size={24} color="#3b82f6" strokeWidth={1.8} />
               </div>
               <div className="qa-label">{t('home.discover_exercises')}</div>
-              <div className="qa-sub">71 Übungen</div>
+              <div className="qa-sub">71 {t('nav.exercises')}</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('calculator')}>
               <div className="qa-icon" style={{ background: 'rgba(239,68,68,0.15)' }}>
-                <Calculator size={22} color="var(--red)" />
+                <Calculator size={24} color="#ef4444" strokeWidth={1.8} />
               </div>
               <div className="qa-label">{t('home.calorie_calc')}</div>
-              <div className="qa-sub">Mifflin-St Jeor</div>
+              <div className="qa-sub">{t('home.calorie_calc_sub')}</div>
             </button>
             <button className="quick-action-card" onClick={() => setActiveSection('progress')}>
               <div className="qa-icon" style={{ background: 'rgba(234,179,8,0.15)' }}>
-                <BarChart2 size={22} color="var(--yellow)" />
+                <TrendingUp size={24} color="#eab308" strokeWidth={1.8} />
               </div>
               <div className="qa-label">{t('home.view_progress')}</div>
-              <div className="qa-sub">Statistiken & Ziele</div>
+              <div className="qa-sub">{t('home.view_progress_sub')}</div>
             </button>
           </div>
         </div>
